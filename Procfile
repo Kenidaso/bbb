@@ -1,1 +1,1 @@
-web: node keystone.js
+web: npm run docs && node keystone.js
