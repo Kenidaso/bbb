@@ -1,0 +1,49 @@
+{
+  "name": "sk-news-backend",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@sentry/node": "^5.6.2",
+    "async": "^2.1.4",
+    "bcrypt": "^3.0.6",
+    "cheerio": "^1.0.0-rc.3",
+    "cky-image-public": "^1.1.1",
+    "cloudinary": "^1.14.0",
+    "connect-mongo": "^3.0.0",
+    "cors": "^2.8.5",
+    "debug": "^4.1.1",
+    "dotenv": "4.0.0",
+    "i18n": "^0.8.3",
+    "jsonwebtoken": "^8.5.1",
+    "keystone": "4.0.0-beta.5",
+    "keystone-email": "1.0.5",
+    "lodash": "^4.17.15",
+    "moment": "^2.24.0",
+    "mongoose": "^5.6.11",
+    "multer": "^1.4.2",
+    "pug": "2.0.0-beta11",
+    "redis": "^2.8.0",
+    "request": "^2.88.0",
+    "require-dir": "^1.2.0",
+    "short-id-gen": "^1.1.2",
+    "unidecode": "^0.1.8",
+    "uuid": "^3.3.3",
+    "xml2js": "^0.4.22"
+  },
+  "devDependencies": {
+    "eslint": "3.15.0",
+    "eslint-config-keystone": "3.0.0",
+    "eslint-plugin-react": "^5.1.1",
+    "nodemon": "^1.19.1"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "start": "DEBUG=*routes*,*Service*,*Model*,FATAL nodemon keystone.js",
+    "docs": "apidoc -i routes/controllers -o public/docs",
+    "postinstall": "cp cheats/cloudinaryResize.js node_modules/keystone/admin/client/utils && cp cheats/CloudinaryImagesField.js node_modules/keystone/fields/types/cloudinaryimages && cp cheats/CloudinaryImageField.js node_modules/keystone/fields/types/cloudinaryimage && cp -f ./public/images/newspaper.png ./node_modules/keystone/admin/public/images/logo.png && cp -f cheats/Brand.js node_modules/keystone/admin/client/Signin/components/Brand.js"
+  },
+  "engines": {
+    "node": ">= 10.15.3",
+    "npm": ">= 5.0.0"
+  }
+}

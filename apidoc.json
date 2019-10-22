@@ -1,0 +1,8 @@
+{
+  "name": "API Sk News Server",
+  "version": "1.0.0",
+  "description": "API Document for Internal.",
+  "title": "News",
+  "url" : "http://sk-news-backend.herokuapp.com",
+  "eg" : "http://apidocjs.com/source/example_full/example.js"
+}
