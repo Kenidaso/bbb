@@ -1,10 +1,9 @@
 const parseXml = require('xml2js').parseString;
 const moment = require('moment');
-const async = require('async');
 
 const request = require('request').defaults({
 	headers: {
-		authority: 'vnexpress.net',
+		// authority: 'vnexpress.net',
 		'cache-control': 'max-age=0',
 		'upgrade-insecure-requests': 1,
 		dnt: 1,
@@ -19,15 +18,17 @@ const request = require('request').defaults({
 
 const MODIFIED_SINCE_FORMAT = 'ddd, DD MMM YYYY HH:mm:ss'
 
-console.log('if-modified-since=', moment().utcOffset(0).format(MODIFIED_SINCE_FORMAT) + ' GMT');
+const noop = () => {}
 
-const fetch = (link, callback) => {
+const fetch = (opts = {}, callback = noop) => {
+	if (!opts.link) return callback('EMISSINGLINK');
+
 	request({
-		url: link,
-		method: 'GET',
-		headers: {
+		url: opts.link,
+		method: opts.method || 'GET',
+		headers: Object.assign({}, {
 			'if-modified-since': `${moment().utcOffset(0).format(MODIFIED_SINCE_FORMAT)} GMT`
-		}
+		}, opts.headers || {})
 	}, (err, response, body) => {
 		if (err) return callback(err);
 		if (!body) return callback(null, null);
@@ -38,6 +39,4 @@ const fetch = (link, callback) => {
 	});
 }
 
-module.exports = {
-	fetch
-}
+module.exports = fetch

@@ -16,15 +16,15 @@ const Rss = new keystone.List('Rss', {
   	updatedBy: true
 	},
 	perPage: 20,
-	defaultColumns: 'title content heroImage',
+	defaultColumns: 'title url category host',
 	defaultSort: '-updatedAt'
 });
 
 Rss.add({
 	title: { type: String, reqired: true, initial: true },
 	url: { type: Types.Url, required: true, initial: true },
-	category: { type: Types.Relationship, ref: 'Category' },
-	host: { type: Types.Relationship, ref: 'Host' },
+	category: { type: Types.Relationship, ref: 'Category', initial: true },
+	host: { type: Types.Relationship, ref: 'Host', initial: true },
 });
 
 Rss.register();

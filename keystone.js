@@ -87,6 +87,7 @@ keystone.set('nav', {
 		'feeds',
 		'Rss',
 		'CrawlLog',
+		'CmdExec',
 	]
 });
 

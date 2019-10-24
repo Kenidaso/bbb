@@ -9,7 +9,7 @@ let { host_names } = configModel;
  */
 
 const Host = new keystone.List('Host', {
-	map: { name: 'name' },
+	map: { name: 'website' },
 	autokey: { from: 'website', path: 'slug', unique: true },
 	track: {
 		createdAt: true,
@@ -30,7 +30,8 @@ Host.add({
 		initial: true,
 		index: true
 	},
-	website: { type: String, type: Types.Url }
+	website: { type: Types.Url, initial: true },
+	engine: { type: String, initial: true }, // tên engine sử dụng
 });
 
 Host.register();
