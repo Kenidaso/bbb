@@ -30,7 +30,8 @@ Category.add({
 	// 	required: true
 	// },
 	title: {
-		type: String
+		type: String,
+		initial: true
 	},
 	display: { type: String, required: true, initial: true },
 });
