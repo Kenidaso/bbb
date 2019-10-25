@@ -93,6 +93,8 @@ const procOneNews = (engine, objRss, callback) => {
 		},
 
 		save_news: (next) => {
+			if (!objRss._content) return next('ENOCONTENT');
+
 			const FeedModel = keystone.list('Feed').model;
 
 			FeedModel.findOne({
