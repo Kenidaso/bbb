@@ -19,17 +19,26 @@ const Category = new keystone.List('Category', {
   	updatedBy: true
 	},
 	perPage: 20,
-	defaultColumns: 'title',
+	defaultColumns: 'title display',
 	defaultSort: '-updatedAt'
 });
 
 Category.add({
+	// title: {
+	// 	type: Types.Select,
+	// 	options: category_titles.options,
+	// 	required: true
+	// },
 	title: {
-		type: Types.Select,
-		options: category_titles.options,
-		required: true
+		type: String
 	},
 	display: { type: String, required: true, initial: true },
+});
+
+Category.schema.pre('save', function (next) {
+	this.title = this.title.toLowerCase();
+
+	return next();
 });
 
 Category.register();

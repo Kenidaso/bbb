@@ -13,6 +13,11 @@ module.exports = {
 			'technology', // cong nghe
 			'entertainment', // giai tri
 			'sport', // the thao
+			'world', // the gioi
+			'business', // kinh doanh
+			'law', // luat
+			'education', // giao duc
+
 		]
 	}
 }
