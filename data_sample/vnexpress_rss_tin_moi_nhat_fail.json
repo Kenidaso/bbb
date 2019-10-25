@@ -1,0 +1,39 @@
+{
+  "rss": {
+    "$": {
+      "version": "2.0"
+    },
+    "channel": [
+      {
+        "title": [
+          "Tin mới nhất - VnExpress RSS"
+        ],
+        "description": [
+          "VnExpress RSS"
+        ],
+        "image": [
+          {
+            "url": [
+              "https://s.vnecdn.net/vnexpress/i/v20/logos/vne_logo_rss.png"
+            ],
+            "title": [
+              "Tin nhanh VnExpress - Đọc báo, tin tức online 24h"
+            ],
+            "link": [
+              "https://vnexpress.net"
+            ]
+          }
+        ],
+        "pubDate": [
+          "Fri, 25 Oct 2019 01:08:43 +0700"
+        ],
+        "generator": [
+          "VnExpress"
+        ],
+        "link": [
+          "https://vnexpress.net/rss/tin-moi-nhat.rss"
+        ]
+      }
+    ]
+  }
+}

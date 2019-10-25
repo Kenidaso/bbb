@@ -10,7 +10,7 @@ const Types = keystone.Field.Types;
  */
 
 const Media = new Schema({
-	url: {
+	src: {
 		type: String
 	},
 
@@ -43,20 +43,22 @@ Feed.add({
 	title: { type: String, required: true },
 	publishDate: { type: Date },
 	link: { type: Types.Url, index: true, unique: true, initial: true },
-	summary: { type: Types.Textarea }, // short content
-	content: { type: Types.Textarea }, // full content
+	description: { type: Types.Textarea }, // short content
 
 	rawHtml: { type: Types.Html, wysiwyg: true },
 
-
-	// heroImage: { type: Media },
-	// images: [ Media ],
-	// videos: [ Media ],
+	category: { type: Types.Relationship, ref: 'Category', initial: true },
+	host: { type: Types.Relationship, ref: 'Host', initial: true },
 });
 
-Feed.schema.add({ heroImage: Media });
-Feed.schema.add({ images: [Media] });
-Feed.schema.add({ videos: [Media] });
+Feed.schema.add({ contentOrder: [Schema.Types.Mixed] }); // full content order
 Feed.schema.add({ metadata: Schema.Types.Mixed });
+Feed.schema.add({ heroImage: Schema.Types.Mixed });
+Feed.schema.add({ images: [Schema.Types.Mixed] });
+Feed.schema.add({ videos: [Schema.Types.Mixed] });
+
+// Feed.schema.add({ heroImage: Media });
+// Feed.schema.add({ images: [Media] });
+// Feed.schema.add({ videos: [Media] });
 
 Feed.register();

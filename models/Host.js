@@ -1,8 +1,14 @@
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
+
 const keystone = require('keystone');
 const Types = keystone.Field.Types;
 
 let configModel = require('../statics/configModel');
 let { host_names } = configModel;
+
+let { minify } = require('../helpers/stringUtils');
+
 /**
  * Host Model
  * =============
@@ -32,6 +38,29 @@ Host.add({
 	},
 	website: { type: Types.Url, initial: true },
 	engine: { type: String, initial: true }, // tên engine sử dụng
+	metadataJson: { type: Types.Textarea },
+	// .container .sidebar_1
+});
+
+Host.schema.add({ metadata: Schema.Types.Mixed });
+
+Host.schema.pre('save', function (next) {
+	if (this.metadataJson) {
+		let _tmp = null;
+		try {
+			_tmp = JSON.parse(this.metadataJson);
+		} catch (ex) {
+			this.metadataJson = ex.toString() + '\n' + this.metadataJson;
+			return next('EPARSEJSON');
+		}
+
+		if (_tmp) {
+			this.metadata = _tmp;
+			this.metadataJson = minify(this.metadataJson);
+		}
+	}
+
+	return next();
 });
 
 Host.register();

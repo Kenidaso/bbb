@@ -3,7 +3,7 @@ module.exports = {
 	  return { errorCode, message, data, statusCode, codeDebug }
 	},
 
-	normalizeText: (text) => {
+	normalizeText: (text = '') => {
 		let result = text.replace(/\s\s/g, ' ').trim();
 		return result;
 	},

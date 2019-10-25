@@ -1,63 +1,164 @@
 const request = require('request');
 const cheerio = require('cheerio');
 const _ = require('lodash');
+const async = require('async');
+const moment = require('moment');
 
+const fetchRss = require('./fetchRss');
 const utils = require('../helpers/utils');
 
-const _parseContent = ($) => {
-	let pubishDate = $('.container .time').text();
-	let title = $('.container .title_news_detail').text();
-	title = utils.normalizeText(title);
-	title = title.replace(/\n/g, '');
+const _parseContent = ($, objRss) => {
+  let pubishDate = $('.container .time').text();
+  let title = $('.container .title_news_detail').text();
+  title = utils.normalizeText(title);
+  title = title.replace(/\n/g, '');
 
-	let description = $('.container .sidebar_1 .description').text();
-	let content = $('article.content_detail p.Normal').text();
-	content = utils.normalizeText(content);
+  let description = $('.container .sidebar_1 .description').text();
 
-	let heroImage = null;
-	let images = [];
+  // let content = $('article.content_detail p.Normal').text();
+  // content = utils.normalizeText(content);
 
-	let imgs = $('article.content_detail img');
-	_.forEach(imgs, (img) => {
-		let src = utils.normalizeText($(img).attr('src'));
-		let description = utils.normalizeText($(img).attr('alt'));
+  let children = $('article.content_detail').contents();
 
-		images.push({
-			src,
-			description,
-		});
-	})
+  let contentOrder = children.map(function () {
 
-	let videos = [];
+    if (this.name === 'p') {
+      return {
+        type: 'text',
+        text: $(this).text().trim()
+      };
+    }
 
-	let result = {
-		pubishDate,
-		title,
-		description,
-		content,
-		images,
-		heroImage,
-		videos,
-	}
+    if (this.name === 'table') {
+      let img = $('img', this);
 
-	return result;
+      return {
+        type: 'image',
+        src: $(img).attr('src'),
+        description: $(img).attr('alt')
+      };
+    }
+
+  }).get();
+  // console.log('contentOrder=', JSON.stringify(contentOrder));
+
+  let heroImage = null;
+  let images = [];
+
+  let imgs = $('article.content_detail img');
+  _.forEach(imgs, (img) => {
+    let src = utils.normalizeText($(img).attr('src'));
+    let description = utils.normalizeText($(img).attr('alt'));
+
+    images.push({
+      src,
+      description,
+    });
+  })
+
+  let videos = [];
+
+  let rawHtml = '';
+  if (objRss && objRss.host && objRss.host.metadata && objRss.host.metadata.mainSelector) {
+    rawHtml = $(objRss.host.metadata.mainSelector).html();
+  }
+
+  let result = {
+    pubishDate,
+    title,
+    description,
+    // content,
+    contentOrder,
+
+    images,
+    heroImage,
+    videos,
+
+    rawHtml
+  }
+
+  return result;
 }
 
-const getContent = (link, callback) => {
-	request({
-		url: link,
-		method: 'GET'
-	}, (err, response, body) => {
-		if (err) return callback('EGETLINK', err);
-		if (!body) return callback('EBODYNULL');
+const getContent = (objRss = {}, callback) => {
+  if (!objRss || !objRss.link) return callback('ERSSNOLINK', objRss);
 
-		const $ = cheerio.load(body);
-		const content = _parseContent($);
+  request({
+    url: objRss.link,
+    method: 'GET'
+  }, (err, response, body) => {
+    if (err) return callback('EVNEXPRESSGETLINK', err);
+    if (!body) return callback('EVNEXPRESSBODYNULL');
 
-		return callback(null, content);
-	});
+    const $ = cheerio.load(body);
+    const content = _parseContent($, objRss);
+
+    objRss._content = content;
+
+    return callback(null, objRss);
+  });
+}
+
+const validateRssResult = (result) => {
+  if (!result) return false;
+
+  let { rss } = result;
+  if (!rss) return false;
+
+  let { channel } = rss;
+  if (!channel || channel.length == 0) return false;
+
+  channel = channel[0];
+
+  let { item } = channel;
+  if (!item || item.length == 0) return false;
+
+  return true;
+}
+
+const getNewsFromRss = (rssUrl, callback) => {
+  let task = (cb) => {
+    console.log('fetching rss ...');
+
+    fetchRss({
+      link: rssUrl
+    }, (err, result) => {
+      if (err) return cb(err);
+
+      let isValid = validateRssResult(result);
+
+      if (!isValid) return cb('ENOITEMINRSS');
+
+      let items = result.rss.channel[0].item;
+      items = items.map((item) => {
+        for (let key in item) {
+          let value = item[key][0];
+          if (value && key == 'description') {
+            try {
+              let $ = cheerio.load(item[key][0]);
+              value = $(value).text().trim();
+            } catch {
+
+            }
+          }
+
+          item[key] = value;
+        }
+
+        return item;
+      });
+
+      return cb(null, items);
+    });
+  }
+
+  async.retry({
+    times: 5,
+    interval: 5e3
+  }, task, callback);
 }
 
 module.exports = {
-	getContent
+  getContent,
+  getNewsFromRss,
 }
