@@ -10,7 +10,7 @@ let { category_titles } = configModel;
  */
 
 const Category = new keystone.List('Category', {
-	map: { name: 'title' },
+	map: { name: 'display' },
 	autokey: { from: 'title', path: 'slug', unique: true },
 	track: {
 		createdAt: true,
