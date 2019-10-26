@@ -1,4 +1,3 @@
-
 const Response = require('../services/Response');
 const FeedService = require('../services/FeedService');
 
@@ -7,7 +6,7 @@ module.exports = FeedCtrl;
 
 FeedCtrl.getFeeds = (req, res) => {
 	let { category, page } = req.params;
-	page = Number(page) || 1;
+	page = Number(page) || 0;
 
 	FeedService.getFeeds({ category, page }, (err, feeds) => {
 		if (err) return Response.error(req, res, err, feeds);
