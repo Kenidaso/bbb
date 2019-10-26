@@ -31,7 +31,8 @@ Category.add({
 	// },
 	title: {
 		type: String,
-		initial: true
+		initial: true,
+		index: true
 	},
 	display: { type: String, required: true, initial: true },
 });

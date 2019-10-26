@@ -45,7 +45,7 @@ keystone.init({
 
 	'auto update': true,
 	'session': true,
-	'session store' : 'mongo',
+	// 'session store' : 'mongo',
 	'session options': {cookie: { secure: false, maxAge: 30*24*60*60*1e3 }},
 
 	'auth': true,

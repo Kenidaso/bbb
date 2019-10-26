@@ -3,6 +3,15 @@ module.exports = {
 	  return { errorCode, message, data, statusCode, codeDebug }
 	},
 
+	safeParse: (input) => {
+		try {
+			if (typeof input === 'object') return input;
+			return JSON.parse(input);
+		} catch {
+			return null;
+		}
+	},
+
 	normalizeText: (text = '') => {
 		let result = text.replace(/\s\s/g, ' ').trim();
 		return result;
