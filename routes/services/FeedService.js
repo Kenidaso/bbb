@@ -50,7 +50,7 @@ Feed.getFeeds = (params, callback) => {
 						createdAt: -1
 					})
 					.limit(limit)
-					.skip(page * limit)
+					.skip((page - 1) * limit)
 					.exec(next)
 			}
 		], (err, feeds) => {
