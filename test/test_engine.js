@@ -1,5 +1,5 @@
 // node test/test_engine [engine] [link]
-// node test/test_engine vnexpress https://vnexpress.net/thoi-su/30-nam-tran-giu-them-luc-dia-cua-linh-nha-gian-dk1-3983248.html
+// node test/test_engine vnexpress https://vnexpress.net/giao-duc/nha-van-hoa-sinh-vien-hinh-luc-giac-hon-400-ty-dong-4001695.html
 // node test/test_engine vnexpress http://vnexpress.net/rss/the-thao.rss
 
 process.env.PORT = 1234;
@@ -22,7 +22,7 @@ engine.getContent({
 	link
 }, (err, result) => {
 	console.log('err=', err);
-	console.log('result=', result);
+	console.log('result=', JSON.stringify(result));
 })
 
 // engine.getNewsFromRss(link, (err, result) => {

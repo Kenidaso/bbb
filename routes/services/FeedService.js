@@ -1,6 +1,8 @@
 const keystone = require('keystone');
 const async = require('async');
 
+const NODE_ENV = process.env.NODE_ENV || 'development';
+
 const FeedModel = keystone.list('Feed').model;
 const CategoryModel = keystone.list('Category').model;
 
@@ -8,7 +10,8 @@ const RedisService = require('../services/RedisService');
 
 const utils = require('../../helpers/utils');
 
-const TTL = 60 * 15; // time to live key redis: 900 second = 15 minute
+let TTL = 60 * 15; // time to live key redis: 900 second = 15 minute
+if (NODE_ENV === 'development') TTL = 60 * 60;
 
 Feed = {};
 module.exports = Feed;
@@ -47,6 +50,8 @@ Feed.getFeeds = (params, callback) => {
 					})
 					.select('-_id slug title link publishDate description heroImage images videos contentOrder')
 					.setOptions({
+						publishDate: -1,
+						updatedAt: -1,
 						createdAt: -1
 					})
 					.limit(limit)
