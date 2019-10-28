@@ -49,7 +49,7 @@ Feed.getFeeds = (params, callback) => {
 						category: category._id,
 					})
 					.select('-_id slug title link publishDate description heroImage images videos contentOrder')
-					.setOptions({
+					.sort({
 						publishDate: -1,
 						updatedAt: -1,
 						createdAt: -1
