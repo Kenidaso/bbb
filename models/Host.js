@@ -30,8 +30,7 @@ const Host = new keystone.List('Host', {
 
 Host.add({
 	name: {
-		type: Types.Select,
-		options: host_names.options,
+		type: Types.Text,
 		required: true,
 		initial: true,
 		index: true

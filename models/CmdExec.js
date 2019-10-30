@@ -7,8 +7,8 @@ const Types = keystone.Field.Types;
  */
 
 const CmdExec = new keystone.List('CmdExec', {
-	map: { name: 'cmd' },
-	autokey: { from: 'cmd', path: 'slug', unique: true },
+	map: { name: 'name' },
+	autokey: { from: 'name', path: 'slug', unique: true },
 	track: {
 		createdAt: true,
   	createdBy: true,
@@ -21,9 +21,10 @@ const CmdExec = new keystone.List('CmdExec', {
 });
 
 CmdExec.add({
+	name: { type: String, required: true, initial: true },
 	cmd: { type: String, required: true, initial: true },
 	description: { type: Types.Textarea, initial: true },
-	status: { type: Number, required: true, default: 1 },
+	status: { type: Types.Number, required: true, default: 1 },
 });
 
 CmdExec.schema.virtual('isActive').get(function () {

@@ -35,7 +35,7 @@ const Feed = new keystone.List('Feed', {
   	updatedBy: true
 	},
 	perPage: 20,
-	defaultColumns: 'title content heroImage images',
+	defaultColumns: 'title publishDate category host',
 	defaultSort: '-updatedAt'
 });
 
@@ -47,7 +47,7 @@ Feed.add({
 
 	rawHtml: { type: Types.Html, wysiwyg: true },
 
-	category: { type: Types.Relationship, ref: 'Category', initial: true },
+	category: { type: Types.Relationship, ref: 'Category', initial: true, many: true },
 	host: { type: Types.Relationship, ref: 'Host', initial: true },
 });
 

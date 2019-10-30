@@ -73,6 +73,7 @@ exports = module.exports = function (app) {
 	app.get('/gallery', routes.views.gallery);
 
 	app.get('/feed/:category/:page?', routes.controllers.feed.getFeeds);
+	app.post('/ggn/search', routes.controllers.search.ggnSearch);
 
 	// NOTE: To protect a route so that only admins can see it, use the requireUser middleware:
 	// app.get('/protected', middleware.requireUser, routes.views.protected);

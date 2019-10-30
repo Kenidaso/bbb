@@ -33,7 +33,7 @@ function createAdmin (admin, done) {
 	const newAdmin = new User.model(admin);
 
 	newAdmin.isAdmin = true;
-	newAdmin.create(function (err) {
+	newAdmin.save(function (err) {
 		if (err) {
 			console.error('Error adding admin ' + admin.email + ' to the database:');
 			console.error(err);

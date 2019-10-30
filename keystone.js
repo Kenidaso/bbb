@@ -88,6 +88,11 @@ keystone.set('nav', {
 		'Rss',
 		'CrawlLog',
 		'CmdExec',
+	],
+	'Google News': [
+		'NewsTopic',
+		'NewsStory',
+		'UserSearch'
 	]
 });
 
