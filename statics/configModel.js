@@ -2,7 +2,8 @@ module.exports = {
 	host_names: {
 		options: [
 			'VNEXPRESS',
-			'ZINGNEWS'
+			'ZINGNEWS',
+			'BAOMOI'
 		]
 	},
 
