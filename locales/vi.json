@@ -7,5 +7,7 @@
 	"connection 0 to ds259245.mlab.com:59245 timed out": "connection 0 to ds259245.mlab.com:59245 timed out",
 	"connection 3 to ds259245.mlab.com:59245 timed out": "connection 3 to ds259245.mlab.com:59245 timed out",
 	"connection 4 to ds259245.mlab.com:59245 timed out": "connection 4 to ds259245.mlab.com:59245 timed out",
-	"connection 1 to ds259245.mlab.com:59245 timed out": "connection 1 to ds259245.mlab.com:59245 timed out"
+	"connection 1 to ds259245.mlab.com:59245 timed out": "connection 1 to ds259245.mlab.com:59245 timed out",
+	"Not define error message": "Not define error message",
+	"Fetching failed: https://news.google.com/rss/search?pz=1&cf=all&q=&hl=vi&gl=VN&ceid=VN:vi": "Fetching failed: https://news.google.com/rss/search?pz=1&cf=all&q=&hl=vi&gl=VN&ceid=VN:vi"
 }

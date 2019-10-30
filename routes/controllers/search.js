@@ -9,11 +9,11 @@ SearchCtrl.ggnSearch = (req, res) => {
 
 	type = type || 'rss';
 
-	let searchEngine = GoogleNewsService.getEntriesFromRss;
+	let moduleSearch = GoogleNewsService.getEntriesFromRss;
 
-	if (type === 'html') searchEngine = GoogleNewsService.search;
+	if (type === 'html') moduleSearch = GoogleNewsService.search;
 
-	searchEngine(search, (err, results) => {
+	moduleSearch(search, (err, results) => {
 		if (err) return Response.error(req, res, err, results);
 		return Response.success(req, res, results);
 	});

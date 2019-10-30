@@ -4,22 +4,23 @@ const { HTTP_STATUS_CODE } = Statics.Constant;
 const messageCode = Statics.messageCode;
 
 module.exports = {
-	error: (req, res, error, result) => {
-		if (typeof error == 'string') { // EDEFAULT
-			let { errorCode, message, data, statusCode, codeDebug } = result;
-			codeDebug = error.startsWith('E') ? error :  codeDebug;
+  error: (req, res, error, result) => {
+    if (typeof error == 'string') { // EDEFAULT
+      result = result || {};
+      let { errorCode, message, data, statusCode, codeDebug } = result;
+      codeDebug = error.startsWith('E') ? error :  codeDebug;
 
-			return Error(req, res, errorCode, codeDebug, data, message, statusCode);
-		}
+      return Error(req, res, errorCode, codeDebug, data, message, statusCode);
+    }
 
-		if (typeof error == 'object') {
-			let { errorCode, message, data, statusCode, codeDebug } = error;
-			return Error(req, res, errorCode, codeDebug, data, message, statusCode);
-		}
+    if (typeof error == 'object') {
+      let { errorCode, message, data, statusCode, codeDebug } = error;
+      return Error(req, res, errorCode, codeDebug, data, message, statusCode);
+    }
 
-		return Error(req, res);
-	},
-	success: Success
+    return Error(req, res);
+  },
+  success: Success
 }
 
 function Success (req, res, data = {}, message = 'success', statusCode = HTTP_STATUS_CODE.SUCCESS) {
@@ -33,7 +34,7 @@ function Success (req, res, data = {}, message = 'success', statusCode = HTTP_ST
 }
 
 function Error (req, res, erroCode = -1, errorCodeDebug = 'EDEFAULT', data = {}, message = '', statusCode = HTTP_STATUS_CODE.BAD_REQUEST) {
-	if (message === '') message = messageCode[erroCode];
+  if (message === '') message = messageCode[erroCode];
 
   const response = {
     error   : erroCode,

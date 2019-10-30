@@ -6,7 +6,9 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const FeedModel = keystone.list('Feed').model;
 const CategoryModel = keystone.list('Category').model;
 
-const RedisService = require('../services/RedisService');
+const RedisService = require('./RedisService');
+
+const debug = require('debug')('FeedService');
 
 const utils = require('../../helpers/utils');
 
@@ -21,6 +23,8 @@ Feed.getFeeds = (params, callback) => {
 	let limit = 18;
 
 	let key = `getFeeds:${category}:${page}`;
+
+	debug('key= %s', key);
 
 	RedisService.get(key, (err, result) => {
 		result = utils.safeParse(result);
@@ -59,6 +63,7 @@ Feed.getFeeds = (params, callback) => {
 					.exec(next)
 			}
 		], (err, feeds) => {
+			debug('getFeeds err= %s feeds= %s', err, feeds);
 			if (!err && feeds) RedisService.set(key, feeds, TTL);
 
 			return callback(err, feeds);
