@@ -81,6 +81,7 @@ keystone.set('nav', {
 	'posts': ['posts', 'post-categories'],
 	'galleries': 'galleries',
 	'ks-users': 'ks-users',
+	'Device': 'Device',
 	'News': [
 		'categories',
 		'hosts',

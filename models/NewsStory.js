@@ -9,6 +9,10 @@ const Types = keystone.Field.Types;
 const NewsStory = new keystone.List('NewsStory', {
 	map: { name: 'name' },
 	autokey: { from: 'name', path: 'slug', unique: true },
+	track: {
+		createdAt: true,
+  	updatedAt: true,
+	},
 });
 
 NewsStory.add({
