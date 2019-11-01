@@ -9,9 +9,16 @@
  */
 const _ = require('lodash');
 const keystone = require('keystone');
+const unidecode = require('unidecode');
+
+const Response = require('./services/Response');
+const UserSearch = keystone.list('UserSearch');
 
 const i18n = keystone.get('i18n');
 const t = i18n.__;
+
+const noop = () => {}
+
 /**
 	Initialises the standard view locals
 
@@ -62,3 +69,26 @@ exports.requireUser = function (req, res, next) {
 		next();
 	}
 };
+
+exports.trackSearch = (req, res, next) => {
+	let search = req.body.search;
+	if (!search) return Response.error(req, res, 'EMISSSEARCHKEYWORD');
+
+	search = unidecode(search.toLowerCase().trim());
+	req.body.search = search;
+
+	UserSearch.model.findOne({ searchContent: search }, (err, result) => {
+		if (err) {
+			console.log('track search err=', err);
+			// return next('EFINDKEYWORD', err);
+			return noop();
+		}
+
+		if (result) return result.incCount(noop);
+
+		let newSearch = new UserSearch.model({ searchContent: search });
+		newSearch.save(noop);
+	});
+
+	return next()
+}
