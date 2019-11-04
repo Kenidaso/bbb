@@ -18,6 +18,7 @@ const NewsTopic = new keystone.List('NewsTopic', {
 NewsTopic.add({
 	name: { type: Types.Text, required: true, initial: true },
 	link: { type: Types.Url, required: true, initial: true },
+	category: { type: Types.Relationship, ref: 'Category', initial: true, many: true },
 	description: { type: Types.Textarea, initial: true },
 	status: { type: Types.Number, default: 1 },
 });

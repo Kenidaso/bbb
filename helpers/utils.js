@@ -19,5 +19,35 @@ module.exports = {
 
 	randInt: (min, max) => {
 		return Math.floor(Math.random() * (max - min + 1) + min);
+	},
+
+	upsertSafe: (List, find, update, callback) => {
+		console.log(`[upsertSafe] find= ${JSON.stringify(find)}`);
+		console.log(`[upsertSafe] update= ${JSON.stringify(update)}`);
+
+		List.model.findOne(find, (err, result) => {
+			if (err) {
+				console.log('upsertSafe err=', err);
+				return callback(err);
+			}
+
+			if (result) {
+				result = Object.assign(result, update);
+
+				// console.log('upsertSafe result=', result);
+
+				return result.save((err) => {
+					return callback(err, result);
+				});
+			}
+
+			let newObj = new List.model(update);
+
+			// console.log('upsertSafe newObj=', newObj);
+
+			return newObj.save((err) => {
+				return callback(err, newObj);
+			});
+		})
 	}
 }

@@ -49,6 +49,8 @@ Feed.add({
 
 	category: { type: Types.Relationship, ref: 'Category', initial: true, many: true },
 	host: { type: Types.Relationship, ref: 'Host', initial: true },
+
+	view: { type: Types.Number, default: 0 },
 });
 
 Feed.schema.add({ contentOrder: [Schema.Types.Mixed] }); // full content order
