@@ -170,7 +170,7 @@ const proc_1_topic = (topic, callback) => {
 			return callback(err);
 		}
 
-		console.log(`\n------------------\nproc_1_topic getFeedAndStoryFromTopic results.length= ${results.length} \n------------------\n`);
+		console.log(`\n------------------\nproc_1_topic getFeedAndStoryFromTopic ${topic.link} :: results.length= ${results.length} \n------------------\n`);
 
 		if (NODE_ENV !== 'production') {
 			results = _.slice(results, 0, 1);
@@ -224,7 +224,7 @@ const procTopics = (topics, callback) => {
 		topics = [ topics[0] ];
 	}
 
-	async.each(topics, proc_1_topic, callback);
+	async.eachLimit(topics, 1, proc_1_topic, callback);
 }
 
 const runProcess = (callback) => {
