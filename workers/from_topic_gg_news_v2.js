@@ -32,8 +32,8 @@ const engine = require('../engines/googleNews');
 
 const noop = () => {};
 
-const LIMIT_ARTICLE = 10;
-const LIMIT_LINK_STORY = 2;
+const LIMIT_ARTICLE = 1;
+const LIMIT_LINK_STORY = 1;
 
 process.on('uncaughtException', function (error) {
   console.log(`====> uncaughtException=`, error);
@@ -162,13 +162,15 @@ const proc_1_link_story = (objStory, callback) => {
 const proc_1_topic = (topic, callback) => {
 	let isGetOriginLink = NODE_ENV != 'production' ? false : true;
 
+	console.log('begin get link topic:', topic.link);
+
 	engine.getFeedAndStoryFromTopic(topic.link, (err, results) => {
 		if (err) {
 			console.log('proc_1_topic err=', err);
 			return callback(err);
 		}
 
-		console.log(`\n------------------\nproc_1_topic getFeedAndStoryFromTopic results= ${JSON.stringify(results)} \n------------------\n`);
+		console.log(`\n------------------\nproc_1_topic getFeedAndStoryFromTopic results.length= ${results.length} \n------------------\n`);
 
 		if (NODE_ENV !== 'production') {
 			results = _.slice(results, 0, 1);

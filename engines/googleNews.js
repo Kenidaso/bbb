@@ -20,7 +20,7 @@ const request = require('request').defaults({
 	}
 });
 
-const LIMIT = 5;
+const LIMIT = 1;
 
 // https://news.google.com/search?q=vu%2039%20nguoi%20chet%20trong%20container&hl=vi&gl=VN&ceid=VN%3Avi
 const BASE_URL = 'https://news.google.com/search';
