@@ -34,9 +34,8 @@ module.exports = {
 			if (result) {
 				result = Object.assign(result, update);
 
-				// console.log('upsertSafe result=', result);
-
 				return result.save((err) => {
+					if (err) return callback(err);
 					return callback(err, result);
 				});
 			}
@@ -46,10 +45,12 @@ module.exports = {
 			// console.log('upsertSafe newObj=', newObj);
 
 			return newObj.save((err) => {
+				if (err) return callback(err);
 				return callback(err, newObj);
 			});
 		});
 	},
+
 	to: (promise) => {
 		return promise
 			.then(data => {

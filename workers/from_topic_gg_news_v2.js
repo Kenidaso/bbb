@@ -76,17 +76,15 @@ const save_1_article = (article, callback) => {
 
 		storyLink: article.linkStory,
 
+		topic: [article._topic._id],
+
 		paperName: article.paper,
 		paperImg: article.paperImg || '',
 	}
 
 	if (article.linkArticle) update.metadata = { linkArticle: article.linkArticle };
-	if (article.image) {
-		article.heroImage = {
-			src: article.image
-		}
-	}
-
+	if (article.image) update.heroImage = { src: article.image }
+	if (article._topic) update.topic = [ ...article._topic._id ];
 	if (article.story) update.story = article.story;
 
 	console.log(`\nsave_1_article update= ${JSON.stringify(update)}`);
