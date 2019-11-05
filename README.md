@@ -11,4 +11,4 @@ mongoexport -h ds259245.mlab.com:59245 -d sk-news-backend -c rsses -u admin -p 1
 mongoexport -h ds259245.mlab.com:59245 -d sk-news-backend -c usersearches -u admin -p 123456qwerty -o db_export/usersearches.json
 
 # run worker
-NODE_ENV=production LIMIT_RSS=5 LIMIT_NEWS=5 node workers/from_rss && NODE_ENV=production node workers/from_topic_gg_news_v2 && NODE_ENV=production node workers/fix_originLink_article
+NODE_ENV=production LIMIT_RSS=5 LIMIT_NEWS=5 node workers/from_rss && NODE_ENV=production node workers/from_topic_gg_news_v2 && NODE_ENV=production node workers/fix_originLink_article && NODE_ENV=production LIMIT_PAGE=10 LIMIT_NEWS=30 node workers/from_html
