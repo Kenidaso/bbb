@@ -9,18 +9,18 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 // key format: <env>:<key>
 const prefix = `${NODE_ENV}:`;
 
-const noop = () => {};
+const noop = () => { };
 
 module.exports = {
 	init: () => {
 		_client = redis.createClient(REDIS_URI);
 
 		_client.on("error", (err) => {
-		    console.error("Redis Error: " + err);
+			console.error("Redis Error: " + err);
 		});
 
 		_client.on("ready", () => {
-		    console.log("Redis ready!");
+			console.log("Redis ready!");
 		});
 	},
 
@@ -42,8 +42,8 @@ module.exports = {
 
 	set: (key, value, ttl = 0, callback = noop) => {
 		try {
-			if (typeof value == 'object') value = JSON.stringify(value);
-		} catch {
+			if (typeof value === 'object') value = JSON.stringify(value);
+		} catch (err) {
 
 		}
 

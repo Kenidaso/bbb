@@ -74,7 +74,7 @@ exports.trackSearch = (req, res, next) => {
 	let search = req.body.search;
 	if (!search) return Response.error(req, res, 'EMISSSEARCHKEYWORD');
 
-	search = unidecode(search.toLowerCase().trim());
+	search = search.toLowerCase().trim();
 	req.body.search = search;
 
 	UserSearch.model.findOne({ searchContent: search }, (err, result) => {

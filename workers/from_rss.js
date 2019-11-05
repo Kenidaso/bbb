@@ -18,10 +18,10 @@ const LIMIT_RSS = Number(process.env.LIMIT_RSS) || 1;
 const LIMIT_NEWS = Number(process.env.LIMIT_NEWS) || 1;
 
 keystone.init({
-	headless: true,
+	'headless': true,
 	'user model': 'KsUser',
 	'auto update': false,
-	'cookie secret': shortId.generate(16)
+	'cookie secret': shortId.generate(16),
 });
 
 keystone.import('../models');
@@ -37,11 +37,11 @@ const getAllRss = (callback) => {
 		.populate('category', '_id slug title')
 		.populate('host', '_id name website engine metadata')
 		.exec((err, rsses) => {
-		  if (err) return callback('EFINDRSS', err);
+			if (err) return callback('EFINDRSS', err);
 
-		  if (NODE_ENV != 'production') rsses = rsses.slice(0, 1);
+			if (NODE_ENV != 'production') rsses = rsses.slice(0, 1);
 
-		  return callback(null, rsses);
+			return callback(null, rsses);
 		});
 }
 
@@ -155,7 +155,7 @@ const runProcess = (callback) => {
 }
 
 const startWorker = () => {
-	keystone.start( x => {
+	keystone.start(x => {
 		console.log('start done ...');
 
 		runProcess(stopWorker);
