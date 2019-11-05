@@ -63,7 +63,7 @@ Feed.getFeeds = (params, callback) => {
 					.exec(next)
 			}
 		], (err, feeds) => {
-			debug('getFeeds err= %s feeds= %s', err, feeds);
+			debug('getFeeds err= %s', err);
 			if (!err && feeds) RedisService.set(key, feeds, TTL);
 
 			return callback(err, feeds);

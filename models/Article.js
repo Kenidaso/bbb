@@ -35,7 +35,7 @@ Article.add({
 	story: { type: Types.Relationship, ref: 'NewsStory', initial: true, many: true },
 	storyLink: { type: Types.Text },
 
-	topic: { type: Types.Relationship, ref: 'NewsTopic', initial: true, many: true },
+	topic: { type: Types.Relationship, ref: 'NewsTopic', initial: true, many: true, index: true },
 
 	paperName: { type: Types.Text },
 	paperImg: { type: Types.Text },
