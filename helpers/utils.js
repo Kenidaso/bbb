@@ -1,13 +1,13 @@
 module.exports = {
-  errorObj: (errorCode, codeDebug = 'EUNKNOWN', data = {}, message = '', statusCode = 400) => {
-	  return { errorCode, message, data, statusCode, codeDebug }
+	errorObj: (errorCode, codeDebug = 'EUNKNOWN', data = {}, message = '', statusCode = 400) => {
+		return { errorCode, message, data, statusCode, codeDebug };
 	},
 
 	safeParse: (input) => {
 		try {
 			if (typeof input === 'object') return input;
 			return JSON.parse(input);
-		} catch {
+		} catch (err) {
 			return null;
 		}
 	},
@@ -19,5 +19,14 @@ module.exports = {
 
 	randInt: (min, max) => {
 		return Math.floor(Math.random() * (max - min + 1) + min);
-	}
-}
+	},
+
+	to: (promise) => {
+		return promise
+			.then(data => {
+				return [null, data];
+			})
+			.catch(err => [err]);
+	},
+
+};
