@@ -14,7 +14,7 @@ const path = require('path');
 const moment = require('moment');
 
 const LIMIT_PAGE = Number(process.env.LIMIT_PAGE) || 1;
-const LIMIT_NEWS = Number(process.env.LIMIT_NEWS) || 1;
+let LIMIT_NEWS = Number(process.env.LIMIT_NEWS) || 1;
 
 keystone.init({
 	'headless': true,
@@ -132,8 +132,14 @@ const procEachHtml = (htmls) => {
 						return reject(error);
 					}
 					if (NODE_ENV !== 'production') feeds = feeds.slice(0, 2);
+					if (LIMIT_NEWS > feeds.length) {
+						LIMIT_NEWS = feeds.length;
+					}
+					console.log('TCL: procOnePageHtml -> LIMIT_NEWS', LIMIT_NEWS);
 					for (let i = 0; i < LIMIT_NEWS; i++) {
-						console.log('zozo');
+						if (!feeds[i]) {
+							return reject('ENEWSUNDEFINED');
+						}
 						const news = feeds[i];
 						news._objHtml = objHtml;
 						console.log('news=', JSON.stringify(news));
