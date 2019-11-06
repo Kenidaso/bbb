@@ -185,10 +185,12 @@ const runProcess = () => {
 };
 
 const startWorker = () => {
+	Utils.sendMessage('Start Worker::::');
 	keystone.start(async x => {
 		console.log('start done ...');
 
 		await runProcess(stopWorker);
+		Utils.sendMessage('Done Process::::');
 	});
 };
 

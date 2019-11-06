@@ -1,3 +1,5 @@
+const NODE_ENV = process.env.NODE_ENV.toLocaleUpperCase() || 'DEVELOPMENT';
+const request = require('request');
 module.exports = {
 	errorObj: (errorCode, codeDebug = 'EUNKNOWN', data = {}, message = '', statusCode = 400) => {
 		return { errorCode, message, data, statusCode, codeDebug };
@@ -57,5 +59,32 @@ module.exports = {
 				return [null, data];
 			})
 			.catch(err => [err]);
+	},
+
+	sendMessage: (message) => {
+		if (NODE_ENV !== 'PRODUCTION') {
+			return;
+		}
+		let bot_token = '926051369:AAEWO57QlmvfHpySz07DSXPMSlf7kQiD4M4';
+		let website = 'https://api.telegram.org/bot' + bot_token;
+		let data = {
+			chat_id: '-373758728',
+			parse_mode: 'markdown',
+			text: `WORKER:BAOMOI - ENV: *${NODE_ENV}* - ${message}`,
+		};
+		let link = website + '/sendmessage';
+		request({
+			uri: link,
+			method: 'POST',
+			form: data,
+		},
+			function (error, response, body) {
+				if (error) {
+					// console.log((error.message));
+				} else {
+					// console.log(response);
+				}
+			}
+		);
 	},
 };
