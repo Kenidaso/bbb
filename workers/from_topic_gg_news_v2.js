@@ -53,48 +53,67 @@ const getAllTopic = (callback) => {
 }
 
 const save_1_article = (article, callback) => {
-	if (!article.originLink) {
-		console.log(`\nsave_1_article originLink not found, ${JSON.stringify(article)}`);
-		article.originLink = article.linkArticle;
-		// return callback();
-	}
-
 	if (!article.title) {
 		console.log(`\nsave_1_article title not found`);
 		return callback();
 	}
 
-	let update = {
-		title: article.title,
-		sectionTitle: article.sectionTitle || '',
-		publishDate: moment(article.publishDate).toDate(),
-		link: article.originLink,
-		description: article.description,
-		category: article._topic.category,
+	async.series({
+		checkOriginLinkAgain: (next) => {
+			if (article.originLink && !/news\.google\.com/.test(article.originLink)) {
+				return next();
+			}
 
-		// story,
+			console.log(`\nsave_1_article originLink not found, ${JSON.stringify(article)}`);
+			console.log('get link redicrec again ...');
 
-		storyLink: article.linkStory,
+			engine.getLinkRedirect(article.linkArticle, (err, originLink) => {
+				if (err || !originLink) {
+					article.originLink = article.linkArticle;
+					return next();
+				}
 
-		topic: [article._topic._id],
+				article.originLink = originLink
+				return next()
+			});
+		},
 
-		paperName: article.paper,
-		paperImg: article.paperImg || '',
-	}
+		update: (next) => {
+			let find = {
+				link: article.originLink
+			}
 
-	if (article.linkArticle) update.metadata = { linkArticle: article.linkArticle };
-	if (article.image) update.heroImage = { src: article.image }
-	if (article._topic) update.topic = [ article._topic._id ];
-	if (article.story) update.story = article.story;
+			let update = {
+				title: article.title,
+				sectionTitle: article.sectionTitle || '',
+				publishDate: moment(article.publishDate).toDate(),
+				link: article.originLink,
+				description: article.description,
+				category: article._topic.category,
 
-	console.log(`\nsave_1_article update= ${JSON.stringify(update)}`);
+				// story,
 
-  utils.upsertSafe(Article, {
-		link: article.originLink
-	}, update, (err, result) => {
-		if (err) console.log(`save_1_article err= ${err}`);
-		return callback(null, result);
-	})
+				storyLink: article.linkStory,
+
+				topic: [article._topic._id],
+
+				paperName: article.paper,
+				paperImg: article.paperImg || '',
+			}
+
+			if (article.linkArticle) update.metadata = { linkArticle: article.linkArticle };
+			if (article.image) update.heroImage = { src: article.image }
+			if (article._topic) update.topic = [ article._topic._id ];
+			if (article.story) update.story = article.story;
+
+			console.log(`\nsave_1_article update= ${JSON.stringify(update)}`);
+
+		  utils.upsertSafe(Article, find, update, (err, result) => {
+				if (err) console.log(`save_1_article err= ${err}`);
+				return next(null, result);
+			})
+		}
+	}, callback);
 }
 
 const save_1_story = (story, callback) => {

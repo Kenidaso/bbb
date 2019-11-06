@@ -48,7 +48,7 @@ const getLinkRedirect = (articleLink, callback) => {
 		let $ = cheerio.load(body);
 		let redirectLink = $('c-wiz > div > div > c-wiz > div > a').text();
 
-		console.log('---> getLinkRedirect ', articleLink, '-->', redirectLink);
+		// console.log('---> getLinkRedirect ', articleLink, '-->', redirectLink);
 
 		return callback(null, redirectLink);
 	})
