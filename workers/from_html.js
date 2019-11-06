@@ -195,8 +195,8 @@ const startWorker = () => {
 const stopWorker = () => {
 	keystone.closeDatabaseConnection((err, result) => {
 		console.log('stop worker done');
-		return process.exit(0);
-		// return startWorker();
+		// return process.exit(0);
+		return startWorker();
 	});
 };
 
