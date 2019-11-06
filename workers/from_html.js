@@ -185,18 +185,20 @@ const runProcess = () => {
 };
 
 const startWorker = () => {
+	Utils.sendMessage('Start Worker::::');
 	keystone.start(async x => {
 		console.log('start done ...');
 
 		await runProcess(stopWorker);
+		Utils.sendMessage('Done Process::::');
 	});
 };
 
 const stopWorker = () => {
 	keystone.closeDatabaseConnection((err, result) => {
 		console.log('stop worker done');
-		return process.exit(0);
-		// return startWorker();
+		// return process.exit(0);
+		return startWorker();
 	});
 };
 
