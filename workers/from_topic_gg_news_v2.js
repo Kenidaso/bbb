@@ -104,7 +104,7 @@ const save_1_article = (article, callback) => {
 			}
 
 			if (article.linkArticle) update.metadata = { linkArticle: article.linkArticle };
-			if (article.image) update.heroImage = { src: article.image }
+			// if (article.image) update.heroImage = { src: article.image }
 			if (article._topic) update.topic = [ article._topic._id ];
 			if (article.story) update.story = article.story;
 

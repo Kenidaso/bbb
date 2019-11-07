@@ -1,4 +1,4 @@
-const NODE_ENV = process.env.NODE_ENV.toLocaleUpperCase() || 'DEVELOPMENT';
+const NODE_ENV = process.env.NODE_ENV || 'development';
 const request = require('request');
 module.exports = {
 	errorObj: (errorCode, codeDebug = 'EUNKNOWN', data = {}, message = '', statusCode = 400) => {
@@ -62,9 +62,10 @@ module.exports = {
 	},
 
 	sendMessage: (message) => {
-		if (NODE_ENV !== 'PRODUCTION') {
+		if (NODE_ENV !== 'production') {
 			return;
 		}
+
 		let bot_token = '926051369:AAEWO57QlmvfHpySz07DSXPMSlf7kQiD4M4';
 		let website = 'https://api.telegram.org/bot' + bot_token;
 		let data = {
