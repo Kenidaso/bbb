@@ -399,8 +399,13 @@ const getFeedFromStory = (storyUrl, callback, isGetOriginLink = false) => {
 
 const _parse_gg_news_topic = ($, isGetOriginLink = false, callback) => {
 	let cards = $('c-wiz > div > div > c-wiz > div > div > div > main > c-wiz > div > div > main > div > div > div');
+	// let cards = $('div > div > main > c-wiz > div > div > main > div > div > div');
 
-	if (process.env.NODE_ENV != 'production') cards = [ cards[0], cards[1], cards[2] ]
+	if (!cards || cards.length == 0) {
+		cards = $('div > div > main > c-wiz > div > div > main > div > div > div');
+	}
+
+	// if (process.env.NODE_ENV != 'production') cards = [ cards[0], cards[1], cards[2] ]
 
 	let result = [];
 

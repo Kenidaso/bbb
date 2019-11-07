@@ -17,6 +17,9 @@ let GGNews = require('./engines/googleNews');
 
 let GGN_TOPIC = 'https://news.google.com/topics/CAAqIggKIhxDQkFTRHdvSkwyMHZNRGxqTjNjd0VnSmxiaWdBUAE?hl=en-US&gl=US&ceid=US%3Aen';
 GGN_TOPIC = 'https://news.google.com/topics/CAAqIggKIhxDQkFTRHdvSkwyMHZNREZqY21RMUVnSjJhU2dBUAE?hl=vi&gl=VN&ceid=VN%3Avi';
+GGN_TOPIC = 'https://news.google.com/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNREpxYW5RU0FuWnBHZ0pXVGlnQVAB?hl=vi&gl=VN&ceid=VN%3Avi';
+GGN_TOPIC = 'https://news.google.com/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNREpxYW5RU0FuWnBHZ0pXVGlnQVAB/sections/CAQiWkNCQVNQUW9JTDIwdk1ESnFhblFTQW5acEdnSldUaUlPQ0FRYUNnb0lMMjB2TURKMmVHNHFHUW9YQ2hOTlQxWkpSVk5mVTBWRFZFbFBUbDlPUVUxRklBRW9BQSoqCAAqJggKIiBDQkFTRWdvSUwyMHZNREpxYW5RU0FuWnBHZ0pXVGlnQVABUAE?hl=vi&gl=VN&ceid=VN%3Avi';
+GGN_TOPIC = 'https://news.google.com/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNREpxYW5RU0FuWnBHZ0pXVGlnQVAB/sections/CAQiRkNCQVNMZ29JTDIwdk1ESnFhblFTQW5acEdnSldUaUlPQ0FRYUNnb0lMMjB2TURSeWJHWXFDaElJTDIwdk1EUnliR1lvQUEqKggAKiYICiIgQ0JBU0Vnb0lMMjB2TURKcWFuUVNBblpwR2dKV1RpZ0FQAVAB?hl=vi&gl=VN&ceid=VN%3Avi';
 
 let GGN_STORY = 'https://news.google.com/stories/CAAqcggKImxDQklTU3pvSmMzUnZjbmt0TXpZd1NqNEtFUWpQdy1ld2pvQU1FUW9xdXRxZm03b3VFaWt5SUdacGNtVm1hV2RvZEdWeWN5QmlkWEp1WldRZ2FXNGdRMkZzYVdadmNtNXBZU0JpYkdGNlpTZ0FQAQ?hl=en-US&gl=US&ceid=US%3Aen';
 
@@ -50,7 +53,7 @@ let ggNews_RSS = (callback) => {
 }
 
 let ggNews_Topic = (callback) => {
-	let isGetOriginLink = true;
+	let isGetOriginLink = false;
 	GGNews.getFeedAndStoryFromTopic(GGN_TOPIC, (err, result) => {
 		// fs.writeFileSync(path.join(__dirname, 'data_sample/raw_ggn_topic.html'), result);
 		return callback(err, result);
