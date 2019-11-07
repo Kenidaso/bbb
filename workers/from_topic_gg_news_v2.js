@@ -27,13 +27,15 @@ keystone.import('../models');
 const NewsTopic = keystone.list('NewsTopic');
 const NewsStory = keystone.list('NewsStory');
 const Article = keystone.list('Article');
+const Feed = keystone.list('Feed');
 
 const engine = require('../engines/googleNews');
 
 const noop = () => {};
 
-const LIMIT_ARTICLE = 1;
-const LIMIT_LINK_STORY = 1;
+const LIMIT_ARTICLE = Number(process.env.LIMIT_ARTICLE) || 1;
+const LIMIT_LINK_STORY = Number(process.env.LIMIT_LINK_STORY) || 1;
+const LIMIT_TOPIC = Number(process.env.LIMIT_TOPIC) || 1;
 
 process.on('uncaughtException', function (error) {
   console.log(`====> uncaughtException=`, error);
@@ -108,7 +110,7 @@ const save_1_article = (article, callback) => {
 
 			console.log(`\nsave_1_article update= ${JSON.stringify(update)}`);
 
-		  utils.upsertSafe(Article, find, update, (err, result) => {
+		  utils.upsertSafe(Feed, find, update, (err, result) => {
 				if (err) console.log(`save_1_article err= ${err}`);
 				return next(null, result);
 			})
@@ -241,7 +243,7 @@ const procTopics = (topics, callback) => {
 		topics = [ topics[0] ];
 	}
 
-	async.eachLimit(topics, 1, proc_1_topic, callback);
+	async.eachLimit(topics, LIMIT_TOPIC, proc_1_topic, callback);
 }
 
 const runProcess = (callback) => {

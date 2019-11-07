@@ -52,6 +52,9 @@ Feed.add({
 	category: { type: Types.Relationship, ref: 'Category', initial: true, many: true },
 	host: { type: Types.Relationship, ref: 'Host', initial: true },
 
+	story: { type: Types.Relationship, ref: 'NewsStory', initial: true, many: true },
+	topic: { type: Types.Relationship, ref: 'NewsTopic', initial: true, many: true, index: true },
+
 	view: { type: Types.Number, default: 0 },
 });
 
