@@ -34,6 +34,12 @@ module.exports = {
 			}
 
 			if (result) {
+				if (update.metadata) {
+					result.metadata = result.metadata || {};
+					result.metadata = Object.assign({}, result.metadata, update.metadata);
+					delete update.metadata;
+				}
+
 				result = Object.assign(result, update);
 
 				return result.save((err) => {
