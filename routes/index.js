@@ -72,6 +72,7 @@ exports = module.exports = function (app) {
 	app.get('/blog/post/:post', routes.views.post);
 	app.get('/gallery', routes.views.gallery);
 
+	app.post('/feed/raw', routes.controllers.feed.getRawContent);
 	app.get('/feed/:category/:page?', routes.controllers.feed.getFeeds);
 	app.post('/ggn/search', middleware.trackSearch, routes.controllers.search.ggnSearch);
 	app.post('/device/register', routes.controllers.device.register);

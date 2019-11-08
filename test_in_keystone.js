@@ -84,10 +84,22 @@ const test_upsertSafe = (callback) => {
 				title: 'test',
 				publishDate: new Date(),
 				topic: [ '5dbe979fa3c49a09c70c83d7' ],
+
+				// 'metadata.raw': 'abc',
+				// 'metadata.html': 'xyz',
+
+				metadata: {
+					chickyky: 'pro va dep trai'
+				}
+
 				// topic: [ '5db844173cff191fd6ed7598', '5db844173cff191fd6ed7598', '5dbe95f2a3c49a09c70c83d5', '5dbe9734a3c49a09c70c83d6' ],
 				// story: [ new ObjectId('5db844173cff191fd6ed7598'), new ObjectId('5dbe95f2a3c49a09c70c83d5') ]
 				// story: new ObjectId('5dbe95f2a3c49a09c70c83d5')
 			}
+
+			// Article.model.findOneAndUpdate(find, {
+			// 	$set: update
+			// }, { new: true }, next)
 
 			utils.upsertSafe(Article, find, update, callback);
 		}

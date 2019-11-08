@@ -19,17 +19,43 @@ const register = (params, callback) => {
 	}, (err, device) => {
 		if (err) return callback('EFINDDEVICE', err);
 
-		let regisDevice = null;
-
 		if (device) {
-			regisDevice = Object.assign(device, params);
-		} else {
-			regisDevice = new DeviceModel(params);
+			device = Object.assign(device, params);
+			let specifications = [];
+			for (let key in params) {
+				if (key.startsWith('is') && params[key]) specifications.push(key);
+			}
+
+			device.specifications = specifications;
+			device.headers = [];
+			device.headers.push(`app-timezone-offset:${params._headers['app-timezone-offset']}`);
+			device.headers.push(`app-build-key:${params._headers['app-build-key']}`);
+			device.headers.push(`app-version:${params._headers['app-version']}`);
+
+			return device.save((err) => {
+				if (err) return callback('EREGISDEVICE', err);
+				return callback(null, { fingerprint: device.fingerprint });
+			})
 		}
+
+		let newDevice = Object.assign({}, params);
+
+		let specifications = [];
+		for (let key in newDevice) {
+			if (key.startsWith('is') && newDevice[key]) specifications.push(key);
+		}
+
+		newDevice.specifications = specifications;
+		newDevice.headers = [];
+		newDevice.headers.push(`app-timezone-offset:${params._headers['app-timezone-offset']}`);
+		newDevice.headers.push(`app-build-key:${params._headers['app-build-key']}`);
+		newDevice.headers.push(`app-version:${params._headers['app-version']}`);
+
+		let regisDevice = new DeviceModel(newDevice);
 
 		regisDevice.save((err) => {
 			if (err) return callback('EREGISDEVICE', err);
-			return callback(null, regisDevice);
+			return callback(null, { fingerprint: regisDevice.fingerprint });
 		})
 	})
 }
