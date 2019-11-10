@@ -37,7 +37,7 @@ Host.add({
 	},
 	website: { type: Types.Url, initial: true, index: true, unique: true },
 	engine: { type: String, initial: true }, // tên engine sử dụng
-	metadataJson: { type: Types.Textarea },
+	metadataJson: { type: Types.Textarea, initial: true },
 });
 
 Host.schema.add({ metadata: Schema.Types.Mixed });
