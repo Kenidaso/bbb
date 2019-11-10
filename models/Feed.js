@@ -64,8 +64,11 @@ Feed.schema.add({ heroImage: Schema.Types.Mixed });
 Feed.schema.add({ images: [Schema.Types.Mixed] });
 Feed.schema.add({ videos: [Schema.Types.Mixed] });
 
-// Feed.schema.add({ heroImage: Media });
-// Feed.schema.add({ images: [Media] });
-// Feed.schema.add({ videos: [Media] });
+Feed.schema.pre('save', function (next) {
+	this.createdAt = this.createdAt || new Date();
+	this.updatedAt = this.updatedAt || new Date();
+
+	return next();
+});
 
 Feed.register();

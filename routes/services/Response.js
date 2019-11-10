@@ -7,6 +7,11 @@ module.exports = {
   error: (req, res, error, result) => {
     if (typeof error == 'string') { // EDEFAULT
       result = result || {};
+
+      if (typeof result === 'number') {
+        result = { errorCode: result }
+      }
+
       let { errorCode, message, data, statusCode, codeDebug } = result;
       codeDebug = error.startsWith('E') ? error :  codeDebug;
 

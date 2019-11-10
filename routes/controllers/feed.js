@@ -23,3 +23,12 @@ FeedCtrl.getRawContent = (req, res) => {
 		return Response.success(req, res, html);
 	});
 }
+
+FeedCtrl.getContent = (req, res) => {
+	let { slug } = req.params;
+
+	FeedService.getContent(slug, (err, result) => {
+		if (err) return Response.error(req, res, err, result);
+		return Response.success(req, res, result);
+	});
+}

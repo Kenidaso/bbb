@@ -7,7 +7,7 @@ let _client = null;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // key format: <env>:<key>
-const prefix = `${NODE_ENV}:`;
+const prefix = `${NODE_ENV}`;
 
 const noop = () => { };
 

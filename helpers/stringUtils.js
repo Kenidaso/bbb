@@ -10,6 +10,6 @@ module.exports = {
 		return input;
 	},
 	minify: (input = '') => {
-		return input.replace(/\r\n/g, '').replace(/\n/g, '').replace(/\s\s/g, '').trim();
+		return input.replace(/\r\n|\n|\t/g, ' ').replace(/\s\s/g, '').trim();
 	},
 };

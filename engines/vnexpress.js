@@ -1,8 +1,12 @@
+const NAME = 'vnexpress';
+
 const request = require('request');
 const cheerio = require('cheerio');
 const _ = require('lodash');
 const async = require('async');
 const moment = require('moment');
+const fs = require('fs');
+const path = require('path');
 
 const fetchRss = require('./fetchRss');
 const utils = require('../helpers/utils');
@@ -158,7 +162,17 @@ const getNewsFromRss = (rssUrl, callback) => {
   }, task, callback);
 }
 
+const cleanSpecial = ($, content) => {
+  if (process.env.NODE_ENV !== 'production') {
+    fs.writeFileSync(path.join(__dirname, `../data_sample/parse_${NAME}.html`), $(content).html());
+  }
+
+  // clear trash
+  $('.box_category', content).remove();
+}
+
 module.exports = {
   getContent,
   getNewsFromRss,
+  cleanSpecial,
 }

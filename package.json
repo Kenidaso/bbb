@@ -30,6 +30,7 @@
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
     "require-dir": "^1.2.0",
+    "sanitize-html": "^1.20.1",
     "short-id-gen": "^1.1.2",
     "unidecode": "^0.1.8",
     "uuid": "^3.3.3",
@@ -43,7 +44,7 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "start": "npm run docs && DEBUG=*routes*,*Service*,*Model*,FATAL nodemon keystone.js",
+    "start": "npm run docs && DEBUG=*routes*,*Service*,*Model*,FATAL,*Engine* nodemon keystone.js",
     "docs": "apidoc -i routes/controllers -o public/docs",
     "postinstall": "npm install apidoc -g && cp cheats/cloudinaryResize.js node_modules/keystone/admin/client/utils && cp cheats/CloudinaryImagesField.js node_modules/keystone/fields/types/cloudinaryimages && cp cheats/CloudinaryImageField.js node_modules/keystone/fields/types/cloudinaryimage && cp -f ./public/images/newspaper.png ./node_modules/keystone/admin/public/images/logo.png && cp -f cheats/Brand.js node_modules/keystone/admin/client/Signin/components/Brand.js"
   },

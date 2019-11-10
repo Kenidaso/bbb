@@ -2,13 +2,12 @@ module.exports = {
   //****************** */
   // 1xxx CLIENT ERROR
   //****************** */
+  1000: 'Timeout - no response',
   1001: 'Missing Parameter',
   1002: 'Invalid Parameter',
   1003: 'API authentication failed',
   1004: 'Get token failed',
-  1000: 'Timeout - no response',
-  16: 'Account has linked',
-  2131: 'Create Qrcode failed',
+  1005: 'Link is invalid',
 
 
   1010: 'Missing Header Parameter',

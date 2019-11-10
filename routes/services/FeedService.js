@@ -7,6 +7,7 @@ const FeedModel = keystone.list('Feed').model;
 const CategoryModel = keystone.list('Category').model;
 
 const RedisService = require('./RedisService');
+const RawFeedService = require('./RawFeedService');
 
 const debug = require('debug')('FeedService');
 
@@ -14,6 +15,8 @@ const utils = require('../../helpers/utils');
 
 let TTL = 60 * 15; // time to live key redis: 900 second = 15 minute
 if (NODE_ENV === 'development') TTL = 60 * 60;
+
+let TTL_LINK_FEED = 60 * 60 * 24 * 7; // 7 day
 
 Feed = {};
 module.exports = Feed;
@@ -68,5 +71,31 @@ Feed.getFeeds = (params, callback) => {
 
 			return callback(err, feeds);
 		});
+	});
+}
+
+Feed.getContent = (slugFeed, callback) => {
+	// get link feed from slug-feed
+	let keyLinkFeed = `linkFeed:${slugFeed}`;
+	RedisService.get(keyLinkFeed, (err, link) => {
+		if (!err && link) {
+			debug('get link feed from cache key= %s', keyLinkFeed);
+			return RawFeedService.getHtmlContent(link, callback);
+		}
+
+		FeedModel.findOne({
+			slug: slugFeed
+		}, 'link rawHtml contentOrder heroImage slug', (errFind, feed) => {
+			if (errFind) return callback('EFINDFEED', errFind);
+			if (!feed) return callback('EFEEDNOTFOUND');
+
+			RedisService.set(keyLinkFeed, feed.link, TTL_LINK_FEED);
+
+			if (feed.rawHtml && feed.rawHtml.length > 0) return callback(null, feed.rawHtml);
+
+			return callback(null, feed);
+
+			return RawFeedService.getHtmlContent(feed.link, callback);
+		})
 	});
 }
