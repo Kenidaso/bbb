@@ -93,8 +93,6 @@ Feed.getContent = (slugFeed, callback) => {
 
 			if (feed.rawHtml && feed.rawHtml.length > 0) return callback(null, feed.rawHtml);
 
-			return callback(null, feed);
-
 			return RawFeedService.getHtmlContent(feed.link, callback);
 		})
 	});
