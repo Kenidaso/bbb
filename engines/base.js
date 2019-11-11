@@ -27,10 +27,11 @@ const minify = require('html-minifier').minify;
 
 const defaultSanitizeHtml = () => {
   return {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat([ 'img', 'h1', 'h2', 'header', 'article', 'section', 'footer', 'figure' ]),
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat([ 'img', 'h1', 'h2', 'header', 'article', 'section', 'footer', 'figure', 'video' ]),
     allowedAttributes: {
       a: [ 'href', 'name' ],
-      img: [ 'src', 'alt' ]
+      img: [ 'src', 'alt' ],
+      video: [ 'src' ],
     },
   }
 }
@@ -84,10 +85,33 @@ base.getRawContent = (link, hostInfo, engine = {}, callback) => {
 
     let contentStr = $(content).html();
 
+    contentStr = contentStr.replace(/\n/g, ' ').replace(/\t/g, ' ');
+
+    while (contentStr.indexOf('  ') > -1) {
+      contentStr = contentStr.replace(/\s\s/g, ' ');
+    }
+
+    contentStr = contentStr.replace(/\>\s\</g, '><');
+    contentStr = contentStr.trim();
+
     try {
       contentStr = minify(contentStr, {
         removeComments: true,
-        decodeEntities: true
+        removeCommentsFromCDATA: true,
+        collapseWhitespace: true,
+        collapseBooleanAttributes: true,
+        removeRedundantAttributes: true,
+        removeEmptyAttributes: true,
+        removeEmptyElements: true,
+
+        decodeEntities: true,
+        collapseInlineTagWhitespace: true,
+
+        conservativeCollapse: true,
+        html5: true,
+        quoteCharacter: '\'',
+        removeScriptTypeAttributes: true,
+        useShortDoctype: true
       });
     } catch (ex) {
       fatal('minify err= %s', ex.toString());
@@ -96,15 +120,6 @@ base.getRawContent = (link, hostInfo, engine = {}, callback) => {
     debug('sanitize html ...');
     let optSanitize = Object.assign({}, defaultSanitizeHtml(), engine.optSanitizeHtml || {});
     contentStr = sanitizeHtml(contentStr, optSanitize);
-
-    contentStr = contentStr.replace(/\n/g, ' ').replace(/\t/g, ' ');
-
-    while (contentStr.indexOf('  ') > -1) {
-      contentStr = contentStr.replace(/\s\s/g, ' ');
-    }
-
-    contentStr = contentStr.replace(/\> \</g, '><');
-    contentStr = contentStr.trim();
 
     if (NODE_ENV !== 'production') debug('content= %s', contentStr);
 

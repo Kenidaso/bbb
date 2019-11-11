@@ -55,7 +55,7 @@ Feed.getFeeds = (params, callback) => {
 					.find({
 						category: category._id,
 					})
-					.select('-_id slug title link publishDate description heroImage images videos contentOrder')
+					.select('-_id slug title link publishDate description heroImage images videos contentOrder rawHtml')
 					.sort({
 						publishDate: -1,
 						updatedAt: -1,

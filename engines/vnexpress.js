@@ -169,6 +169,25 @@ const cleanSpecial = ($, content) => {
 
   // clear trash
   $('.box_category', content).remove();
+  $('#box_splienquan', content).remove();
+  $('[id*="social"]', content).remove();
+  $('[class*="banner"]', content).remove();
+  $('#ms_topic', content).remove();
+  $('.bottom_detail', content).remove();
+  $('#ms_seemore', content).remove();
+
+  let ps = $('p', content);
+  let flag = false;
+  for (let i = 0; i < ps.length; i++) {
+    let text = $(ps[i]).text();
+
+    if (text && text.toLowerCase().indexOf('xem thêm:') > -1) flag = true;
+    if (flag) $(ps[i]).remove();
+  }
+
+  if (process.env.NODE_ENV !== 'production') {
+    fs.writeFileSync(path.join(__dirname, `../data_sample/parse_${NAME}_2.html`), $(content).html());
+  }
 }
 
 module.exports = {

@@ -1,5 +1,10 @@
+const NAME = '24hcomvn';
+
 const sanitizeHtml = require('sanitize-html');
 const debug = require('debug')('Engine:24h.com.vn');
+
+const fs = require('fs');
+const path = require('path');
 
 let engine = {};
 module.exports = engine;
@@ -9,6 +14,10 @@ engine.optSanitizeHtml = {
 }
 
 engine.cleanSpecial = ($, content) => {
+	if (process.env.NODE_ENV !== 'production') {
+		fs.writeFileSync(path.join(__dirname, `../data_sample/parse_${NAME}.html`), $(content).html());
+	}
+
 	debug('tag img: convert data-original -> src ');
 	$('img', content).each(function () {
 		let dataOriginal = $(this).attr('data-original');
@@ -32,4 +41,6 @@ engine.cleanSpecial = ($, content) => {
 	$('[id*="ADS"]').each(function () {
 		$(this).remove();
 	});
+
+	$('.sbNws', content).remove();
 }

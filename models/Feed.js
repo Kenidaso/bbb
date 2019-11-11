@@ -42,7 +42,7 @@ const Feed = new keystone.List('Feed', {
 
 Feed.add({
 	title: { type: String, required: true },
-	publishDate: { type: Date },
+	publishDate: { type: Date, index: true },
 	link: { type: Types.Url, index: true, unique: true, initial: true },
 	linkBaoMoi: { type: Types.Url, index: true, unique: true, initial: true, sparse: true },
 	description: { type: Types.Textarea }, // short content
