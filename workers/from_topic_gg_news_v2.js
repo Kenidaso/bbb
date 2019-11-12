@@ -81,6 +81,11 @@ const save_1_article = (article, callback) => {
 		},
 
 		update: (next) => {
+			if (/news\.zing\.vn.*tin-tuc.html$/.test(article.originLink)) {
+				// ignore link tin tuc cua news.zing.vn
+				return next();
+			}
+
 			let find = {
 				link: article.originLink
 			}

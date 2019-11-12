@@ -84,17 +84,16 @@ base.getRawContent = (link, hostInfo, engine = {}, callback) => {
     });
 
     let contentStr = $(content).html();
-
-    contentStr = contentStr.replace(/\n/g, ' ').replace(/\t/g, ' ');
-
-    while (contentStr.indexOf('  ') > -1) {
-      contentStr = contentStr.replace(/\s\s/g, ' ');
-    }
-
-    contentStr = contentStr.replace(/\>\s\</g, '><');
-    contentStr = contentStr.trim();
-
     try {
+      contentStr = contentStr.replace(/\n/g, ' ').replace(/\t/g, ' ');
+
+      while (contentStr.indexOf('  ') > -1) {
+        contentStr = contentStr.replace(/\s\s/g, ' ');
+      }
+
+      contentStr = contentStr.replace(/\>\s\</g, '><');
+      contentStr = contentStr.trim();
+
       contentStr = minify(contentStr, {
         removeComments: true,
         removeCommentsFromCDATA: true,
