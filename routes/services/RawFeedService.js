@@ -126,10 +126,14 @@ RawFeed.getHtmlContent = (link, callback) => {
 			Host.model.findOne({
 				website: new RegExp(host)
 			},
-			'slug name engine website metadata',
+			'slug name engine website metadata customClass',
 			(err, result) => {
 				if (err) return next('EFINDHOST', err);
-				if (!result) return next('EHOSTNOTFOUND');
+				if (!result) {
+					debug('WARNING host not found');
+					// return next(null, null);
+					return next('EHOSTNOTFOUND');
+				}
 
 				RedisService.set(keyHost, result);
 
@@ -139,16 +143,19 @@ RawFeed.getHtmlContent = (link, callback) => {
 
 		// parse
 		(hostInfo, next) => {
-			let engineName = hostInfo.engine;
-			let enginePath = `../../engines/${engineName}.js`;
-			let engineFullPath = path.join(__dirname, enginePath);
-
 			let engine = null;
-			if (!fs.existsSync(engineFullPath)) {
-				debug('WARNING: no engine implement for host', host);
-				// return next('EENGINENOTEXISTS');
-			} else {
-				engine = require(enginePath);
+			if (hostInfo) {
+				let engineName = hostInfo.engine;
+				let enginePath = `../../engines/${engineName}.js`;
+				let engineFullPath = path.join(__dirname, enginePath);
+
+				let engine = null;
+				if (!fs.existsSync(engineFullPath)) {
+					debug('WARNING: no engine implement for host', host);
+					// return next('EENGINENOTEXISTS');
+				} else {
+					engine = require(enginePath);
+				}
 			}
 
 			baseEngine.getRawContent(link, hostInfo, engine, (err, result) => {

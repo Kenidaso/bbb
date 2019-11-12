@@ -5,6 +5,8 @@ const cheerio = require('cheerio');
 const Entities = require('html-entities').AllHtmlEntities;
 const entities = new Entities();
 const sanitizeHtml = require('sanitize-html');
+const fs = require('fs');
+const path = require('path');
 
 const debug = require('debug')('BaseEngine');
 const fatal = require('debug')('FATAL');
@@ -48,13 +50,24 @@ base.fetch = (link, callback) => {
   })
 }
 
-base.getRawContent = (link, hostInfo, engine = {}, callback) => {
+base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
   engine = engine || {};
-  let fetchEngine = engine.fetch || base.fetch;
-  let config = hostInfo.metadata;
+  hostInfo = hostInfo || {};
 
-  if (!config) return callback('ENOCONFIG');
-  if (!config.mainContentSelector) return callback('ENOMAINCONTENTSELECTOR');
+  let NAME = 'default';
+
+  let fetchEngine = engine.fetch || base.fetch;
+  let config = hostInfo.metadata || {};
+
+  debug('host config= %o', config);
+
+  // if (!config) return callback('ENOCONFIG');
+  // if (!config.mainContentSelector) return callback('ENOMAINCONTENTSELECTOR');
+
+  config.mainContentSelector = config.mainContentSelector;
+  config.removeSelectors = config.removeSelectors || [];
+
+  if (hostInfo && hostInfo.name) NAME = hostInfo.name;
 
   fetchEngine(link, (err, html) => {
     if (err) return callback('EFETCHLINK', err);
@@ -69,9 +82,19 @@ base.getRawContent = (link, hostInfo, engine = {}, callback) => {
 
     $('script', content).remove();
 
+    if (process.env.NODE_ENV !== 'production') {
+      fs.writeFileSync(path.join(__dirname, `../data_sample/parse_${NAME}.html`), $(content).html());
+    }
+
     if (engine.cleanSpecial) {
       debug('go cleanSpecial ...');
       engine.cleanSpecial($, content);
+    }
+
+    for (let i=0; i < config.removeSelectors.length; i++) {
+      let selector = config.removeSelectors[i];
+      $(selector, content).remove();
+      debug('remove selector %s', selector);
     }
 
     // remove class and inline style
@@ -120,7 +143,23 @@ base.getRawContent = (link, hostInfo, engine = {}, callback) => {
     let optSanitize = Object.assign({}, defaultSanitizeHtml(), engine.optSanitizeHtml || {});
     contentStr = sanitizeHtml(contentStr, optSanitize);
 
-    if (NODE_ENV !== 'production') debug('content= %s', contentStr);
+    let classStr = [];
+    if (hostInfo && hostInfo.name) {
+      classStr.push(`host-${hostInfo.name}`);
+    }
+
+    if (hostInfo && hostInfo.customClass && hostInfo.customClass.length > 0) {
+      classStr = [...classStr, ...hostInfo.customClass];
+    }
+
+    classStr = classStr.join(' ');
+
+    contentStr = `<div class="${classStr}">${contentStr}</div>`;
+
+    if (NODE_ENV !== 'production') {
+      debug('content= %s', contentStr);
+      fs.writeFileSync(path.join(__dirname, `../data_sample/parse_${NAME}_2.html`), contentStr);
+    }
 
     return callback(null, contentStr);
   })

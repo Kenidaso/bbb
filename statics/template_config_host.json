@@ -1,0 +1,14 @@
+{
+  "mainContentSelector": "#admwrapper .pkg .col630",
+  "removeSelectors": [
+    ".tag_detail",
+    ".head_detail",
+    "[class*=\"sharing-zone\"]",
+    ".list_vote_detail",
+    "#tab_news",
+    "#tab_relation",
+    ".letsop-title",
+    "[class*=\"adv\"]",
+    "[id*=\"dablewidget\"]"
+  ]
+}

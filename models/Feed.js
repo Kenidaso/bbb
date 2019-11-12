@@ -4,6 +4,8 @@ const { Schema } = mongoose;
 const keystone = require('keystone');
 const Types = keystone.Field.Types;
 
+const RedisService = require('../routes/services/RedisService');
+
 /**
  * Feed Model
  * =============
@@ -67,6 +69,12 @@ Feed.schema.add({ videos: [Schema.Types.Mixed] });
 Feed.schema.pre('save', function (next) {
 	this.createdAt = this.createdAt || new Date();
 	this.updatedAt = this.updatedAt || new Date();
+
+	if (this.link) {
+		let keyContentFeed = `rawHtml:${this.link}`;
+		console.log('trigger delete key redis:', keyContentFeed);
+		RedisService.del(keyContentFeed);
+	}
 
 	return next();
 });

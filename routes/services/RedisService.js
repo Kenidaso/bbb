@@ -32,7 +32,7 @@ module.exports = {
 		_client.get(`${prefix}:${key}`, callback);
 	},
 
-	del: (key, callback) => {
+	del: (key, callback = noop) => {
 		_client.del(`${prefix}:${key}`, callback);
 	},
 

@@ -85,6 +85,7 @@ keystone.set('nav', {
 	'News': [
 		'categories',
 		'hosts',
+		'Style',
 		'feeds',
 		'Rss',
 		'Html',
