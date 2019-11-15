@@ -99,21 +99,18 @@ const save_1_article = (article, callback) => {
 				link: article.originLink,
 				description: article.description,
 				category: article._topic.category,
-
-				// story,
-
 				storyLink: article.linkStory,
-
 				topic: [article._topic._id],
-
-				paperName: article.paper,
-				paperImg: article.paperImg || '',
 			}
 
-			if (article.linkArticle) update.metadata = { linkArticle: article.linkArticle };
+			if (article.linkArticle) {
+				update.metadata = Object.assign({}, update.metadata, { linkArticle: article.linkArticle });
+			}
+			if (article.linkArticle) {
+				update.metadata = Object.assign({}, update.metadata, { linkStory: article.linkStory });
+			}
 			// if (article.image) update.heroImage = { src: article.image }
 			if (article._topic) update.topic = [ article._topic._id ];
-			if (article.story) update.story = article.story;
 
 			console.log(`\nsave_1_article update= ${JSON.stringify(update)}`);
 
@@ -156,32 +153,29 @@ const proc_1_link_story = (objStory, callback) => {
 			return callback(null);
 		}
 
-		// save story
-		save_1_story(objStory, (err, storySaved) => {
-			let sections = result.sections;
+		let sections = result.sections;
 
-			let articles = [];
+		let articles = [];
 
-			_.forEach(sections, (section) => {
-				let sectionTitle = section.title;
+		_.forEach(sections, (section) => {
+			let sectionTitle = section.title;
 
-				section.articles = _.map(section.articles, (a) => {
-					a.sectionTitle = sectionTitle;
-					a.storyLink = objStory.linkStory;
-					a.story = storySaved._id;
-					a._topic = objStory._topic;
+			section.articles = _.map(section.articles, (a) => {
+				a.sectionTitle = sectionTitle;
+				a.storyLink = objStory.linkStory;
+				// a.story = storySaved._id;
+				a._topic = objStory._topic;
 
-					return a;
-				})
-
-				articles = [...articles, ...section.articles];
+				return a;
 			})
 
-			console.log('articles length=', articles.length);
-			// console.log('articles=', JSON.stringify(articles));
-
-			async.eachLimit(articles, LIMIT_ARTICLE, save_1_article, callback);
+			articles = [...articles, ...section.articles];
 		})
+
+		console.log('articles length=', articles.length);
+		// console.log('articles=', JSON.stringify(articles));
+
+		async.eachLimit(articles, LIMIT_ARTICLE, save_1_article, callback);
 	}, isGetOriginLink);
 }
 
