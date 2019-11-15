@@ -128,7 +128,9 @@ keystone.on = function (eventname, callback) {
 };
 
 async.parallel({
-	start_keystone: keystone.start,
+	start_keystone: (next) => {
+		keystone.start(next)
+	},
 	init_redis: redisService.init
 }, (err, result) => {
 	if (err) {
