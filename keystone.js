@@ -6,6 +6,7 @@ require('dotenv').config();
 const keystone = require('keystone');
 const requireDir = require('require-dir');
 const i18n = require("i18n");
+const async = require('async');
 
 i18n.configure({
 	// setup some locales - other locales default to en silently
@@ -113,7 +114,7 @@ if (!process.env.MAILGUN_API_KEY || !process.env.MAILGUN_DOMAIN) {
 }
 
 let redisService = require('./routes/services/RedisService');
-redisService.init();
+// redisService.init();
 
 let events = require('events');
 keystone.keystoneEmitter = new events.EventEmitter();
@@ -126,9 +127,22 @@ keystone.on = function (eventname, callback) {
 	keystone.keystoneEmitter.on(eventname, callback);
 };
 
-keystone.start(() => {
+async.parallel({
+	start_keystone: keystone.start,
+	init_redis: redisService.init
+}, (err, result) => {
+	if (err) {
+		console.log('start keystone fail, err=', err);
+		return;
+	}
+
 	console.log('keystone start done.');
 	keystone.emit('ready');
-});
+})
+
+// keystone.start(() => {
+// 	console.log('keystone start done.');
+// 	keystone.emit('ready');
+// });
 
 module.exports = keystone;

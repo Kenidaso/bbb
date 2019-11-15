@@ -72,6 +72,7 @@ exports = module.exports = function (app) {
 	app.get('/blog/post/:post', routes.views.post);
 	app.get('/gallery', routes.views.gallery);
 
+	app.get('/categories', routes.controllers.feed.getCategories);
 	app.get('/content/:slug', routes.controllers.feed.getContent);
 	app.post('/feed/raw', routes.controllers.feed.getRawContent);
 	app.get('/feed/:category/:page?', routes.controllers.feed.getFeeds);

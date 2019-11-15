@@ -1,5 +1,6 @@
 const keystone = require('keystone');
 const async = require('async');
+const _ = require('lodash');
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
@@ -41,7 +42,11 @@ Feed.getFeeds = (params, callback) => {
 			// find category
 			(next) => {
 				CategoryModel.findOne({
-					title: category
+					// title: category
+					$or: [
+						{ title: category },
+						{ slug: category },
+					]
 				}, (err, doc) => {
 					if (err) return next('EFINDCATEGORY', err);
 
@@ -96,4 +101,12 @@ Feed.getContent = (slugFeed, callback) => {
 			return RawFeedService.getHtmlContent(feed.link, callback);
 		})
 	});
+}
+
+Feed.getCategories = (callback) => {
+	CategoryModel.find({}, '-_id slug display title', (err, categories) => {
+		if (err) return callback(err);
+		let result = _.keyBy(categories, 'slug');
+		return callback(null, result);
+	})
 }

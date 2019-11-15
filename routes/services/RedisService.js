@@ -12,7 +12,8 @@ const prefix = `${NODE_ENV}`;
 const noop = () => { };
 
 module.exports = {
-	init: () => {
+	init: (callback = noop) => {
+		let isCallback = false;
 		_client = redis.createClient(REDIS_URI);
 
 		_client.on("error", (err) => {
@@ -21,6 +22,10 @@ module.exports = {
 
 		_client.on("ready", () => {
 			console.log("Redis ready!");
+			if (!isCallback) {
+				isCallback = true;
+				return callback && callback();
+			}
 		});
 	},
 

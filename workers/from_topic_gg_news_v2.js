@@ -24,6 +24,8 @@ keystone.init({
 
 keystone.import('../models');
 
+let redisService = require('../routes/services/RedisService');
+
 const NewsTopic = keystone.list('NewsTopic');
 const NewsStory = keystone.list('NewsStory');
 const Article = keystone.list('Article');
@@ -81,7 +83,7 @@ const save_1_article = (article, callback) => {
 		},
 
 		update: (next) => {
-			if (/news\.zing\.vn.*tin-tuc.html$/.test(article.originLink)) {
+			if (/news\.zing\.vn.*tin-tuc\.html$/.test(article.originLink)) {
 				// ignore link tin tuc cua news.zing.vn
 				return next();
 			}
@@ -251,10 +253,25 @@ const procTopics = (topics, callback) => {
 	async.eachLimit(topics, LIMIT_TOPIC, proc_1_topic, callback);
 }
 
+const removeOldFeed = (callback) => {
+	let cutoff = moment().add(-14, 'd').toDate();
+	console.log('begin remove old feed cutoff=', cutoff);
+
+	Feed.model.remove({
+		publishDate: {
+			$lt: cutoff
+		}
+	}, (err) => {
+		console.log('remove old err=', err);
+		return callback(null);
+	});
+}
+
 const runProcess = (callback) => {
 	console.log('process ...');
 
 	async.waterfall([
+		removeOldFeed,
 		getAllTopic,
 		procTopics,
 	], (err, result) => {
@@ -270,11 +287,20 @@ const startWorker = () => {
 
 	console.log('start worker ...');
 
-	keystone.start( x => {
-		console.log('start done ...');
+	async.parallel({
+		start_keystone: (next) => {
+			keystone.start(next)
+		},
+		init_redis: redisService.init
+	}, (err, result) => {
+		if (err) {
+			console.log('start keystone fail, err=', err);
+			return;
+		}
 
+		console.log('start done ...');
 		runProcess(stopWorker);
-	});
+	})
 }
 
 const stopWorker = () => {

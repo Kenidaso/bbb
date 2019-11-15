@@ -24,6 +24,13 @@ FeedCtrl.getRawContent = (req, res) => {
 	});
 }
 
+FeedCtrl.getCategories = (req, res) => {
+	FeedService.getCategories((err, result) => {
+		if (err) return Response.error(req, res, err, result);
+		return Response.success(req, res, result);
+	});
+}
+
 FeedCtrl.getContent = (req, res) => {
 	let { slug } = req.params;
 

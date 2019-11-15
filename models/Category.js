@@ -11,7 +11,7 @@ let { category_titles } = configModel;
 
 const Category = new keystone.List('Category', {
 	map: { name: 'display' },
-	autokey: { from: 'title', path: 'slug', unique: true },
+	autokey: { from: 'display', path: 'slug', unique: true },
 	track: {
 		createdAt: true,
   	createdBy: true,
@@ -24,11 +24,6 @@ const Category = new keystone.List('Category', {
 });
 
 Category.add({
-	// title: {
-	// 	type: Types.Select,
-	// 	options: category_titles.options,
-	// 	required: true
-	// },
 	title: {
 		type: String,
 		initial: true,
