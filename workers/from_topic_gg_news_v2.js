@@ -255,8 +255,9 @@ const removeOldFeed = (callback) => {
 		publishDate: {
 			$lt: cutoff
 		}
-	}, (err) => {
+	}, (err, result) => {
 		console.log('remove old err=', err);
+		console.log('remove old result=', JSON.stringify(result));
 		return callback(null);
 	});
 }
