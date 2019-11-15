@@ -28,7 +28,7 @@ Feed.getFeeds = (params, callback) => {
 
 	let key = `getFeeds:${category}:${page}`;
 
-	debug('key= %s', key);
+	debug('getFeeds key= %s', key);
 
 	RedisService.get(key, (err, result) => {
 		result = utils.safeParse(result);

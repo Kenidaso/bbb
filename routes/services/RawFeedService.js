@@ -149,11 +149,12 @@ RawFeed.getHtmlContent = (link, callback) => {
 				let enginePath = `../../engines/${engineName}.js`;
 				let engineFullPath = path.join(__dirname, enginePath);
 
-				let engine = null;
 				if (!fs.existsSync(engineFullPath)) {
 					debug('WARNING: no engine implement for host', host);
 					// return next('EENGINENOTEXISTS');
 				} else {
+					debug('engineName= %s', engineName);
+					debug('enginePath= %s', enginePath);
 					engine = require(enginePath);
 				}
 			}

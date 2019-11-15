@@ -27,6 +27,7 @@ engine.optSanitizeHtml = {
 }
 
 engine.fetch = (link, callback) => {
+	console.log('go to fetch engine');
   request({
     url: link,
     method: 'GET',

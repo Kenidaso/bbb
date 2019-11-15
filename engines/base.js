@@ -56,7 +56,7 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
 
   let NAME = 'default';
 
-  let fetchEngine = engine.fetch || base.fetch;
+  let fetchEngine = engine.fetch ? engine.fetch : base.fetch;
   let config = hostInfo.metadata || {};
 
   debug('host config= %o', config);

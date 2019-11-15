@@ -6,5 +6,7 @@
 	"Method not found": "Method not found",
 	"Not define error message": "Not define error message",
 	"Fetching failed: https://news.google.com/rss/search?pz=1&cf=all&q=&hl=vi&gl=VN&ceid=VN:vi": "Fetching failed: https://news.google.com/rss/search?pz=1&cf=all&q=&hl=vi&gl=VN&ceid=VN:vi",
-	"Link is invalid": "Link không hợp lệ"
+	"Link is invalid": "Link không hợp lệ",
+	"connection 3 to ds259245.mlab.com:59245 timed out": "connection 3 to ds259245.mlab.com:59245 timed out",
+	"connection 2 to ds259245.mlab.com:59245 timed out": "connection 2 to ds259245.mlab.com:59245 timed out"
 }

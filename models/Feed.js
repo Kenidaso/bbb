@@ -33,9 +33,7 @@ const Feed = new keystone.List('Feed', {
 	autokey: { from: 'title', path: 'slug', unique: true },
 	track: {
 		createdAt: true,
-		createdBy: true,
 		updatedAt: true,
-		updatedBy: true,
 	},
 	perPage: 20,
 	defaultColumns: 'title publishDate category host',
@@ -51,7 +49,7 @@ Feed.add({
 
 	rawHtml: { type: Types.Html, wysiwyg: true },
 
-	category: { type: Types.Relationship, ref: 'Category', initial: true, many: true },
+	category: { type: Types.Relationship, ref: 'Category', initial: true, many: true, index: true },
 	host: { type: Types.Relationship, ref: 'Host', initial: true },
 
 	story: { type: Types.Relationship, ref: 'NewsStory', initial: true, many: true },
