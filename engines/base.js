@@ -56,7 +56,13 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
 
   let NAME = 'default';
 
-  let fetchEngine = engine.fetch ? engine.fetch : base.fetch;
+  let fetchEngine = base.fetch;
+
+  if (engine.fetch) {
+    debug('using fetch of engine')
+    fetchEngine = engine.fetch;
+  }
+
   let config = hostInfo.metadata || {};
 
   debug('host config= %o', config);
@@ -142,6 +148,11 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
     debug('sanitize html ...');
     let optSanitize = Object.assign({}, defaultSanitizeHtml(), engine.optSanitizeHtml || {});
     contentStr = sanitizeHtml(contentStr, optSanitize);
+
+    if (contentStr == null || contentStr == 'null' || contentStr.length == 0) {
+      fatal('Can not parse link %s, please check', link);
+      return callback(null, null);
+    }
 
     let classStr = [];
     if (hostInfo && hostInfo.name) {
