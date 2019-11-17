@@ -126,7 +126,7 @@ RawFeed.getHtmlContent = (link, callback) => {
 			Host.model.findOne({
 				website: new RegExp(host)
 			},
-			'slug name engine website metadata customClass',
+			'slug name engine website metadata customClass mainContentSelector removeSelectors fallbackMainContent',
 			(err, result) => {
 				if (err) return next('EFINDHOST', err);
 				if (!result) {

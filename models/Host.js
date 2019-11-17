@@ -59,6 +59,12 @@ Host.add({
 	styles: { type: Types.Relationship, ref: 'Style', initial: true, many: true },
 	customClass: { type: Types.TextArray, initial: true },
 	engine: { type: String, initial: true }, // tên engine sử dụng
+
+	mainContentSelector: { type: Types.Text, initial: true }, // main content,
+	fallbackMainContent: { type: Types.TextArray }, // fallback nếu main selector không có kết quả
+
+	removeSelectors: { type: Types.TextArray, initial: true }, // những thứ cần remove đi
+
 	metadataJson: { type: Types.Textarea, initial: true },
 });
 

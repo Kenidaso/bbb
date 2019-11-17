@@ -51,6 +51,8 @@ base.fetch = (link, callback) => {
 }
 
 base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
+  if (NODE_ENV !== 'production') debug('hostInfo= %o', hostInfo);
+
   engine = engine || {};
   hostInfo = hostInfo || {};
 
@@ -70,7 +72,7 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
   // if (!config) return callback('ENOCONFIG');
   // if (!config.mainContentSelector) return callback('ENOMAINCONTENTSELECTOR');
 
-  config.mainContentSelector = config.mainContentSelector;
+  config.mainContentSelector = hostInfo.mainContentSelector || config.mainContentSelector;
   config.removeSelectors = config.removeSelectors || [];
 
   if (hostInfo && hostInfo.name) NAME = hostInfo.name;
@@ -86,6 +88,27 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
 
     let content = $(config.mainContentSelector);
 
+    // console.log('content=', content)
+
+    if ((!content || content.length == 0) && hostInfo.fallbackMainContent) {
+      debug('use mainContentSelector not found content, using fallbackMainContent ...');
+
+      for (let i=0; i < hostInfo.fallbackMainContent.length; i++) {
+        let selector = hostInfo.fallbackMainContent[i];
+        content = $(selector);
+
+        if (content && content.length !== 0) {
+          debug('found main content, use selector %s', selector);
+          break;
+        }
+      }
+    }
+
+    if (!content || content.length == 0) {
+      fatal('Can not parse link %s, please check', link);
+      return callback(null, null);
+    }
+
     $('script', content).remove();
 
     if (process.env.NODE_ENV !== 'production') {
@@ -97,10 +120,20 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
       engine.cleanSpecial($, content);
     }
 
+    // remove in config metadata
     for (let i=0; i < config.removeSelectors.length; i++) {
       let selector = config.removeSelectors[i];
       $(selector, content).remove();
       debug('remove selector %s', selector);
+    }
+
+    // remove in setup model
+    if (hostInfo.removeSelectors) {
+      for (let i=0; i < hostInfo.removeSelectors.length; i++) {
+        let selector = hostInfo.removeSelectors[i];
+        $(selector, content).remove();
+        debug('remove selector %s', selector);
+      }
     }
 
     // remove class and inline style
