@@ -7,8 +7,8 @@ var Types = keystone.Field.Types;
  */
 
 var UserSearch = new keystone.List('UserSearch', {
-	map: { name: 'keyword' },
-	autokey: { from: 'keyword', path: 'slug', unique: true },
+	map: { name: 'searchContent' },
+	autokey: { from: 'searchContent', path: 'slug', unique: true },
 	track: {
 		createdAt: true,
   	updatedAt: true,
