@@ -38,6 +38,7 @@ module.exports = {
 	},
 
 	del: (key, callback = noop) => {
+		console.log(`redis del key ${prefix}:${key}`);
 		_client.del(`${prefix}:${key}`, callback);
 	},
 

@@ -248,7 +248,7 @@ const procTopics = (topics, callback) => {
 }
 
 const removeOldFeed = (callback) => {
-	let cutoff = moment().add(-14, 'd').toDate();
+	let cutoff = moment().add(-30, 'd').toDate();
 	console.log('begin remove old feed cutoff=', cutoff);
 
 	Feed.model.remove({
@@ -280,7 +280,7 @@ const runProcess = (callback) => {
 const startWorker = () => {
 	NODE_ENV != 'production' && console.clear();
 
-	console.log('start worker ...');
+	console.log('start worker ... NODE_ENV=', NODE_ENV);
 
 	async.parallel({
 		start_keystone: (next) => {
@@ -302,7 +302,7 @@ const stopWorker = () => {
 	keystone.closeDatabaseConnection((err, result) => {
 		console.log('stop worker done');
 		return process.exit(0);
-		// return startWorker();
+		// return setTimeout(startWorker, 3e3);
 	});
 }
 

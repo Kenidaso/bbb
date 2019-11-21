@@ -83,28 +83,28 @@ Host.schema.pre('save', function (next) {
 		if (_tmp) {
 			this.metadata = _tmp;
 			this.metadataJson = minify(this.metadataJson);
-
-			// trigger delete key redis
-			const websiteUrl = url.parse(this.website);
-			let { host } = websiteUrl;
-
-			// clear subdomain
-			if (host.split('.').length > 2) {
-				let split = host.split('.');
-				split.shift();
-				let _tmpHost = split.join('.');
-				let findTld = tldsInVn.find((t) => {
-					return t == _tmpHost;
-				})
-
-				if (!findTld) host = _tmpHost;
-			}
-
-			let keyHost = `host:${host}`;
-			console.log('trigger delete key redis:', keyHost);
-			RedisService.del(keyHost);
 		}
 	}
+
+	// trigger delete key redis
+	const websiteUrl = url.parse(this.website);
+	let { host } = websiteUrl;
+
+	// clear subdomain
+	if (host.split('.').length > 2) {
+		let split = host.split('.');
+		split.shift();
+		let _tmpHost = split.join('.');
+		let findTld = tldsInVn.find((t) => {
+			return t == _tmpHost;
+		})
+
+		if (!findTld) host = _tmpHost;
+	}
+
+	let keyHost = `host:${host}`;
+	console.log('trigger delete key redis:', keyHost);
+	RedisService.del(keyHost);
 
 	return next();
 });
