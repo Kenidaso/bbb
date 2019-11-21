@@ -38,6 +38,7 @@ const noop = () => {};
 const LIMIT_ARTICLE = Number(process.env.LIMIT_ARTICLE) || 1;
 const LIMIT_LINK_STORY = Number(process.env.LIMIT_LINK_STORY) || 1;
 const LIMIT_TOPIC = Number(process.env.LIMIT_TOPIC) || 1;
+const MONTH_CUTOFF = Number(process.env.MONTH_CUTOFF) || 6;
 
 process.on('uncaughtException', function (error) {
   console.log(`====> uncaughtException=`, error);
@@ -248,7 +249,7 @@ const procTopics = (topics, callback) => {
 }
 
 const removeOldFeed = (callback) => {
-	let cutoff = moment().add(-30, 'd').toDate();
+	let cutoff = moment().add(-MONTH_CUTOFF, 'M').toDate();
 	console.log('begin remove old feed cutoff=', cutoff);
 
 	Feed.model.remove({
