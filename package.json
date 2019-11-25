@@ -8,6 +8,7 @@
     "bcrypt": "^3.0.6",
     "cheerio": "^1.0.0-rc.3",
     "cky-image-public": "^1.1.1",
+    "cky-mongo-decay": "^1.1.1",
     "cloudinary": "^1.14.0",
     "connect-mongo": "^3.0.0",
     "cors": "^2.8.5",

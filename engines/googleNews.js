@@ -149,6 +149,17 @@ const defaultOpts = {
 	ceid: 'VN:vi'
 }
 
+const defaultGgSearch = {
+	source: 'lnt',
+	tbs: 'lr:lang_1vi',
+	lr: 'lang_vi',
+	sa: 'X',
+	biw: 1800,
+	bih: 888,
+	dpr: 1.6,
+	start: 0
+}
+
 const getEntriesFromRss = (keyword, options = {}, callback) => {
 	if (typeof options === 'function') {
 		callback = options;
@@ -489,10 +500,91 @@ const getFeedAndStoryFromTopic = (topicUrl, callback, isGetOriginLink = false) =
 	});
 }
 
+const _parse_gg_search = (body) => {
+	let $ = cheerio.load(body);
+
+	let search = $('#search');
+
+	let div = $('div > div:nth-child(1)', search);
+	div = $(div[1], search);
+
+	let children = div.children();
+
+	let articles = [];
+	let linkStories = [];
+
+	children.each(function (index, child) {
+		let title = $('div > div h3', child).text();
+		let link = $('div > div h3 a', child).attr('href')
+
+		let description = $('div div div div:nth-child(3)', child).text();
+		let publishDate = $('div div div div:nth-child(2) span:nth-child(3)', child).text();
+		publishDate = moment(publishDate, 'DD thg MM, YYYY').utcOffset(420).format();
+
+		let article = {
+			title,
+			link,
+			description,
+			publishDate
+		}
+
+		articles.push(article);
+
+		let cardSection = $('.card-section', child);
+
+		if (cardSection && cardSection.length > 0) {
+			let linkCard = $('.card-section > a', cardSection).attr('href');
+			let titleCard = $('.card-section > a', cardSection).text();
+			let descriptionCard = $('.card-section span', cardSection).text();
+			let spans = $('.card-section span', cardSection);
+			let publishDateCard = $(spans[2]).text();
+			publishDateCard = moment(publishDateCard, 'DD thg MM, YYYY').utcOffset(420).format();
+
+			articles.push({
+				// isExtra: true,
+
+				title: titleCard,
+				link: linkCard,
+				description: descriptionCard,
+				publishDate: publishDateCard,
+			});
+
+			let linkStory = $('.card-section div:last-child > a', cardSection).attr('href');
+			linkStories.push(linkStory);
+		}
+	});
+
+	return { articles, linkStories};
+}
+
+const getFeedFromGgSearch = (keyword, options, callback) => {
+	if (typeof options === 'function') {
+		callback = options;
+		options =  {};
+	}
+
+	options = Object.assign({}, defaultGgSearch, options);
+
+	options.q = keyword;
+
+	request({
+		url: `https://www.google.com/search?q=${keyword}&tbm=nws&source=lnt&tbs=lr:lang_1vi&lr=lang_vi&sa=X&biw=1800&bih=888&dpr=1.6&start=0`,
+		method: 'GET',
+		// qs: options
+	}, (err, response, body) => {
+		if (err) return callback(err);
+
+		let result = _parse_gg_search(body);
+
+		return callback(null, result);
+	});
+}
+
 module.exports = {
 	search,
 	getLinkRedirect,
 	getEntriesFromRss,
 	getFeedFromStory,
 	getFeedAndStoryFromTopic,
+	getFeedFromGgSearch
 }
