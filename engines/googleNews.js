@@ -20,7 +20,7 @@ const request = require('request').defaults({
 	}
 });
 
-const LIMIT = 2;
+const LIMIT = 1;
 
 // https://news.google.com/search?q=vu%2039%20nguoi%20chet%20trong%20container&hl=vi&gl=VN&ceid=VN%3Avi
 const BASE_URL = 'https://news.google.com/search';
@@ -36,22 +36,33 @@ const map_section_vi = {
 let storeLinkRedirect = {};
 
 const getLinkRedirect = (articleLink, callback) => {
-	callback = once(callback);
-	request({
-		url: articleLink,
-		method: 'GET'
-	}, (err, response, body) => {
-		if (err || !body) {
-			return callback(null, null);
-		}
+	let _getLink = (cb) => {
+		request({
+			url: articleLink,
+			method: 'GET'
+		}, (err, response, body) => {
+			if (err || !body) {
+				return cb(null, null);
+			}
 
-		let $ = cheerio.load(body);
-		let redirectLink = $('c-wiz > div > div > c-wiz > div > a').text();
+			let $ = cheerio.load(body);
+			let redirectLink = $('c-wiz > div > div > c-wiz > div > a').text();
 
-		// console.log('---> getLinkRedirect ', articleLink, '-->', redirectLink);
+			return cb(null, redirectLink);
+		})
+	}
 
-		return callback(null, redirectLink);
-	})
+	async.retry({ times: 10, interval: 1000}, (cbRetry) => {
+		_getLink((err, originLink) => {
+			if (originLink) return cbRetry(null, originLink);
+
+			console.log('----> retry getLinkRedirect ...');
+
+			return cbRetry('ENOORIGINLINK');
+		});
+	}, (err, result) => {
+		return callback(null, result);
+	});
 }
 
 const _parse_gg_news = ($, isGetOriginLink = false, callback) => {
@@ -150,6 +161,7 @@ const defaultOpts = {
 }
 
 const defaultGgSearch = {
+	tbm: 'nws',
 	source: 'lnt',
 	tbs: 'lr:lang_1vi',
 	lr: 'lang_vi',
@@ -380,9 +392,25 @@ const _parse_gg_news_story = ($, isGetOriginLink = false, callback) => {
 	async.eachLimit(objStory.sections, LIMIT, (section, cbS) => {
 		async.eachLimit(section.articles, LIMIT, (article, cbA) => {
 			getLinkRedirect(article.link, (err, originLink) => {
+				// if (originLink)
 				article.originLink = originLink;
 				return cbA()
 			});
+
+			// async.retry({ times: 10, interval: 2000 }, (cbRetry) => {
+			// 	getLinkRedirect(article.link, (err, originLink) => {
+			// 		if (originLink) {
+			// 			article.originLink = originLink;
+			// 			return cbRetry()
+			// 		}
+
+			// 		console.log('====> retry getLinkRedirect ...');
+
+			// 		return cbRetry('ENOORIGINLINK')
+			// 	});
+			// }, () => {
+			// 	return cbA();
+			// });
 		}, () => {
 			return cbS();
 		})
@@ -563,20 +591,50 @@ const getFeedFromGgSearch = (keyword, options, callback) => {
 		options =  {};
 	}
 
-	options = Object.assign({}, defaultGgSearch, options);
+	let qs = Object.assign({}, defaultGgSearch, options.qs);
+	qs.q = keyword;
 
-	options.q = keyword;
+	console.log('qs=', qs);
 
 	request({
-		url: `https://www.google.com/search?q=${keyword}&tbm=nws&source=lnt&tbs=lr:lang_1vi&lr=lang_vi&sa=X&biw=1800&bih=888&dpr=1.6&start=0`,
+		// url: `https://www.google.com/search?q=${keyword}&tbm=nws&source=lnt&tbs=lr:lang_1vi&lr=lang_vi&sa=X&biw=1800&bih=888&dpr=1.6&start=0`,
+		url: `https://www.google.com/search`,
 		method: 'GET',
-		// qs: options
+		qs
 	}, (err, response, body) => {
 		if (err) return callback(err);
 
 		let result = _parse_gg_search(body);
 
-		return callback(null, result);
+		result = result || {};
+		result.articles = result.articles || [];
+
+		result.articles = result.articles.map((a) => {
+			a.originLink = a.link;
+			return a;
+		})
+
+		if (!options.getFeedFromStory) {
+			return callback(null, result);
+		}
+
+		console.log('getFeedFromStory ...');
+
+		async.eachLimit(result.linkStories, LIMIT, (linkStory, cbEach) => {
+			getFeedFromStory(linkStory, (err2, feeds) => {
+				if (!err2 && feeds) {
+					_.forEach(feeds.sections, (section) => {
+						result.articles = [...result.articles, ...section.articles];
+					})
+				}
+
+				return cbEach();
+			},
+			options.isGetOriginLink
+		);
+		}, (err3) => {
+			return callback(null, result);
+		})
 	});
 }
 

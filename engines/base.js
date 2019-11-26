@@ -86,9 +86,8 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
 
     debug('host %s : mainContentSelector= %s', hostInfo.website, config.mainContentSelector);
 
+    let heroImageSelector = `${config.mainContentSelector} img`;
     let content = $(config.mainContentSelector);
-
-    // console.log('content=', content)
 
     if ((!content || content.length == 0) && hostInfo.fallbackMainContent) {
       debug('use mainContentSelector not found content, using fallbackMainContent ...');
@@ -99,6 +98,7 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
 
         if (content && content.length !== 0) {
           debug('found main content, use selector %s', selector);
+          heroImageSelector = `${selector} img`;
           break;
         }
       }
@@ -118,6 +118,16 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
     if (engine.cleanSpecial) {
       debug('go cleanSpecial ...');
       engine.cleanSpecial($, content);
+    }
+
+    // get hero Image
+    let heroImage = null;
+    // debug('selector hero image: %s', heroImageSelector);
+    let imgs = $('img', content);
+
+    if (imgs && imgs.length > 0) {
+      debug('---> get hero image ...');
+      heroImage = $(imgs[0]).attr('src');
     }
 
     // remove in config metadata
@@ -205,6 +215,13 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
       fs.writeFileSync(path.join(__dirname, `../data_sample/parse_${NAME}_2.html`), contentStr);
     }
 
-    return callback(null, contentStr);
+    let result = {
+      rawHtml: contentStr,
+      heroImage
+    }
+
+    debug('result= %o', result);
+
+    return callback(null, result);
   })
 }

@@ -64,6 +64,7 @@ RawFeed.getHtmlContent = (link, callback) => {
 	let keyHost = `host:${host}`;
 
 	let rawHtml = null;
+	let heroImage = null;
 
 	async.waterfall([
 		// get rawHtml from cache
@@ -161,8 +162,11 @@ RawFeed.getHtmlContent = (link, callback) => {
 
 			baseEngine.getRawContent(link, hostInfo, engine, (err, result) => {
 				if (err) return next('EGETRAWCONTENT', err);
+				if (!result) return next('EGETRAWCONTENT_NORESULT');
 
-				rawHtml = result;
+				rawHtml = result.rawHtml;
+				heroImage = result.heroImage;
+
 				return next(null);
 			});
 		},
@@ -180,6 +184,18 @@ RawFeed.getHtmlContent = (link, callback) => {
 				if (err || !feed) {
 					debug('find feed err= %s', err);
 					return next();
+				}
+
+				if (heroImage) {
+					Feed.model.findOneAndUpdate({
+						_id: feed._id
+					}, {
+						$set: {
+							heroImage
+						}
+					}, {
+						new: true
+					}, () => {})
 				}
 
 				Feed.updateItem(feed, {

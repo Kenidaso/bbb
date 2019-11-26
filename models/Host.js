@@ -57,13 +57,15 @@ Host.add({
 	},
 	website: { type: Types.Url, initial: true, index: true, unique: true },
 	styles: { type: Types.Relationship, ref: 'Style', initial: true, many: true },
-	customClass: { type: Types.TextArray, initial: true },
+	customClass: { type: Types.TextArray },
 	engine: { type: String, initial: true }, // tên engine sử dụng
 
 	mainContentSelector: { type: Types.Text, initial: true }, // main content,
 	fallbackMainContent: { type: Types.TextArray }, // fallback nếu main selector không có kết quả
 
-	removeSelectors: { type: Types.TextArray, initial: true }, // những thứ cần remove đi
+	removeSelectors: { type: Types.TextArray }, // những thứ cần remove đi
+
+	// heroImage: { type: Types.TextArray },
 
 	metadataJson: { type: Types.Textarea, initial: true },
 });
