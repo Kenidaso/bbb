@@ -70,7 +70,7 @@ const MONTH_CUTOFF = Number(process.env.MONTH_CUTOFF) || 6;
 const TTL_ARTICLELINK = 60 * 60 * 24 * 7; // 7 days
 const TTL_LINK_SAVED = 60 * 60 * 24 * 7; // 7 days
 
-process.on('uncaughtException', function (error) {
+process.on('uncaughtException', (error) => {
   console.log(`====> uncaughtException=`, error);
 });
 
@@ -90,6 +90,12 @@ const getAllTopic = (callback) => {
 const save_1_article = (article, callback) => {
 	if (!article.title) {
 		console.log(`\nsave_1_article title not found`);
+		return callback();
+	}
+
+	if (!article.linkArticle && !article.originLink) {
+		console.log(`\n----------\nsave_1_article linkArticle & originLink not found`);
+		console.log(`${JSON.stringify(article)}\n-------------\n`);
 		return callback();
 	}
 
@@ -380,6 +386,7 @@ const startWorker = () => {
 	NODE_ENV != 'production' && console.clear();
 
 	console.log('start worker ... NODE_ENV=', NODE_ENV);
+	console.time('run-worker');
 
 	async.parallel({
 		start_keystone: (next) => {
@@ -400,9 +407,11 @@ const startWorker = () => {
 const stopWorker = () => {
 	keystone.closeDatabaseConnection((err, result) => {
 		console.log('stop worker done');
+		console.timeEnd('run-worker');
 		return process.exit(0);
 		// return setTimeout(startWorker, 3e3);
 	});
 }
 
+// run
 startWorker();
