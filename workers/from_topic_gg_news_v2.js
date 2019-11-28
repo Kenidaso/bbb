@@ -106,32 +106,6 @@ const save_1_article = (article, callback) => {
 				return next();
 			}
 
-			// get originLink from redis
-			/*let keyLinkArticleGgn = `ggn:linkArticle:${article.linkArticle}`;
-			redisService.get(keyLinkArticleGgn, (err, link) => {
-				if (!err && link) {
-					article.originLink = link;
-					console.log(`done get originLink from cache: ${link}`);
-
-					return next();
-				}
-
-				console.log(`\nsave_1_article originLink not found, ${JSON.stringify(article)}`);
-				console.log('get link redicrec again ...');
-
-				engine.getLinkRedirect(article.linkArticle, (err, originLink) => {
-					if (err || !originLink) {
-						// article.originLink = article.linkArticle;
-						return next();
-					}
-
-					article.originLink = originLink
-					redisService.set(keyLinkArticleGgn, originLink, TTL_ARTICLELINK);
-
-					return next()
-				});
-			})*/
-
 			engine.getLinkRedirect(article.linkArticle, (err, originLink) => {
 				if (err || !originLink) return next();
 				article.originLink = originLink
@@ -174,23 +148,22 @@ const save_1_article = (article, callback) => {
 			// check redis save
 
 			let keyLinkSaved = `ggn:saved:${article.originLink}`;
-			redisService.get(keyLinkSaved, (err, value) => {
-				if (!err && value) {
-					console.log(`${article.originLink} already saved, skip ...`);
-					return next();
+			// redisService.get(keyLinkSaved, (err, value) => {
+			// 	if (!err && value) {
+			// 		console.log(`${article.originLink} already saved, skip ...`);
+			// 		return next();
+			// 	}
+			// })
+
+		  utils.upsertSafe(Feed, find, update, (err, result) => {
+				if (err) {
+					console.log(`save_1_article err= ${err}`);
+				} else {
+					console.log(`\nsave_1_article update= ${JSON.stringify(update)}`);
+					// redisService.set(keyLinkSaved, 1, TTL_LINK_SAVED);
 				}
 
-				console.log(`\nsave_1_article update= ${JSON.stringify(update)}`);
-
-			  utils.upsertSafe(Feed, find, update, (err, result) => {
-					if (err) {
-						console.log(`save_1_article err= ${err}`);
-					} else {
-						redisService.set(keyLinkSaved, 1, TTL_LINK_SAVED);
-					}
-
-					return next(null, result);
-				})
+				return next(null, result);
 			})
 		}
 	}, callback);
