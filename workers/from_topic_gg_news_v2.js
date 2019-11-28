@@ -6,6 +6,7 @@ const utils = require('../helpers/utils');
 
 process.env.PORT = utils.randInt(3000, 4000);
 const NODE_ENV = process.env.NODE_ENV || 'development';
+const APP_NAME = process.env.APP_NAME || 'local';
 
 const keystone = require('keystone');
 const shortId = require('short-id-gen');
@@ -106,7 +107,7 @@ const save_1_article = (article, callback) => {
 			}
 
 			// get originLink from redis
-			let keyLinkArticleGgn = `ggn:linkArticle:${article.linkArticle}`;
+			/*let keyLinkArticleGgn = `ggn:linkArticle:${article.linkArticle}`;
 			redisService.get(keyLinkArticleGgn, (err, link) => {
 				if (!err && link) {
 					article.originLink = link;
@@ -129,7 +130,13 @@ const save_1_article = (article, callback) => {
 
 					return next()
 				});
-			})
+			})*/
+
+			engine.getLinkRedirect(article.linkArticle, (err, originLink) => {
+				if (err || !originLink) return next();
+				article.originLink = originLink
+				return next()
+			});
 		},
 
 		update: (next) => {
@@ -408,8 +415,13 @@ const stopWorker = () => {
 	keystone.closeDatabaseConnection((err, result) => {
 		console.log('stop worker done');
 		console.timeEnd('run-worker');
-		return process.exit(0);
-		// return setTimeout(startWorker, 3e3);
+		// return process.exit(0);
+
+		keystone.httpServer.close();
+
+		setTimeout(() => {
+			startWorker();
+		}, 3e3);
 	});
 }
 

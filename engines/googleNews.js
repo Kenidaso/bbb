@@ -6,7 +6,10 @@ const async = require('async');
 const parse = require('feed-reader').parse;
 const moment = require('moment');
 const unidecode = require('unidecode');
-const once = require('once')
+const once = require('once');
+
+const url = require('url');
+const querystring = require('querystring');
 
 const Entities = require('html-entities').AllHtmlEntities;
 const entities = new Entities();
@@ -20,7 +23,7 @@ const request = require('request').defaults({
 	}
 });
 
-const LIMIT = 1;
+const LIMIT = 2;
 
 // https://news.google.com/search?q=vu%2039%20nguoi%20chet%20trong%20container&hl=vi&gl=VN&ceid=VN%3Avi
 const BASE_URL = 'https://news.google.com/search';
@@ -35,7 +38,78 @@ const map_section_vi = {
 
 let storeLinkRedirect = {};
 
+function escapeUnicode(str) {
+  return str.replace(/[\u00A0-\uffff]/gu, function (c) {
+    return "\\u" + ("000" + c.charCodeAt().toString(16)).slice(-4)
+  });
+}
+
+const removeQs = [
+	'vn_source',
+	'vn_campaign',
+	'vn_medium',
+	'vn_term',
+	'vn_thumb'
+]
+
+const cleanQueryString = (qs) => {
+	let qsParsed = querystring.parse(qs);
+	for (let key in qsParsed) {
+		if (removeQs.indexOf(key) > -1) delete qsParsed[key];
+	}
+
+	return querystring.stringify(qsParsed);
+}
+
+const decodeLinkGgn = function (articleLink) {
+	if (!articleLink || articleLink.length == 0) return null;
+
+	const urlParsed = url.parse(articleLink);
+	let pathname = urlParsed.pathname;
+
+	let encode = pathname.substr(pathname.lastIndexOf('/') + 1);
+	// let decode = atob(encode);
+	encode = decodeURIComponent(encode);
+
+	let decode = Buffer.from(encode, 'base64').toString();
+	decode = decode.substr(decode.lastIndexOf('http'));
+	decode = decodeURIComponent(decode);
+	decode = unidecode(decode);
+	decode = decode.toString('utf8').replace('\x01', '').replace('\x00', '');
+	decode = decode.replace('\u0001\u0000', '');
+	decode = escapeUnicode(decode);
+
+	if (decode[decode.length - 1] === '/') decode.substr(0, decode.length - 1);
+
+	decode = decode.trim();
+
+	try {
+		let test = new URL(decode);
+	} catch (ex) {
+		return null;
+	}
+
+	let decodeParserd = url.parse(decode);
+	const qs = cleanQueryString(decodeParserd.query);
+
+	// console.log('decode=', decode);
+	// console.log('decodeParserd=', JSON.stringify(decodeParserd));
+	// console.log('qs=', qs);
+
+	let finalLink = `${decodeParserd.protocol}//${decodeParserd.host}${decodeParserd.port ? ':' + decodeParserd.port : ''}${decodeParserd.pathname}`;
+
+	if (qs && qs.length > 0) finalLink += `?${qs}`;
+
+	if (finalLink[finalLink.length - 1] === '/') finalLink.substr(0, finalLink.length - 1);
+
+	return finalLink;
+}
+
 const getLinkRedirect = (articleLink, callback) => {
+
+	let decode = decodeLinkGgn(articleLink);
+	if (decode && decode.length > 0) return callback(null, decode);
+
 	let _getLink = (cb) => {
 		request({
 			url: articleLink,
@@ -160,6 +234,15 @@ const defaultOpts = {
 	ceid: 'VN:vi'
 }
 
+/*
+&biw=1800
+&bih=888
+&tbm=nws
+&ei=YZDfXdyNEsnW-QbCiZiADQ
+&start=20
+&sa=N
+&ved=0ahUKEwicwsKGyYzmAhVJa94KHcIEBtA4HhDy0wMIWQ
+*/
 const defaultGgSearch = {
 	tbm: 'nws',
 	source: 'lnt',
@@ -391,26 +474,14 @@ const _parse_gg_news_story = ($, isGetOriginLink = false, callback) => {
 
 	async.eachLimit(objStory.sections, LIMIT, (section, cbS) => {
 		async.eachLimit(section.articles, LIMIT, (article, cbA) => {
-			getLinkRedirect(article.link, (err, originLink) => {
+
+			let link = article.link || article.linkArticle;
+
+			getLinkRedirect(link, (err, originLink) => {
 				// if (originLink)
 				article.originLink = originLink;
 				return cbA()
 			});
-
-			// async.retry({ times: 10, interval: 2000 }, (cbRetry) => {
-			// 	getLinkRedirect(article.link, (err, originLink) => {
-			// 		if (originLink) {
-			// 			article.originLink = originLink;
-			// 			return cbRetry()
-			// 		}
-
-			// 		console.log('====> retry getLinkRedirect ...');
-
-			// 		return cbRetry('ENOORIGINLINK')
-			// 	});
-			// }, () => {
-			// 	return cbA();
-			// });
 		}, () => {
 			return cbS();
 		})
@@ -546,8 +617,23 @@ const _parse_gg_search = (body) => {
 		let link = $('div > div h3 a', child).attr('href')
 
 		let description = $('div div div div:nth-child(3)', child).text();
-		let publishDate = $('div div div div:nth-child(2) span:nth-child(3)', child).text();
-		publishDate = moment(publishDate, 'DD thg MM, YYYY').utcOffset(420).format();
+		let publishDateText = $('div div div div:nth-child(2) span:nth-child(3)', child).text();
+
+		let publishDate = null;
+
+		if (publishDateText.indexOf('giờ trước') > -1) {
+			let _tmp = publishDateText.match(/\d{1,2} giờ trước/)[0];
+			let hour = Number(_tmp.match(/\d{1,2}/)[0]);
+			publishDate = moment().add(hour * -1, 'h').utcOffset(420).format();
+		} else {
+			let _tmp = publishDateText.match(/\d{1,2} thg \d{1,2}, \d{4}/)[0];
+			_tmp = publishDateText.replace('thg', '').replace(',', '');
+
+			publishDate = moment(_tmp, 'DD MM YYYY')
+			publishDate = publishDate.isValid() ? publishDate.utcOffset(420).format() : null;
+		}
+
+		console.log(`-> ${publishDateText} : ${publishDate}`);
 
 		let article = {
 			title,
@@ -565,12 +651,23 @@ const _parse_gg_search = (body) => {
 			let titleCard = $('.card-section > a', cardSection).text();
 			let descriptionCard = $('.card-section span', cardSection).text();
 			let spans = $('.card-section span', cardSection);
-			let publishDateCard = $(spans[2]).text();
-			publishDateCard = moment(publishDateCard, 'DD thg MM, YYYY').utcOffset(420).format();
+			let publishDateCardText = $(spans[2]).text();
+			let publishDateCard = null;
+
+			if (publishDateCardText.indexOf('giờ trước') > -1) {
+				let _tmp = publishDateCardText.match(/\d{1,2} giờ trước/)[0];
+				let hour = Number(_tmp.match(/\d{1,2}/)[0]);
+				publishDate = moment().add(hour * -1, 'h').utcOffset(420).format();
+			} else {
+				let _tmp = publishDateCardText.match(/\d{1,2} thg \d{1,2}, \d{4}/)[0];
+				_tmp = publishDateCardText.replace('thg', '').replace(',', '');
+
+				publishDateCard = moment(_tmp, 'DD MM YYYY')
+				publishDateCard = publishDateCard.isValid() ? publishDateCard.utcOffset(420).format() : null;
+			}
 
 			articles.push({
 				// isExtra: true,
-
 				title: titleCard,
 				link: linkCard,
 				description: descriptionCard,
@@ -578,11 +675,17 @@ const _parse_gg_search = (body) => {
 			});
 
 			let linkStory = $('.card-section div:last-child > a', cardSection).attr('href');
-			linkStories.push(linkStory);
+
+			if (linkStory && linkStory.length > 0) linkStories.push(linkStory);
 		}
 	});
 
-	return { articles, linkStories};
+	// get query string
+	let next = $('#pnnext').attr('href');
+
+	if (next && next.length > 0) next = 'https://www.google.com' + next;
+
+	return { articles, linkStories, next};
 }
 
 const getFeedFromGgSearch = (keyword, options, callback) => {
@@ -591,54 +694,134 @@ const getFeedFromGgSearch = (keyword, options, callback) => {
 		options =  {};
 	}
 
-	let qs = Object.assign({}, defaultGgSearch, options.qs);
-	qs.q = keyword;
+	options['maxPage'] = options['maxPage'] || 1;
 
-	console.log('qs=', qs);
+	options['maxPage'] = Math.min(options['maxPage'], 10);
 
-	request({
-		// url: `https://www.google.com/search?q=${keyword}&tbm=nws&source=lnt&tbs=lr:lang_1vi&lr=lang_vi&sa=X&biw=1800&bih=888&dpr=1.6&start=0`,
-		url: `https://www.google.com/search`,
-		method: 'GET',
-		qs
-	}, (err, response, body) => {
-		if (err) return callback(err);
+	let finalResult = {
+		articles: [],
+		linkStories: [],
+	}
 
-		let result = _parse_gg_search(body);
+	let nextLink = null;
 
-		result = result || {};
-		result.articles = result.articles || [];
+	let times = [...Array(options.maxPage).keys()];
 
-		result.articles = result.articles.map((a) => {
+	let qsNext = null;
+
+	let _processPage = (page, cb) => {
+		console.log(`--> page ${page + 1} ...`);
+
+		if (page > 0 && !qsNext) {
+			console.log('result search is max ...')
+			return cb();
+		}
+
+		let qs = Object.assign({}, defaultGgSearch, options.qs);
+		qs.q = qs.q || keyword;
+		qs.start = page * 10;
+
+		if (qsNext) qs = Object.assign({}, qsNext);;
+
+		console.log('qs=', qs);
+
+		request({
+			url: `https://www.google.com/search`,
+			method: 'GET',
+			qs
+		}, (err, response, body) => {
+			if (err) return cb();
+
+			fs.writeFileSync(path.join(__dirname, '../data_sample/google_search.html'), body, 'utf8');
+
+			let result = _parse_gg_search(body);
+
+			if (result.next) {
+				console.log('===> next= ', result.next);
+
+				let nextParse = url.parse(result.next);
+				qsNext = querystring.parse(nextParse.query);
+			} else {
+				qsNext = null;
+			}
+
+			result = result || {};
+			result.articles = result.articles || [];
+			result.linkStories = result.linkStories || [];
+
+			finalResult.articles = [...finalResult.articles, ...result.articles];
+			finalResult.linkStories = [...finalResult.linkStories, ...result.linkStories];
+
+			return cb();
+		});
+	}
+
+	async.eachSeries(times, _processPage, (err) => {
+		finalResult.articles = finalResult.articles.map((a) => {
 			a.originLink = a.link;
 			return a;
 		})
 
 		if (!options.getFeedFromStory) {
-			return callback(null, result);
+			_.remove(finalResult.articles, function (n) {
+			  return !n.publishDate;
+			});
+
+			finalResult.articles = _.uniqBy(finalResult.articles, 'originLink');
+
+			finalResult.articles = _.orderBy(
+				finalResult.articles,
+				[
+					function (o) {
+						return (new Date(o.publishDate).getTime());
+					}
+				],
+				['desc']
+			);
+
+			return callback(null, finalResult);
 		}
 
 		console.log('getFeedFromStory ...');
 
-		async.eachLimit(result.linkStories, LIMIT, (linkStory, cbEach) => {
-			getFeedFromStory(linkStory, (err2, feeds) => {
-				if (!err2 && feeds) {
-					_.forEach(feeds.sections, (section) => {
-						result.articles = [...result.articles, ...section.articles];
-					})
-				}
+		async.eachLimit(finalResult.linkStories, LIMIT, (linkStory, cbEach) => {
+			getFeedFromStory(
+				linkStory,
+				(err2, feeds) => {
+					if (!err2 && feeds) {
+						_.forEach(feeds.sections, (section) => {
+							finalResult.articles = [...finalResult.articles, ...section.articles];
+						})
+					}
 
-				return cbEach();
-			},
-			options.isGetOriginLink
-		);
+					return cbEach();
+				},
+				options.isGetOriginLink
+			);
 		}, (err3) => {
-			return callback(null, result);
+			_.remove(finalResult.articles, function (n) {
+			  return !n.publishDate || !n.originLink;
+			});
+
+			finalResult.articles = _.uniqBy(finalResult.articles, 'originLink');
+
+			finalResult.articles = _.orderBy(
+				finalResult.articles,
+				[
+					function (o) {
+						return (new Date(o.publishDate).getTime());
+					}
+				],
+				['desc']
+			);
+
+			return callback(null, finalResult);
 		})
-	});
+	})
 }
 
 module.exports = {
+	decodeLinkGgn,
 	search,
 	getLinkRedirect,
 	getEntriesFromRss,

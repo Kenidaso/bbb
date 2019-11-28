@@ -12,3 +12,5 @@ mongoexport -h ds259245.mlab.com:59245 -d sk-news-backend -c usersearches -u adm
 
 # run worker
 NODE_ENV=production LIMIT_RSS=5 LIMIT_NEWS=5 node workers/from_rss && NODE_ENV=production node workers/from_topic_gg_news_v2 && NODE_ENV=production node workers/fix_originLink_article && NODE_ENV=production LIMIT_PAGE=10 LIMIT_NEWS=30 node workers/from_html
+
+redis-cli -u redis://user:9nSpQH7B3aRjcTClWjOJqVOINX0AoDRH@redis-16930.c62.us-east-1-4.ec2.cloud.redislabs.com:16930 "monitor" | grep "set.*ggn:saved"
