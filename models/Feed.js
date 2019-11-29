@@ -42,6 +42,8 @@ const Feed = new keystone.List('Feed', {
 
 Feed.add({
 	title: { type: String, required: true },
+	slug: { type: String, index: true, unique: true },
+
 	publishDate: { type: Date, index: true },
 	link: { type: Types.Url, index: true, unique: true, initial: true },
 	linkBaoMoi: { type: Types.Url, index: true, unique: true, initial: true, sparse: true },
@@ -56,11 +58,27 @@ Feed.add({
 	topic: { type: Types.Relationship, ref: 'NewsTopic', initial: true, many: true, index: true },
 
 	view: { type: Types.Number, default: 0 },
+
+	/*
+	{
+		"public_id" : "rdrwfwzzbenze4hzlogk",
+		"version" : 1567263420,
+		"signature" : "0132e60eed466f644e3442bd101db2157f6843f5",
+		"width" : 749,
+		"height" : 500,
+		"format" : "jpg",
+		"resource_type" : "image",
+		"url" : "http://res.cloudinary.com/chickyky/image/upload/v1567263420/rdrwfwzzbenze4hzlogk.jpg",
+		"secure_url" : "https://res.cloudinary.com/chickyky/image/upload/v1567263420/rdrwfwzzbenze4hzlogk.jpg",
+		"_id" : ObjectId("5d6a8abc166fea081d4811d4")
+	}
+	*/
+	heroImage: { type: Types.CloudinaryImage },
 });
 
 Feed.schema.add({ contentOrder: [Schema.Types.Mixed] }); // full content order
 Feed.schema.add({ metadata: Schema.Types.Mixed });
-Feed.schema.add({ heroImage: Schema.Types.Mixed });
+// Feed.schema.add({ heroImage: Schema.Types.Mixed });
 Feed.schema.add({ images: [Schema.Types.Mixed] });
 Feed.schema.add({ videos: [Schema.Types.Mixed] });
 

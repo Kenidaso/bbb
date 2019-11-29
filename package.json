@@ -18,6 +18,7 @@
     "html-entities": "^1.2.1",
     "html-minifier": "^4.0.0",
     "i18n": "^0.8.3",
+    "image-size": "^0.8.3",
     "jsonwebtoken": "^8.5.1",
     "keystone": "4.0.0-beta.5",
     "keystone-email": "1.0.5",
@@ -48,7 +49,7 @@
     "ggn": "NODE_ENV=production node workers/from_topic_gg_news_v2",
     "start": "npm run docs && DEBUG=*routes*,*Service*,*Model*,FATAL,*Engine* PORT=3222 nodemon keystone.js",
     "docs": "apidoc -i routes/controllers -o public/docs",
-    "postinstall": "npm install apidoc -g && cp cheats/cloudinaryResize.js node_modules/keystone/admin/client/utils && cp cheats/CloudinaryImagesField.js node_modules/keystone/fields/types/cloudinaryimages && cp cheats/CloudinaryImageField.js node_modules/keystone/fields/types/cloudinaryimage && cp -f ./public/images/newspaper.png ./node_modules/keystone/admin/public/images/logo.png && cp -f cheats/Brand.js node_modules/keystone/admin/client/Signin/components/Brand.js"
+    "postinstall": "npm install apidoc -g && cp cheats/FileChangeMessage.js node_modules/keystone/fields/components &&  cp cheats/cloudinaryResize.js node_modules/keystone/admin/client/utils && cp cheats/CloudinaryImagesField.js node_modules/keystone/fields/types/cloudinaryimages && cp cheats/CloudinaryImageField.js node_modules/keystone/fields/types/cloudinaryimage && cp -f ./public/images/newspaper.png ./node_modules/keystone/admin/public/images/logo.png && cp -f cheats/Brand.js node_modules/keystone/admin/client/Signin/components/Brand.js"
   },
   "engines": {
     "node": ">= 10.15.3",

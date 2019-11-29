@@ -1,5 +1,7 @@
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const request = require('request');
+const sizeOf = require('image-size');
+
 module.exports = {
 	errorObj: (errorCode, codeDebug = 'EUNKNOWN', data = {}, message = '', statusCode = 400) => {
 		return { errorCode, message, data, statusCode, codeDebug };
@@ -94,4 +96,17 @@ module.exports = {
 			}
 		);
 	},
+
+	getSizeImage: (urlImage, callback) => {
+		request({
+			url: urlImage,
+			method: 'GET',
+			encoding: null,
+		}, (err, response, body) => {
+			if (err) return callback(err);
+			if (!body) return callback(null, null);
+
+			return callback(null, sizeOf(body));
+		})
+	}
 };

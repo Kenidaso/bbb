@@ -37,6 +37,8 @@ const tldsInVn = [ // top level domain
 	'vn'
 ]
 
+const noop = () => {};
+
 RawFeed = {};
 module.exports = RawFeed;
 
@@ -187,15 +189,42 @@ RawFeed.getHtmlContent = (link, callback) => {
 				}
 
 				if (heroImage) {
-					Feed.model.findOneAndUpdate({
-						_id: feed._id
-					}, {
-						$set: {
-							heroImage
+					let urlImage = heroImage;
+					let public_id = heroImage;
+					let width = 0;
+					let height = 0;
+					let format = 'jpg';
+
+					utils.getSizeImage(urlImage, (errSize, sizeOf) => {
+						debug(`get size image url= ${urlImage}: ${JSON.stringify(sizeOf)}`);
+
+						if (sizeOf) {
+							width = sizeOf.width;
+							height = sizeOf.height;
+							format = sizeOf.type;
+							public_id = public_id.replace(`.${format}`, '');
 						}
-					}, {
-						new: true
-					}, () => {})
+
+						let updateHeroImage = {
+							url: urlImage,
+							width,
+							height,
+							format,
+							public_id
+						}
+
+						debug(`update hero image: ${JSON.stringify(updateHeroImage)}`);
+
+						Feed.model.findOneAndUpdate({
+							_id: feed._id
+						}, {
+							$set: {
+								heroImage: updateHeroImage
+							}
+						}, {
+							new: true
+						}, noop)
+					})
 				}
 
 				Feed.updateItem(feed, {
