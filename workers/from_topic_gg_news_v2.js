@@ -385,16 +385,22 @@ const startWorker = () => {
 }
 
 const stopWorker = () => {
-	keystone.closeDatabaseConnection((err, result) => {
+	async.parallel({
+		close_redis: (next) => {
+			redisService.close(next);
+		},
+
+		close_mongo: (next) => {
+			keystone.closeDatabaseConnection((err, result) => {
+				keystone.httpServer.close();
+				setTimeout(next, 500);
+			});
+		}
+	}, (err, result) => {
 		console.log('stop worker done');
 		console.timeEnd('run-worker');
-		// return process.exit(0);
 
-		keystone.httpServer.close();
-
-		setTimeout(() => {
-			startWorker();
-		}, 3e3);
+		setTimeout(startWorker, 3e3);
 	});
 }
 

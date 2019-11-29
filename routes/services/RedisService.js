@@ -55,5 +55,11 @@ module.exports = {
 
 		_client.set(`${prefix}:${key}`, value, callback);
 		if (ttl && Number(ttl) > 0) _client.expire(`${prefix}:${key}`, ttl);
+	},
+
+	close: (cb = noop) => {
+		if (!_client) return cb();
+		_client.quit();
+		setTimeout(cb, 500);
 	}
 }
