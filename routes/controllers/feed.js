@@ -16,9 +16,9 @@ FeedCtrl.getFeeds = (req, res) => {
 }
 
 FeedCtrl.getRawContent = (req, res) => {
-	let { link } = req.body;
+	let { link, ignoreCache } = req.body;
 
-	RawFeedService.getHtmlContent(link, (err, html) => {
+	RawFeedService.getHtmlContent(link, ignoreCache, (err, html) => {
 		if (err) return Response.error(req, res, err, html);
 		return Response.success(req, res, html);
 	});

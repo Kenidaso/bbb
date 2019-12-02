@@ -6,6 +6,9 @@ const url = require('url');
 const async = require('async');
 const fs = require('fs');
 const path = require('path');
+const cheerio = require('cheerio');
+
+
 
 const baseEngine = require('../../engines/base');
 
@@ -42,7 +45,7 @@ const noop = () => {};
 RawFeed = {};
 module.exports = RawFeed;
 
-RawFeed.getHtmlContent = (link, callback) => {
+RawFeed.getHtmlContent = (link, ignoreCache = false, callback) => {
 	const feedUrl = url.parse(link);
 	let { host } = feedUrl;
 
@@ -67,11 +70,14 @@ RawFeed.getHtmlContent = (link, callback) => {
 
 	let rawHtml = null;
 	let heroImage = null;
+	let articleParse = null;
 
 	async.waterfall([
 		// get rawHtml from cache
 		(next) => {
 			if (NODE_ENV !== 'production') return next();
+
+			if (ignoreCache) return next();
 
 			RedisService.get(keyContent, (err, value) => {
 				if (!err && value) {
@@ -110,6 +116,8 @@ RawFeed.getHtmlContent = (link, callback) => {
 		(next) => {
 			if (NODE_ENV !== 'production') return next(null, null);
 
+			if (ignoreCache) return next();
+
 			RedisService.get(keyHost, (err, hostInfo) => {
 				if (err || !hostInfo) return next(null, null);
 
@@ -133,9 +141,10 @@ RawFeed.getHtmlContent = (link, callback) => {
 			(err, result) => {
 				if (err) return next('EFINDHOST', err);
 				if (!result) {
-					debug('WARNING host not found');
-					// return next(null, null);
-					return next('EHOSTNOTFOUND');
+					debug('WARNING host %s not found', host);
+
+					return next(null, null);
+					// return next('EHOSTNOTFOUND');
 				}
 
 				RedisService.set(keyHost, result);
@@ -146,6 +155,20 @@ RawFeed.getHtmlContent = (link, callback) => {
 
 		// parse
 		(hostInfo, next) => {
+			if (!hostInfo) { // no host config, use flow auto
+				debug('--> use article-parser ...');
+
+				return baseEngine.userArticleParse(link, (err, article) => {
+					if (err) return next('EPARSEARTICLE', err);
+
+					articleParse = article;
+					rawHtml = article.content;
+					if (article.image) heroImage = article.image;
+
+					return next(null);
+				});
+			}
+
 			let engine = null;
 			if (hostInfo) {
 				let engineName = hostInfo.engine;
@@ -227,9 +250,17 @@ RawFeed.getHtmlContent = (link, callback) => {
 					})
 				}
 
-				Feed.updateItem(feed, {
+				let update = {
 					rawHtml: rawHtml
-				}, {
+				}
+
+				if (!feed.description && articleParse.description) {
+					update.description = articleParse.description;
+				}
+
+				debug('update feed %o', update);
+
+				Feed.updateItem(feed, update, {
 					new: true
 				}, (err, newFeed) => {
 					if (err) debug('update feed err= %s', err);

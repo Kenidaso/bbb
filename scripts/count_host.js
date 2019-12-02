@@ -24,4 +24,6 @@ db.getCollection('feeds').aggregate([
             count: -1
         }
     }
-])
+]).forEach(function (doc) {
+    print(doc._id, doc.count)
+})
