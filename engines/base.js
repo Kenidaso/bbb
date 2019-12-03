@@ -92,6 +92,12 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
 
     debug('host %s : mainContentSelector= %s', hostInfo.website, config.mainContentSelector);
 
+    let description = $('[name="description"]').attr('content');
+
+    if (!description || description.length == 0) {
+      description = $('[property="og:description"]').attr('content');
+    }
+
     let heroImageSelector = `${config.mainContentSelector} img`;
     let content = $(config.mainContentSelector);
 
@@ -223,7 +229,8 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
 
     let result = {
       rawHtml: contentStr,
-      heroImage
+      heroImage,
+      description
     }
 
     debug('result= %o', result);

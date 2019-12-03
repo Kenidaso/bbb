@@ -71,6 +71,7 @@ RawFeed.getHtmlContent = (link, ignoreCache = false, callback) => {
 
 	let rawHtml = null;
 	let heroImage = null;
+	let description = null;
 	let articleParse = null;
 
 	async.waterfall([
@@ -170,7 +171,9 @@ RawFeed.getHtmlContent = (link, ignoreCache = false, callback) => {
 
 					articleParse = article;
 					rawHtml = article.content;
+
 					if (article.image) heroImage = article.image;
+					if (article.description) description = article.description;
 
 					return next(null);
 				});
@@ -198,6 +201,8 @@ RawFeed.getHtmlContent = (link, ignoreCache = false, callback) => {
 
 				rawHtml = result.rawHtml;
 				heroImage = result.heroImage;
+
+				if (result.description) description = result.description;
 
 				return next(null);
 			});
@@ -261,8 +266,8 @@ RawFeed.getHtmlContent = (link, ignoreCache = false, callback) => {
 					rawHtml: rawHtml
 				}
 
-				if (!feed.description && articleParse.description) {
-					update.description = articleParse.description;
+				if (!feed.description && description) {
+					update.description = description;
 				}
 
 				debug('update feed %o', update);
