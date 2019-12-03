@@ -64,6 +64,7 @@ RawFeed.getHtmlContent = (link, ignoreCache = false, callback) => {
 	}
 
 	debug('--> host= %o', host);
+	debug('--> ignoreCache= %s', ignoreCache);
 
 	let keyContent = `rawHtml:${link}`;
 	let keyHost = `host:${host}`;
@@ -77,7 +78,10 @@ RawFeed.getHtmlContent = (link, ignoreCache = false, callback) => {
 		(next) => {
 			if (NODE_ENV !== 'production') return next();
 
-			if (ignoreCache) return next();
+			if (ignoreCache) {
+				debug('ignoreCache -> skip get rawHtml from cache ...');
+				return next();
+			}
 
 			RedisService.get(keyContent, (err, value) => {
 				if (!err && value) {
@@ -116,7 +120,10 @@ RawFeed.getHtmlContent = (link, ignoreCache = false, callback) => {
 		(next) => {
 			if (NODE_ENV !== 'production') return next(null, null);
 
-			if (ignoreCache) return next();
+			if (ignoreCache) {
+				debug('ignoreCache -> skip get hostInfo from cache ...');
+				return next(null, null);
+			}
 
 			RedisService.get(keyHost, (err, hostInfo) => {
 				if (err || !hostInfo) return next(null, null);
