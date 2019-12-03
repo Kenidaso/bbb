@@ -7,9 +7,15 @@ module.exports = FeedCtrl;
 
 FeedCtrl.getFeeds = (req, res) => {
 	let { category, page } = req.params;
+	let { limit } = req.query;
 	page = Number(page) || 1;
 
-	FeedService.getFeeds({ category, page }, (err, feeds) => {
+	limit = Number(limit) || 18;
+
+	if (limit < 1) limit = 1;
+	else if (limit > 100) limit = 100;
+
+	FeedService.getFeeds({ category, page, limit }, (err, feeds) => {
 		if (err) return Response.error(req, res, err, feeds);
 		return Response.success(req, res, feeds);
 	});
