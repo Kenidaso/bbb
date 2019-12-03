@@ -100,6 +100,11 @@ RawFeed.getHtmlContent = (link, ignoreCache = false, callback) => {
 		(next) => {
 			if (NODE_ENV !== 'production') return next();
 
+			if (ignoreCache) {
+				debug('ignoreCache -> skip get rawHtml from database ...');
+				return next();
+			}
+
 			Feed.model.findOne({
 				link
 			}, (err, doc) => {
