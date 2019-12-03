@@ -34,10 +34,14 @@ module.exports = {
 	},
 
 	get: (key, callback) => {
+		if (!_client) return callback('ENOCLIENT');
+
 		_client.get(`${prefix}:${key}`, callback);
 	},
 
 	del: (key, callback = noop) => {
+		if (!_client) return callback('ENOCLIENT');
+
 		console.log(`redis del key ${prefix}:${key}`);
 		_client.del(`${prefix}:${key}`, callback);
 	},
@@ -47,6 +51,8 @@ module.exports = {
 	},
 
 	set: (key, value, ttl = 0, callback = noop) => {
+		if (!_client) return callback('ENOCLIENT');
+
 		try {
 			if (typeof value === 'object') value = JSON.stringify(value);
 		} catch (err) {
