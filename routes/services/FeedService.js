@@ -79,13 +79,13 @@ Feed.getFeeds = (params, callback) => {
 	});
 }
 
-Feed.getContent = (slugFeed, callback) => {
+Feed.getContent = (slugFeed, ignoreCache = false, callback) => {
 	// get link feed from slug-feed
 	let keyLinkFeed = `linkFeed:${slugFeed}`;
 	RedisService.get(keyLinkFeed, (err, link) => {
 		if (!err && link) {
 			debug('get link feed from cache key= %s', keyLinkFeed);
-			return RawFeedService.getHtmlContent(link, callback);
+			return RawFeedService.getHtmlContent(link, ignoreCache, callback);
 		}
 
 		FeedModel.findOne({
@@ -98,7 +98,7 @@ Feed.getContent = (slugFeed, callback) => {
 
 			if (feed.rawHtml && feed.rawHtml.length > 0) return callback(null, feed.rawHtml);
 
-			return RawFeedService.getHtmlContent(feed.link, callback);
+			return RawFeedService.getHtmlContent(feed.link, ignoreCache, callback);
 		})
 	});
 }

@@ -32,9 +32,9 @@ FeedCtrl.getCategories = (req, res) => {
 }
 
 FeedCtrl.getContent = (req, res) => {
-	let { slug } = req.params;
+	let { slug, ignoreCache } = req.params;
 
-	FeedService.getContent(slug, (err, result) => {
+	FeedService.getContent(slug, ignoreCache, (err, result) => {
 		if (err) return Response.error(req, res, err, result);
 		return Response.success(req, res, result);
 	});
