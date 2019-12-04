@@ -12,8 +12,8 @@ FeedCtrl.getFeeds = (req, res) => {
 
 	limit = Number(limit) || 18;
 
-	if (limit < 1) limit = 1;
-	else if (limit > 100) limit = 100;
+	limit = Math.max(limit, 1);
+	limit = Math.min(limit, 100);
 
 	FeedService.getFeeds({ category, page, limit }, (err, feeds) => {
 		if (err) return Response.error(req, res, err, feeds);

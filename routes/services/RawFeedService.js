@@ -23,45 +23,15 @@ const utils = require('../../helpers/utils');
 
 const TTL_RAW_HTML = 60 * 60 * 24 * 7; // cache 1 week
 
-const tldsInVn = [ // top level domain
-	'org.vn',
-	'net.vn',
-	'biz.vn',
-	'edu.vn',
-	'gov.vn',
-	'int.vn',
-	'ac.vn',
-	'pro.vn',
-	'info.vn',
-	'health.vn',
-	'name.vn',
-	'com.vn',
-	'com',
-	'vn'
-]
-
 const noop = () => {};
 
 RawFeed = {};
 module.exports = RawFeed;
 
 RawFeed.getHtmlContent = (link, ignoreCache = false, callback) => {
-	const feedUrl = url.parse(link);
-	let { host } = feedUrl;
+	let host = utils.getMainDomain(link);
 
 	if (!host) return callback('ELINKINVALID', 1005);
-
-	// clear subdomain
-	if (host.split('.').length > 2) {
-		let split = host.split('.');
-		split.shift();
-		let _tmpHost = split.join('.');
-		let findTld = tldsInVn.find((t) => {
-			return t == _tmpHost;
-		})
-
-		if (!findTld) host = _tmpHost;
-	}
 
 	debug('--> host= %o', host);
 	debug('--> ignoreCache= %s', ignoreCache);
@@ -178,7 +148,7 @@ RawFeed.getHtmlContent = (link, ignoreCache = false, callback) => {
 					rawHtml = article.content;
 
 					if (article.image) heroImage = article.image;
-					if (article.description) description = article.description;
+					if (article.description || article.excerpt) description = article.description || article.excerpt;
 
 					return next(null);
 				});

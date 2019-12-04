@@ -32,7 +32,7 @@ Feed.getFeeds = (params, callback) => {
 	RedisService.get(key, (err, result) => {
 		result = utils.safeParse(result);
 
-		if (result) {
+		if (result && NODE_ENV === 'production') {
 			console.log('get from cache key=', key);
 			return callback(null, result);
 		}
@@ -59,7 +59,10 @@ Feed.getFeeds = (params, callback) => {
 					.find({
 						category: category._id,
 					})
-					.select('-_id slug title link publishDate description heroImage images videos contentOrder rawHtml')
+					.select('-_id slug title link publishDate description heroImage rawHtml category topic host')
+					.populate('category', '-_id slug title display')
+					.populate('topic', '-_id name description')
+					.populate('host', '-_id name website')
 					.sort({
 						publishDate: -1,
 						updatedAt: -1,

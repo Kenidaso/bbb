@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@sentry/node": "^5.6.2",
+    "@web-clipper/area-selector": "^0.1.1",
+    "@web-clipper/readability": "^0.2.0",
     "article-extractor": "^1.0.2",
     "article-parser": "^4.0.9",
     "async": "^2.1.4",
@@ -22,6 +24,7 @@
     "html-minifier": "^4.0.0",
     "i18n": "^0.8.3",
     "image-size": "^0.8.3",
+    "jsdom": "^15.2.1",
     "jsonwebtoken": "^8.5.1",
     "keystone": "4.0.0-beta.5",
     "keystone-email": "1.0.5",
@@ -43,7 +46,7 @@
   },
   "esm": {
     "cjs": true,
-    "mode":"auto"
+    "mode": "auto"
   },
   "devDependencies": {
     "eslint": "3.15.0",
