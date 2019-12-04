@@ -14,7 +14,7 @@ const feedSchema = new Schema({
 	category: Types.Mixed,
 	view: Number,
 	images: Types.Mixed,
-	heroImage: String,
+	heroImage: Types.Mixed,
 	updatedAt: Date,
 	createdAt: Date
 });

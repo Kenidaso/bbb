@@ -161,6 +161,28 @@ const save_1_article = (article, callback) => {
 				} else {
 					console.log(`\nsave_1_article update= ${JSON.stringify(update)}`);
 					// redisService.set(keyLinkSaved, 1, TTL_LINK_SAVED);
+
+					let objDecay = {
+						slug: result.slug,
+						link: result.link,
+						title: result.title,
+						publishDate: result.publishDate,
+						createdAt: result.createdAt,
+						updatedAt: result.updatedAt,
+					};
+
+					if (result.heroImage) objDecay.heroImage = result.heroImage;
+					if (result.description) objDecay.description = result.description;
+					if (result.rawHtml) objDecay.rawHtml = result.rawHtml;
+					// if (result.linkBaoMoi) objDecay.linkBaoMoi = result.linkBaoMoi;
+					if (result.topic) objDecay.topic = result.topic;
+					if (result.category) objDecay.category = result.category;
+
+					console.log('objDecay=', objDecay);
+
+					decayMongo.decay({ link: 1 }, objDecay, (err, resultDecay) => {
+						console.log('decay er=', err, 'result=', resultDecay);
+					});
 				}
 
 				return next(null, result);
@@ -299,15 +321,15 @@ const procTopics = (topics, callback) => {
 
 const letsDecay = (listDecay, callback) => {
 	async.waterfall([
-		(next) => {
-			decayMongo.init(next);
-		},
+		// (next) => {
+		// 	decayMongo.init(next);
+		// },
 		(next) => {
 			decayMongo.decay({ link: 1 }, listDecay, next);
 		},
-		(resultDecay, next) => {
-			decayMongo.close(next);
-		}
+		// (resultDecay, next) => {
+		// 	decayMongo.close(next);
+		// }
 	], callback);
 }
 
@@ -369,6 +391,9 @@ const startWorker = () => {
 	console.time('run-worker');
 
 	async.parallel({
+		init_decay: (next) => {
+			decayMongo.init(next);
+		},
 		start_keystone: (next) => {
 			keystone.start(next)
 		},
@@ -395,6 +420,11 @@ const stopWorker = () => {
 				keystone.httpServer.close();
 				setTimeout(next, 500);
 			});
+		},
+
+		close_decay: (next) => {
+			setTimeout(decayMongo.close, 1e3, next);
+			// decayMongo.close(next);
 		}
 	}, (err, result) => {
 		console.log('stop worker done');
