@@ -330,7 +330,9 @@ const letsDecay = (listDecay, callback) => {
 		// (resultDecay, next) => {
 		// 	decayMongo.close(next);
 		// }
-	], callback);
+	], (err, result) => {
+		return callback();
+	});
 }
 
 const removeOldFeed = (callback) => {
