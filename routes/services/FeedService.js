@@ -23,10 +23,9 @@ Feed = {};
 module.exports = Feed;
 
 Feed.getFeeds = (params, callback) => {
-	let { category, page } = params;
-	let limit = 18;
+	let { category, page, limit } = params;
 
-	let key = `getFeeds:${category}:${page}`;
+	let key = `getFeeds:${category}:${page}:${limit}`;
 
 	debug('getFeeds key= %s', key);
 
