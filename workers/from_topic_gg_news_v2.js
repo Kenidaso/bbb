@@ -71,6 +71,8 @@ const MONTH_CUTOFF = Number(process.env.MONTH_CUTOFF) || 6;
 const TTL_ARTICLELINK = 60 * 60 * 24 * 7; // 7 days
 const TTL_LINK_SAVED = 60 * 60 * 24 * 7; // 7 days
 
+let START = moment();
+
 process.on('uncaughtException', (error) => {
   console.log(`====> uncaughtException=`, error);
 });
@@ -431,6 +433,10 @@ const stopWorker = () => {
 	}, (err, result) => {
 		console.log('stop worker done');
 		console.timeEnd('run-worker');
+
+		if (moment().diff(START, 'm') >= 30) {
+			return process.exit(0);
+		}
 
 		setTimeout(startWorker, 3e3);
 	});
