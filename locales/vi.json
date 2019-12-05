@@ -9,5 +9,6 @@
 	"Link is invalid": "Link không hợp lệ",
 	"connection 3 to ds259245.mlab.com:59245 timed out": "connection 3 to ds259245.mlab.com:59245 timed out",
 	"connection 2 to ds259245.mlab.com:59245 timed out": "connection 2 to ds259245.mlab.com:59245 timed out",
-	"engine is not defined": "engine is not defined"
+	"engine is not defined": "engine is not defined",
+	"unable to verify the first certificate": "unable to verify the first certificate"
 }

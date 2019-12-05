@@ -8,8 +8,6 @@ const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
 
-
-
 const baseEngine = require('../../engines/base');
 
 const RedisService = require('./RedisService');
@@ -142,7 +140,8 @@ RawFeed.getHtmlContent = (link, ignoreCache = false, callback) => {
 				debug('--> use article-parser ...');
 
 				return baseEngine.userArticleParse(link, (err, article) => {
-					if (err) return next('EPARSEARTICLE', err);
+					if (err) return next(err, article);
+					if (!article) return next('EARTICLENOTFOUND');
 
 					articleParse = article;
 					rawHtml = article.content;

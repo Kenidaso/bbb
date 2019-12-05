@@ -24,7 +24,8 @@ const request = require('request').defaults({
     'sec-fetch-site': 'cross-site',
     'accept-language': 'en-US,en;q=0.9,vi;q=0.8,fr-FR;q=0.7,fr;q=0.6,la;q=0.5',
   },
-  gzip: true
+  gzip: true,
+  rejectUnauthorized: false,
 });
 
 const minify = require('html-minifier').minify;
@@ -52,6 +53,8 @@ let base = {};
 module.exports = base;
 
 base.fetch = (link, callback) => {
+  debug('base fetch link= %s', link);
+
   request({
     url: link,
     method: 'GET'
@@ -307,15 +310,20 @@ let clean = (content) => {
 
 base.userArticleParse = (link, callback) => {
   base.fetch(link, (err, html) => {
+    if (err) return callback('EFETCHLINK', err);
+    if (!html) return callback('EFETCHHTMLNOTFOUND');
+
     let doc = new JSDOM(html, {
       url: link,
     });
     let reader = new Readability(doc.window.document);
     let article = reader.parse();
 
-    let contentStr = clean(article.content);
-    article.content = entities.decode(contentStr);
-    article.content = `<div class="default-auto">${article.content}</div>`;
+    if (article) {
+      let contentStr = clean(article.content);
+      article.content = entities.decode(contentStr);
+      article.content = `<div class="default-auto">${article.content}</div>`;
+    }
 
     extract(html).then((articleParse) => {
       article = Object.assign({}, articleParse, article);
