@@ -107,7 +107,14 @@ module.exports = {
 			if (err) return callback(err);
 			if (!body) return callback(null, null);
 
-			return callback(null, sizeOf(body));
+			let imgSize = null;
+			try {
+				imgSize = sizeOf(body);
+			} catch (ex) {
+				console.log('Image size error=', ex);
+			}
+
+			return callback(null, imgSize);
 		})
 	},
 
