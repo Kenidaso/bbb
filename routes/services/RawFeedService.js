@@ -31,7 +31,7 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 
 	if (!host) return callback('ELINKINVALID', 1005);
 
-	let { ignoreCache, flow } = options;
+	let { ignoreCache, flow, ignoreSaveCache } = options;
 
 	debug('--> host= %o', host);
 	debug('--> ignoreCache= %s', ignoreCache);
@@ -204,8 +204,10 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 		(next) => {
 			if (!rawHtml) return next();
 
-			debug('save cache key= %s', keyContent);
-			RedisService.set(keyContent, rawHtml, TTL_RAW_HTML);
+			if (!ignoreSaveCache) {
+				debug('save cache key= %s', keyContent);
+				RedisService.set(keyContent, rawHtml, TTL_RAW_HTML);
+			}
 
 			Feed.model.findOne({
 				link
@@ -267,7 +269,7 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 				Feed.updateItem(feed, update, {
 					new: true
 				}, (err, newFeed) => {
-					if (err) debug('update feed err= %s', err);
+					if (err) debug('update feed err= %s', JSON.stringify(err));
 					if (newFeed) {
 						debug('update rawHtml newFeed= %o', newFeed);
 					}

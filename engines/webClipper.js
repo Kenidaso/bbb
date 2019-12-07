@@ -734,6 +734,9 @@ clipper.decodeEntities = (rawHtml) => {
 clipper.getLdJSON = (rawHtml) => {
   const $ = cheerio.load(rawHtml);
   let ldJson = $('[type="application/ld+json"]').html();
+
+  if (!ldJson) return null;
+
   ldJson = ldJson.toString('utf8');
   // ldJson = clipper.decodeEntities(ldJson);
 

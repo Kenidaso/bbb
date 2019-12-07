@@ -32,3 +32,4 @@ node_modules
 package-lock.json
 docs
 db_export
+data_sample/parse*

@@ -103,6 +103,7 @@ module.exports = {
 			url: urlImage,
 			method: 'GET',
 			encoding: null,
+			gzip: true
 		}, (err, response, body) => {
 			if (err) return callback(err);
 			if (!body) return callback(null, null);
@@ -112,6 +113,7 @@ module.exports = {
 				imgSize = sizeOf(body);
 			} catch (ex) {
 				console.log('Image size error=', ex);
+				console.log('urlImage=', urlImage);
 			}
 
 			return callback(null, imgSize);
@@ -133,7 +135,8 @@ module.exports = {
 		'com.vn',
 		'com',
 		'vn',
-		'org'
+		'org',
+		'net'
 	],
 
 	getMainDomain: (link) => {
