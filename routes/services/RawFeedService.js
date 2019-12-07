@@ -26,10 +26,12 @@ const noop = () => {};
 RawFeed = {};
 module.exports = RawFeed;
 
-RawFeed.getHtmlContent = (link, ignoreCache = false, callback) => {
+RawFeed.getHtmlContent = (link, options = {}, callback) => {
 	let host = utils.getMainDomain(link);
 
 	if (!host) return callback('ELINKINVALID', 1005);
+
+	let { ignoreCache, flow } = options;
 
 	debug('--> host= %o', host);
 	debug('--> ignoreCache= %s', ignoreCache);
@@ -136,6 +138,23 @@ RawFeed.getHtmlContent = (link, ignoreCache = false, callback) => {
 
 		// parse
 		(hostInfo, next) => {
+			let engine = null;
+
+			if (flow === 'GRAB_ARTICLE') {
+				return baseEngine.grabArticle(link, hostInfo, engine, (err, article) => {
+					if (err) return next(err, article);
+					if (!article) return next('EARTICLENOTFOUND');
+
+					articleParse = article;
+					rawHtml = article.content;
+
+					if (article.image) heroImage = article.image;
+					if (article.description || article.excerpt) description = article.description || article.excerpt;
+
+					return next(null);
+				});
+			}
+
 			if (!hostInfo) { // no host config, use flow auto
 				debug('--> use article-parser ...');
 
@@ -153,7 +172,6 @@ RawFeed.getHtmlContent = (link, ignoreCache = false, callback) => {
 				});
 			}
 
-			let engine = null;
 			if (hostInfo) {
 				let engineName = hostInfo.engine;
 				let enginePath = `../../engines/${engineName}.js`;

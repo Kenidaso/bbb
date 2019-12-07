@@ -1,5 +1,7 @@
 const cheerio = require('cheerio');
 const _ = require('lodash');
+const moment = require('moment');
+const url = require('url');
 
 const Entities = require('html-entities').AllHtmlEntities;
 const entities = new Entities();
@@ -10,18 +12,17 @@ const turndownPluginGfm = require('turndown-plugin-gfm');
 const striptags = require('striptags');
 
 const debug = require('debug')('WebClipper');
+const fatal = require('debug')('FATAL');
 
 const { JSDOM } = require('jsdom');
 const Readability = require('@web-clipper/readability');
-
-const { extract } = require('article-parser');
 
 let clipper = {};
 module.exports = clipper;
 
 const attributesToKeep = [
   'src',
-  'href',
+  // 'href',
   'target'
 ];
 
@@ -32,8 +33,8 @@ const shareUrls = [
 
 const elementsToRemove = [
   'script',
-  'header',
-  'footer'
+  // 'header',
+  // 'footer'
 ];
 
 const blacklistRegex = /ads|social|comment/i;
@@ -84,6 +85,7 @@ clipper.removeAttributes = (rawHtml) => {
       .value();
 
     attributes.forEach(function (attribute) {
+      // debug('-> removeAttributes attr= %s', attribute);
       $(element).removeAttr(attribute);
     });
   });
@@ -131,15 +133,15 @@ clipper.removeNavigationalElements = (rawHtml, host) => {
 
   // Filter out 'back to top' links
   $('a').filter(function () {
-    let hasTopInText = $(this).text().toLowerCase().indexOf('top') > -1;
-    let hasHashInHref = $(this).attr('href').indexOf('#') > -1;
+    let hasTopInText = ($(this).text() || '').toLowerCase().indexOf('top') > -1;
+    let hasHashInHref = ($(this).attr('href') || '').indexOf('#') > -1;
     return hasTopInText && hasHashInHref;
   }).remove();
 
   // Filter out any links that have the `rel="tag"` attribute, or link back to the same host with 'tag' in the URL.
   $('a').each(function () {
     let relTag = $(this).attr('rel');
-    let href = $(this).attr('href');
+    let href = $(this).attr('href') || '';
 
     let isRelTag = relTag === 'tag';
     let isPartOfList = $(this).parents('ul').length > 0;
@@ -258,6 +260,8 @@ function getSummaryFromMetatags (rawHtml) {
       return metaName || metaProperty;
     }
   }
+
+  return null;
 }
 
 /**
@@ -287,6 +291,19 @@ clipper.getDescription = function (rawHtml, content) {
   }
 }
 
+clipper.getHeroImage = (rawHtml) => {
+  const $ = cheerio.load(rawHtml);
+  let urlHeroImg = $('[property="og:image"]').attr('content');
+  return urlHeroImg;
+}
+
+clipper.getPublishDate = (rawHtml) => {
+  const $ = cheerio.load(rawHtml);
+  let publishDate = $('meta[property*="published_time"] , meta[name*="published_time"]').attr('content');
+
+  return publishDate;
+}
+
 /**
  * Removes the site's name from the article title, and keeps removing the last character in the title until it hits
  * an alphabetic character. This is done to remove any delimiters that are usually used to add the site's name to the
@@ -297,13 +314,19 @@ clipper.getDescription = function (rawHtml, content) {
  * @returns {string}
  */
 function removeSiteNameFromTitle(articleTitle, siteName) {
-  articleTitle = articleTitle.replace(siteName, '');
+  debug('removeSiteNameFromTitle title= %s sitename= %s', articleTitle, siteName);
+
+  let regex = new RegExp(siteName, 'i');
+
+  articleTitle = articleTitle.replace(regex, '');
   let lastChar = articleTitle.charAt(articleTitle.length - 1);
 
   while (!/[a-zA-Z|?|!|.]/.test(lastChar)) {
     articleTitle = articleTitle.substring(0, articleTitle.length - 1);
     lastChar = articleTitle.charAt(articleTitle.length - 1);
   }
+
+  articleTitle = articleTitle.substr(0, 1).toUpperCase() + articleTitle.substr(1);
 
   return articleTitle;
 }
@@ -325,6 +348,8 @@ function getSiteName(rawHtml) {
       return sitename;
     }
   }
+
+  return null;
 }
 
 /**
@@ -337,6 +362,7 @@ function getTitleFromMetaTags (rawHtml) {
   let $ = cheerio.load(rawHtml);
   let title;
   let siteName = getSiteName(rawHtml);
+  let author = clipper.getAuthor(rawHtml);
 
   for (let i = 0; i < titleMetatags.length; i++) {
     let metatag = titleMetatags[i];
@@ -347,8 +373,12 @@ function getTitleFromMetaTags (rawHtml) {
     }
   }
 
-  if (siteName) {
+  if (siteName && title) {
     title = removeSiteNameFromTitle(title, siteName);
+  }
+
+  if (author && title) {
+    title = removeSiteNameFromTitle(title, author);
   }
 
   return title;
@@ -364,9 +394,14 @@ function getTitleFromWindowTitle (rawHtml) {
   let $ = cheerio.load(rawHtml);
   let title = $('title').text();
   let siteName = getSiteName(rawHtml);
+  let author = clipper.getAuthor(rawHtml);
 
-  if (siteName) {
+  if (siteName && title) {
     title = removeSiteNameFromTitle(title, siteName);
+  }
+
+  if (author && title) {
+    title = removeSiteNameFromTitle(title, author);
   }
 
   return title;
@@ -468,14 +503,27 @@ clipper.cleanAfterParsing = (rawHtml, host) => {
   rawHtml = clipper.removeSocialElements(rawHtml);
   rawHtml = clipper.removeNavigationalElements(rawHtml, host);
   rawHtml = clipper.removeEmptyElements(rawHtml);
-  rawHtml = clipper.cleanFormatting(rawHtml);
+  rawHtml = clipper.removeNewline(rawHtml);
+
+  rawHtml = clipper.sanitizeHtml(rawHtml);
+
+  rawHtml = clipper.getBody(rawHtml);
+  rawHtml = clipper.minifyHtml(rawHtml);
+  rawHtml = clipper.decodeEntities(rawHtml);
 
   return rawHtml;
 }
 
+clipper.getBody = (rawHtml) => {
+  const $ = cheerio.load(rawHtml);
+  let $body = $('body');
+
+  return $body ? $body.html() : rawHtml;
+}
+
 clipper.getArticleContent = (rawHtml, host) => {
   let content = getLikelyCandidate(rawHtml) || getContentByLongestLength(rawHtml);
-  content = cleanAfterParsing(content, host);
+  content = clipper.cleanAfterParsing(content, host);
   return content;
 }
 
@@ -485,6 +533,8 @@ clipper.readability = (link, html) => {
 	});
 	let reader = new Readability(doc.window.document);
 	let article = reader.parse();
+
+  // doc.close(); // close jsdom
 
 	return article;
 }
@@ -551,7 +601,9 @@ const value = (item) => bodyTags.reduce((acc, curr) => {
   return acc;
 }, 0);
 
-/**/
+/*
+content chỉ ra text, không phải html
+*/
 clipper.parseArticle = (html) => {
   const $ = cheerio.load(html);
 
@@ -589,12 +641,224 @@ clipper.parseArticle = (html) => {
   }
 }
 
-clipper.extract = async (html) => {
-  let article = null;
-  try {
-    article = await extract(html);
-  } catch {
+clipper.getContentFromSelector = (html, selector) => {
+  let $ = cheerio.load(html);
+  return $(selector).html();
+}
+
+clipper.removeBySelectors = (html, selectors) => {
+  if (!Array.isArray(selectors)) selectors = [selectors];
+
+  let $ = cheerio.load(html);
+
+  for (let i=0; i < selectors.length; i++) {
+    let selector = selectors[i];
+    $(selector).remove();
+    debug('remove selector %s', selector);
   }
 
-  return article;
+  return $.html();
 }
+
+clipper.sanitizeHtml = (html, options = {}) => {
+  debug('sanitize html ...');
+  let optSanitize = Object.assign({}, defaultSanitizeHtml(), options);
+  try {
+    let sanitized = sanitizeHtml(html, optSanitize);
+    return sanitized;
+  } catch (ex) {
+    fatal('sanitize html exception: %s', ex.toString());
+    return html;
+  }
+}
+
+clipper.wrapWithSpecialClasses = (rawHtml, specialClasses = '') => {
+  // let $ = cheerio.load(rawHtml);
+  if (!Array.isArray(specialClasses)) specialClasses = [specialClasses];
+  specialClasses.push('_wrap');
+
+  let classStr = specialClasses.join(' ').trim();
+
+  // $('body').children().wrap(`<div class="${classStr}"></div>`);
+
+  return `<div class="${classStr}">${rawHtml}</div>`;
+}
+
+clipper.minifyHtml = (rawHtml) => {
+  try {
+    rawHtml = minify(rawHtml, {
+      removeComments: true,
+      removeCommentsFromCDATA: true,
+      collapseWhitespace: true,
+      collapseBooleanAttributes: true,
+      removeRedundantAttributes: true,
+      removeEmptyAttributes: true,
+      removeEmptyElements: true,
+
+      decodeEntities: true,
+      collapseInlineTagWhitespace: true,
+
+      conservativeCollapse: true,
+      html5: true,
+      quoteCharacter: '\'',
+      removeScriptTypeAttributes: true,
+      useShortDoctype: true
+    });
+  } catch (ex) {
+    fatal('minify err= %s', ex.toString());
+  }
+
+  rawHtml = rawHtml.replace(/\n/g, ' ').replace(/\t/g, ' ');
+
+  while (rawHtml.indexOf('  ') > -1) {
+    rawHtml = rawHtml.replace(/\s\s/g, ' ');
+  }
+
+  rawHtml = rawHtml.replace(/\>\s\</g, '><');
+  rawHtml = rawHtml.trim();
+
+  return rawHtml;
+}
+
+clipper.decodeEntities = (rawHtml) => {
+  try {
+    let decode = entities.decode(rawHtml);
+
+    return decode;
+  } catch (ex) {
+    fatal('decodeEntities err= %s', ex.toString());
+    return rawHtml;
+  }
+}
+
+clipper.getLdJSON = (rawHtml) => {
+  const $ = cheerio.load(rawHtml);
+  let ldJson = $('[type="application/ld+json"]').html();
+  ldJson = ldJson.toString('utf8');
+  // ldJson = clipper.decodeEntities(ldJson);
+
+  debug('ldJson= %s', ldJson);
+
+  try {
+    return JSON.parse(ldJson);
+  } catch (ex) {
+    debug('parse ld+json err= %s', ex.toString());
+    return null;
+  }
+}
+
+clipper.addHeroImage = (rawHtml, heroImage) => {
+  if (!heroImage) return rawHtml;
+
+  let _tryadd = () => {
+    return `<figure class='_try_add'><img src='${heroImage}' /></figure>${rawHtml}`;
+  }
+
+  const parse = url.parse(heroImage);
+  let pathNameHeroImage = parse.pathname;
+
+  if (rawHtml.indexOf(pathNameHeroImage) < 0) {
+    return _tryadd();
+  }
+
+  const $ = cheerio.load(rawHtml);
+  let imgs = $('img');
+
+  if (!imgs || imgs.length === 0) {
+    return _tryadd();
+  }
+
+  return rawHtml;
+}
+
+clipper.extract = (html, link) => {
+  debug('--> go to extract of web clipper ...');
+
+  let rawHtml = clipper.prepareForParse(html);
+
+  let title = clipper.getTitle(rawHtml);
+  let description = clipper.getDescription(rawHtml).trim();
+  let author = clipper.getAuthor(rawHtml);
+  let heroImage = clipper.getHeroImage(rawHtml);
+  let ldJson = clipper.getLdJSON(rawHtml);
+  let publishDate = clipper.getPublishDate(rawHtml);
+
+  let article = clipper.readability(link, html);
+  let articleContent = clipper.getArticleContent(html, link);
+
+  let content = articleContent;
+
+  if (article) {
+    article.content = clipper.cleanAfterParsing(article.content, link);
+    if (article.content.length > content.length) content = article.content;
+  }
+
+  let images = [];
+
+  if (heroImage && heroImage.length > 0) images.push(heroImage);
+
+  if (ldJson) {
+    if (ldJson.description && !description) description = ldJson.description;
+    if (ldJson.image && ldJson.image.url) images.push(ldJson.image.url);
+    if ((!publishDate || !moment(publishDate).isValid()) && ldJson.datePublished) {
+      publishDate = ldJson.datePublished;
+    }
+    if (!heroImage && ldJson.image) heroImage = ldJson.image;
+  }
+
+  // try add hero image if not exists
+  content = clipper.addHeroImage(content, heroImage);
+
+  // wrap content with div
+  content = clipper.wrapWithSpecialClasses(content);
+
+  let resultExtract = {
+    title,
+    description,
+    author,
+    heroImage,
+    ldJson,
+    publishDate,
+    content,
+    images
+  }
+
+  resultExtract = Object.assign({}, article, resultExtract);
+
+  return resultExtract;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

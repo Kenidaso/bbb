@@ -22,9 +22,9 @@ FeedCtrl.getFeeds = (req, res) => {
 }
 
 FeedCtrl.getRawContent = (req, res) => {
-	let { link, ignoreCache } = req.body;
+	let { link, options } = req.body;
 
-	RawFeedService.getHtmlContent(link, ignoreCache, (err, html) => {
+	RawFeedService.getHtmlContent(link, options, (err, html) => {
 		if (err) return Response.error(req, res, err, html);
 		return Response.success(req, res, html);
 	});
@@ -38,9 +38,9 @@ FeedCtrl.getCategories = (req, res) => {
 }
 
 FeedCtrl.getContent = (req, res) => {
-	let { slug, ignoreCache } = req.params;
+	let { slug, options } = req.params;
 
-	FeedService.getContent(slug, ignoreCache, (err, result) => {
+	FeedService.getContent(slug, options, (err, result) => {
 		if (err) return Response.error(req, res, err, result);
 		return Response.success(req, res, result);
 	});

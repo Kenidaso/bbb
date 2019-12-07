@@ -46,7 +46,7 @@ Feed.add({
 
 	publishDate: { type: Date, index: true },
 	link: { type: Types.Url, index: true, unique: true, initial: true },
-	linkBaoMoi: { type: Types.Url, index: true, unique: true, initial: true, sparse: true },
+	linkBaoMoi: { type: Types.Url, index: true, initial: true, sparse: true },
 	description: { type: Types.Textarea }, // short content
 
 	rawHtml: { type: Types.Html, wysiwyg: true },
@@ -90,6 +90,10 @@ Feed.schema.pre('save', function (next) {
 		let keyContentFeed = `rawHtml:${this.link}`;
 		console.log('trigger delete key redis:', keyContentFeed);
 		RedisService.del(keyContentFeed);
+	}
+
+	if (this.linkBaoMoi && (this.linkBaoMoi.length == 0 || this.linkBaoMoi === '')) {
+		this.linkBaoMoi = null;
 	}
 
 	return next();

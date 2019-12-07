@@ -30,13 +30,11 @@ const request = require('request').defaults({
 
 const minify = require('html-minifier').minify;
 
-const {
-  extract
-} = require('article-parser');
-const extractor = require('article-extractor');
-
 const { JSDOM } = require('jsdom');
 const Readability = require('@web-clipper/readability');
+
+const clipper = require('./webClipper');
+const utils = require('../helpers/utils');
 
 const defaultSanitizeHtml = () => {
   return {
@@ -59,7 +57,10 @@ base.fetch = (link, callback) => {
     url: link,
     method: 'GET'
   }, (err, response, body) => {
-    return callback(err, body);
+    if (err) return callback('EFETCHLINK', err);
+    if (!body) return callback('EFETCHNOBODY');
+
+    return callback(null, body);
   })
 }
 
@@ -93,13 +94,11 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
   fetchEngine(link, (err, html) => {
     if (err) return callback('EFETCHLINK', err);
 
-    // debug('html= %s', html);
-
-    const $ = cheerio.load(html);
+    let $ = cheerio.load(html);
 
     debug('host %s : mainContentSelector= %s', hostInfo.website, config.mainContentSelector);
 
-    let description = $('[name="description"]').attr('content');
+    let description = clipper.getDescription(html).trim();
 
     if (!description || description.length == 0) {
       description = $('[property="og:description"]').attr('content');
@@ -108,7 +107,7 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
     let heroImageSelector = `${config.mainContentSelector} img`;
     let content = $(config.mainContentSelector);
 
-    if ((!content || content.length == 0) && hostInfo.fallbackMainContent) {
+    if ((!content || content.length == 0) && hostInfo.fallbackMainContent && hostInfo.fallbackMainContent.length > 0) {
       debug('use mainContentSelector not found content, using fallbackMainContent ...');
 
       for (let i=0; i < hostInfo.fallbackMainContent.length; i++) {
@@ -124,21 +123,26 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
     }
 
     if (!content || content.length == 0) {
-      // fatal('Can not parse link %s, please check', link);
-      // return callback(null, null);
+      let extractor = clipper.extract(html, link);
 
-      let doc = new JSDOM(html, {
-        url: link,
-      });
-      let reader = new Readability(doc.window.document);
-      let article = reader.parse();
+      if (extractor && extractor.content) {
+        if (NODE_ENV !== 'production') debug('content= %s', extractor.content);
 
-      content = article.content;
+        return callback(null, {
+          ...extractor,
+          rawHtml: extractor.content
+        });
+      }
     }
 
-    $('script', content).remove();
+    if (!content || content.length == 0) {
+      fatal('Can not parse link %s, please check', link);
+      return callback(null, null);
+    }
 
-    if (process.env.NODE_ENV !== 'production') {
+    // $('script', content).remove();
+
+    if (NODE_ENV !== 'production') {
       fs.writeFileSync(path.join(__dirname, `../data_sample/parse_${NAME}.html`), $(content).html());
     }
 
@@ -148,11 +152,10 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
     }
 
     // get hero Image
-    let heroImage = null;
-    // debug('selector hero image: %s', heroImageSelector);
+    let heroImage = clipper.getHeroImage(html);
     let imgs = $('img', content);
 
-    if (imgs && imgs.length > 0) {
+    if (!heroImage && imgs && imgs.length > 0) {
       debug('---> get hero image ...');
       heroImage = $(imgs[0]).attr('src');
     }
@@ -183,7 +186,13 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
     });
 
     let contentStr = $(content).html();
-    try {
+
+    if (contentStr == null || contentStr == 'null' || contentStr.length == 0) {
+      fatal('Can not parse link %s, please check', link);
+      return callback(null, null);
+    }
+
+    /*try {
       contentStr = contentStr.replace(/\n/g, ' ').replace(/\t/g, ' ');
 
       while (contentStr.indexOf('  ') > -1) {
@@ -217,10 +226,23 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
 
     debug('sanitize html ...');
     let optSanitize = Object.assign({}, defaultSanitizeHtml(), engine.optSanitizeHtml || {});
-    contentStr = sanitizeHtml(contentStr, optSanitize);
+    contentStr = sanitizeHtml(contentStr, optSanitize);*/
+
+    // contentStr = clipper.cleanAfterParsing(contentStr, link);
+
+    contentStr = clipper.removeAttributes(contentStr);
+    contentStr = clipper.removeSocialElements(contentStr);
+    contentStr = clipper.removeNavigationalElements(contentStr, link);
+    contentStr = clipper.removeEmptyElements(contentStr);
+    contentStr = clipper.removeNewline(contentStr);
+    contentStr = clipper.sanitizeHtml(contentStr, engine.optSanitizeHtml || {});
+
+    contentStr = clipper.getBody(contentStr);
+    contentStr = clipper.minifyHtml(contentStr);
+    contentStr = clipper.decodeEntities(contentStr);
 
     if (contentStr == null || contentStr == 'null' || contentStr.length == 0) {
-      fatal('Can not parse link %s, please check', link);
+      fatal('Can not clean after parsing link %s, please check', link);
       return callback(null, null);
     }
 
@@ -233,9 +255,7 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
       classStr = [...classStr, ...hostInfo.customClass];
     }
 
-    classStr = classStr.join(' ');
-
-    contentStr = `<div class="${classStr}">${contentStr}</div>`;
+    contentStr = clipper.wrapWithSpecialClasses(contentStr, classStr);
 
     if (NODE_ENV !== 'production') {
       debug('content= %s', contentStr);
@@ -335,3 +355,80 @@ base.userArticleParse = (link, callback) => {
     })
   })
 }
+
+base.grabArticle = (link, hostInfo = {}, engine = {}, callback) => {
+  if (NODE_ENV !== 'production') debug('hostInfo= %o', hostInfo);
+
+  engine = engine || {};
+  hostInfo = hostInfo || {};
+
+  let NAME = 'default';
+
+  let fetchEngine = base.fetch;
+
+  if (engine.fetch) {
+    debug('using fetch of engine')
+    fetchEngine = engine.fetch;
+  }
+
+  let config = hostInfo.metadata || {};
+
+  debug('host config= %o', config);
+
+  config.mainContentSelector = hostInfo.mainContentSelector || config.mainContentSelector;
+  config.removeSelectors = config.removeSelectors || hostInfo.removeSelectors || [];
+
+  if (hostInfo && hostInfo.name) NAME = hostInfo.name;
+
+  fetchEngine(link, (err, html) => {
+    if (err) return callback(err);
+
+    let domain = utils.getMainDomain(link);
+
+    let extract = clipper.extract(html, link);
+
+    debug('extract= %s', JSON.stringify(extract));
+
+    return callback(null, 'HIHIHIHIHI');
+  })
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
