@@ -192,44 +192,6 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
       return callback(null, null);
     }
 
-    /*try {
-      contentStr = contentStr.replace(/\n/g, ' ').replace(/\t/g, ' ');
-
-      while (contentStr.indexOf('  ') > -1) {
-        contentStr = contentStr.replace(/\s\s/g, ' ');
-      }
-
-      contentStr = contentStr.replace(/\>\s\</g, '><');
-      contentStr = contentStr.trim();
-
-      contentStr = minify(contentStr, {
-        removeComments: true,
-        removeCommentsFromCDATA: true,
-        collapseWhitespace: true,
-        collapseBooleanAttributes: true,
-        removeRedundantAttributes: true,
-        removeEmptyAttributes: true,
-        removeEmptyElements: true,
-
-        decodeEntities: true,
-        collapseInlineTagWhitespace: true,
-
-        conservativeCollapse: true,
-        html5: true,
-        quoteCharacter: '\'',
-        removeScriptTypeAttributes: true,
-        useShortDoctype: true
-      });
-    } catch (ex) {
-      fatal('minify err= %s', ex.toString());
-    }
-
-    debug('sanitize html ...');
-    let optSanitize = Object.assign({}, defaultSanitizeHtml(), engine.optSanitizeHtml || {});
-    contentStr = sanitizeHtml(contentStr, optSanitize);*/
-
-    // contentStr = clipper.cleanAfterParsing(contentStr, link);
-
     contentStr = clipper.removeAttributes(contentStr);
     contentStr = clipper.removeSocialElements(contentStr);
     contentStr = clipper.removeNavigationalElements(contentStr, link);
@@ -333,26 +295,18 @@ base.userArticleParse = (link, callback) => {
     if (err) return callback('EFETCHLINK', err);
     if (!html) return callback('EFETCHHTMLNOTFOUND');
 
-    let doc = new JSDOM(html, {
-      url: link,
-    });
-    let reader = new Readability(doc.window.document);
-    let article = reader.parse();
+    let extractor = clipper.extract(html, link);
 
-    if (article) {
-      let contentStr = clean(article.content);
-      article.content = entities.decode(contentStr);
-      article.content = `<div class="default-auto">${article.content}</div>`;
+    if (extractor && extractor.content) {
+      if (NODE_ENV !== 'production') debug('content= %s', extractor.content);
+
+      return callback(null, {
+        ...extractor,
+        rawHtml: extractor.content
+      });
     }
 
-    extract(html).then((articleParse) => {
-      article = Object.assign({}, articleParse, article);
-      debug('article= %s', JSON.stringify(article));
-
-      return callback(null, article);
-    }).catch(ex => {
-      return callback(null, article);
-    })
+    return callback(null, null);
   })
 }
 

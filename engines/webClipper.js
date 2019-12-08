@@ -287,7 +287,7 @@ clipper.getDescription = function (rawHtml, content) {
   if (summaryFromMetags) {
     return summaryFromMetags;
   } else {
-    return getSummaryFromContent(content);
+    return getSummaryFromContent(content || rawHtml);
   }
 }
 

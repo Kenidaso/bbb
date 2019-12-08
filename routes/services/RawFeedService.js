@@ -156,7 +156,7 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 			}
 
 			if (!hostInfo) { // no host config, use flow auto
-				debug('--> use article-parser ...');
+				debug('--> use web clipper ...');
 
 				return baseEngine.userArticleParse(link, (err, article) => {
 					if (err) return next(err, article);
