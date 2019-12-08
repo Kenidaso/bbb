@@ -751,6 +751,8 @@ clipper.getLdJSON = (rawHtml) => {
 }
 
 clipper.addHeroImage = (rawHtml, heroImage) => {
+  debug('heroImage= %o', heroImage);
+
   if (!heroImage) return rawHtml;
 
   let _tryadd = () => {
@@ -806,7 +808,7 @@ clipper.extract = (html, link) => {
     if ((!publishDate || !moment(publishDate).isValid()) && ldJson.datePublished) {
       publishDate = ldJson.datePublished;
     }
-    if (!heroImage && ldJson.image) heroImage = ldJson.image;
+    if (!heroImage && ldJson.image && ldJson.image.url) heroImage = ldJson.image.url;
   }
 
   // try add hero image if not exists
