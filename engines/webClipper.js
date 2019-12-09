@@ -33,6 +33,7 @@ const shareUrls = [
 
 const elementsToRemove = [
   'script',
+  'noscript',
   // 'header',
   // 'footer'
 ];

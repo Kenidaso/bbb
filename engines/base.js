@@ -140,7 +140,8 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
       return callback(null, null);
     }
 
-    // $('script', content).remove();
+    $('script', content).remove();
+    $('noscript', content).remove();
 
     if (NODE_ENV !== 'production') {
       fs.writeFileSync(path.join(__dirname, `../data_sample/parse_${NAME}.html`), $(content).html());
