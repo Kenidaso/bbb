@@ -28,6 +28,8 @@ const request = require('request').defaults({
   rejectUnauthorized: false,
 });
 
+const UA_MOBILE = 'Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Mobile Safari/537.36';
+
 const minify = require('html-minifier').minify;
 
 const { JSDOM } = require('jsdom');
@@ -53,10 +55,18 @@ module.exports = base;
 base.fetch = (link, callback) => {
   debug('base fetch link= %s', link);
 
-  request({
+  let options = {
     url: link,
     method: 'GET'
-  }, (err, response, body) => {
+  }
+
+  if (link.indexOf('m.vietnamfinance.vn') > -1) {
+    options['headers'] = {
+      'user-agent': UA_MOBILE
+    }
+  }
+
+  request(options, (err, response, body) => {
     if (err) return callback('EFETCHLINK', err);
     if (!body) return callback('EFETCHNOBODY');
 
