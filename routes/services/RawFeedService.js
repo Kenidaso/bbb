@@ -165,7 +165,7 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 					articleParse = article;
 					rawHtml = article.content;
 
-					if (article.image) heroImage = article.image;
+					if (article.image || article.heroImage) heroImage = article.image || article.heroImage;
 					if (article.description || article.excerpt) description = article.description || article.excerpt;
 
 					return next(null);
@@ -217,65 +217,73 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 					return next();
 				}
 
-				if (heroImage) {
-					let urlImage = heroImage;
-					let public_id = heroImage;
-					let width = 0;
-					let height = 0;
-					let format = 'jpg';
+				async.parallel({
+					update_heroImage: (cb) => {
+						if (!heroImage) return cb();
 
-					utils.getSizeImage(urlImage, (errSize, sizeOf) => {
-						debug(`get size image url= ${urlImage}: ${JSON.stringify(sizeOf)}`);
+						let urlImage = heroImage;
+						let public_id = heroImage;
+						let width = 0;
+						let height = 0;
+						let format = 'jpg';
 
-						if (sizeOf) {
-							width = sizeOf.width;
-							height = sizeOf.height;
-							format = sizeOf.type;
-							public_id = public_id.replace(`.${format}`, '');
-						}
+						utils.getSizeImage(urlImage, (errSize, sizeOf) => {
+							debug(`get size image url= ${urlImage}: ${JSON.stringify(sizeOf)}`);
 
-						let updateHeroImage = {
-							url: urlImage,
-							width,
-							height,
-							format,
-							public_id
-						}
-
-						debug(`update hero image: ${JSON.stringify(updateHeroImage)}`);
-
-						Feed.model.findOneAndUpdate({
-							_id: feed._id
-						}, {
-							$set: {
-								heroImage: updateHeroImage
+							if (sizeOf) {
+								width = sizeOf.width;
+								height = sizeOf.height;
+								format = sizeOf.type;
+								public_id = public_id.replace(`.${format}`, '');
 							}
-						}, {
+
+							let updateHeroImage = {
+								url: urlImage,
+								width,
+								height,
+								format,
+								public_id
+							}
+
+							debug(`update hero image: ${JSON.stringify(updateHeroImage)}`);
+
+							Feed.model.findOneAndUpdate({
+								_id: feed._id
+							}, {
+								$set: {
+									heroImage: updateHeroImage
+								}
+							}, {
+								new: true
+							}, () => {
+								return cb();
+							})
+						})
+					},
+
+					update_rawHtml: (cb) => {
+						let update = {
+							rawHtml: rawHtml
+						}
+
+						if (!feed.description && description) {
+							update.description = description;
+						}
+
+						debug('update feed %o', update);
+
+						Feed.updateItem(feed, update, {
 							new: true
-						}, noop)
-					})
-				}
+						}, (err, newFeed) => {
+							if (err) debug('update feed err= %s', JSON.stringify(err));
+							if (newFeed) {
+								debug('update rawHtml newFeed= %o', newFeed);
+							}
 
-				let update = {
-					rawHtml: rawHtml
-				}
-
-				if (!feed.description && description) {
-					update.description = description;
-				}
-
-				debug('update feed %o', update);
-
-				Feed.updateItem(feed, update, {
-					new: true
-				}, (err, newFeed) => {
-					if (err) debug('update feed err= %s', JSON.stringify(err));
-					if (newFeed) {
-						debug('update rawHtml newFeed= %o', newFeed);
+							return cb();
+						})
 					}
-
-					return next();
-				})
+				}, next);
 			});
 		}
 	], (err, result) => {
