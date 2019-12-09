@@ -35,6 +35,7 @@ const LIMIT_FEED_IN_CATEGORY = Number(process.env.LIMIT_FEED_IN_CATEGORY) || 50;
 
 let regexHost = null;
 let listCategory = null;
+let START = moment();
 
 process.on('uncaughtException', (error) => {
   console.log(`====> uncaughtException=`, error);
@@ -85,7 +86,7 @@ const procOneCategory = (category, callback) => {
 	Feed.model
 		.find({
 			category: category._id,
-			link: new RegExp(regexHost),
+			// link: new RegExp(regexHost),
 			publishDate: {
 				$gte: moment().add(-1, 'M').toDate()
 			},
