@@ -222,24 +222,29 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 
 						let urlImage = heroImage;
 						let public_id = heroImage;
-						let width = 0;
-						let height = 0;
+						let width = -1;
+						let height = -1;
 						let format = 'jpg';
 
 						utils.getSizeImage(urlImage, (errSize, sizeOf) => {
 							debug(`get size image url= ${urlImage}: ${JSON.stringify(sizeOf)}`);
 
 							if (sizeOf) {
-								width = sizeOf.width;
-								height = sizeOf.height;
-								format = sizeOf.type;
+								width = sizeOf.width || -1;
+								height = sizeOf.height || -1;
+								format = sizeOf.type || 'jpg';
 								public_id = public_id.replace(`.${format}`, '');
+							}
+
+							if (sizeOf && sizeOf.newUrlImage) {
+								urlImage = sizeOf.newUrlImage;
+								public_id = urlImage.replace(`.${format}`, '');
 							}
 
 							let updateHeroImage = {
 								url: urlImage,
-								width,
-								height,
+								width: width,
+								height: height,
 								format,
 								public_id
 							}

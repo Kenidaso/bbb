@@ -27,6 +27,7 @@ keystone.init({
 keystone.import('../models');
 
 let redisService = require('../routes/services/RedisService');
+let RawFeedService = require('../routes/services/RawFeedService');
 
 const NewsTopic = keystone.list('NewsTopic');
 const NewsStory = keystone.list('NewsStory');
@@ -145,27 +146,40 @@ const save_1_article = (article, callback) => {
 		  utils.upsertSafe(Feed, find, update, (err, result) => {
 				if (err) {
 					console.log(`save_1_article err= ${err}`);
-				} else {
-					console.log(`\nsave_1_article update link= ${update.link}`);
+					return next(null, result);
+				}
 
-					let objDecay = {
-						slug: result.slug,
-						link: result.link,
-						title: result.title,
-						publishDate: result.publishDate,
-						createdAt: result.createdAt,
-						updatedAt: result.updatedAt,
-					};
+				console.log(`save_1_article done link= ${update.link}`);
 
-					if (result.heroImage) objDecay.heroImage = result.heroImage;
-					if (result.description) objDecay.description = result.description;
-					if (result.rawHtml) objDecay.rawHtml = result.rawHtml;
-					// if (result.linkBaoMoi) objDecay.linkBaoMoi = result.linkBaoMoi;
-					if (result.topic) objDecay.topic = result.topic;
-					if (result.category) objDecay.category = result.category;
+				let objDecay = {
+					slug: result.slug,
+					link: result.link,
+					title: result.title,
+					publishDate: result.publishDate,
+					createdAt: result.createdAt,
+					updatedAt: result.updatedAt,
+				};
 
-					decayMongo.decay({ link: 1 }, objDecay, (err, resultDecay) => {
-						console.log('decay er=', err, 'result=', JSON.stringify(resultDecay));
+				if (result.heroImage) objDecay.heroImage = result.heroImage;
+				if (result.description) objDecay.description = result.description;
+				if (result.rawHtml) objDecay.rawHtml = result.rawHtml;
+				if (result.topic) objDecay.topic = result.topic;
+				if (result.category) objDecay.category = result.category;
+
+				decayMongo.decay({ link: 1 }, objDecay, (err, resultDecay) => {
+					console.log('resultDecay err=', err, JSON.stringify(resultDecay));
+				});
+
+				if (!result.heroImage
+					|| !result.description
+					|| !result.rawHtml
+				) {
+					return RawFeedService.getHtmlContent(result.link, {
+						ignoreCache: true
+					}, (errRaw, resultRaw) => {
+						if (!errRaw) console.log('getHtmlContent done link=', result.link);
+
+						return next(null, result);
 					});
 				}
 

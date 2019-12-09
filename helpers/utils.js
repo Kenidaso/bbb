@@ -2,6 +2,13 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const request = require('request');
 const sizeOf = require('image-size');
 const url = require('url');
+const fs = require('fs');
+const path = require('path');
+const { ImgPublic } = require('cky-image-public');
+
+const imgPub = new ImgPublic({
+	imgur: true
+});
 
 module.exports = {
 	errorObj: (errorCode, codeDebug = 'EUNKNOWN', data = {}, message = '', statusCode = 400) => {
@@ -98,6 +105,43 @@ module.exports = {
 		);
 	},
 
+	isNeedUpload: (urlImage) => {
+		let listHost = [
+			'galaxypub.vn',
+			'congan.com.vn',
+			// 'vietnamfinance.vn'
+		]
+
+		for (let i in listHost) {
+			if (urlImage.indexOf(listHost[i]) > -1) {
+				return true;
+			}
+		}
+
+		return false;
+	},
+
+	upload: (urlImage, dataImg, callback) => {
+		let pathTmp = path.join(__dirname, '..', 'tmp.jpg');
+
+		// save image
+		fs.writeFileSync(pathTmp, dataImg);
+
+		return imgPub.upload({
+			filePath: pathTmp
+		}, (err, result) => {
+			console.log('upload result=', JSON.stringify(result));
+
+			try { fs.unlinkSync(pathTmp); } catch {}
+
+			if (!err && result && result.imgur && result.imgur.image_url) {
+				return callback(null, result.imgur.image_url);
+			}
+
+			return callback(null, null);
+		});
+	},
+
 	getSizeImage: (urlImage, callback) => {
 		request({
 			url: urlImage,
@@ -114,6 +158,17 @@ module.exports = {
 			} catch (ex) {
 				console.log('Image size error=', ex);
 				console.log('urlImage=', urlImage);
+
+				return callback(null, imgSize);
+			}
+
+			if (module.exports.isNeedUpload(urlImage)) {
+				return module.exports.upload(urlImage, body, (err, newUrl) => {
+					imgSize = imgSize = {};
+					imgSize.newUrlImage = newUrl;
+
+					return callback(null, imgSize);
+				})
 			}
 
 			return callback(null, imgSize);
