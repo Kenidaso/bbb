@@ -65,7 +65,7 @@ Feed.getFeeds = (params, callback) => {
 					.populate('host', '-_id name website')
 					.sort({
 						publishDate: -1,
-						updatedAt: -1,
+						// updatedAt: -1,
 						createdAt: -1
 					})
 					.limit(limit)
