@@ -112,7 +112,7 @@ clipper.removeSocialElements = (rawHtml) => {
         let href = $anchor.attr('href');
 
         _.each(shareUrls, function (shareUrl) {
-          if (href.indexOf(shareUrl) > -1) {
+          if (href && href.indexOf(shareUrl) > -1) {
             $anchor.remove();
           }
         });
