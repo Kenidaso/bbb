@@ -374,13 +374,13 @@ function getTitleFromMetaTags (rawHtml) {
     }
   }
 
-  if (siteName && title) {
+  /*if (siteName && title) {
     title = removeSiteNameFromTitle(title, siteName);
   }
 
   if (author && title) {
     title = removeSiteNameFromTitle(title, author);
-  }
+  }*/
 
   return title;
 }
@@ -397,13 +397,13 @@ function getTitleFromWindowTitle (rawHtml) {
   let siteName = getSiteName(rawHtml);
   let author = clipper.getAuthor(rawHtml);
 
-  if (siteName && title) {
+  /*if (siteName && title) {
     title = removeSiteNameFromTitle(title, siteName);
   }
 
   if (author && title) {
     title = removeSiteNameFromTitle(title, author);
-  }
+  }*/
 
   return title;
 }
