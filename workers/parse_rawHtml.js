@@ -72,7 +72,7 @@ const getCategories = (callback) => {
 }
 
 const procOneFeed = (feed, callback) => {
-	console.log('procOneFeed: ', feed);
+	console.log('procOneFeed: ', feed.slug);
 	RawFeedService.getHtmlContent(feed.link, {
 		ignoreSaveCache: true
 	}, () => {
@@ -81,7 +81,7 @@ const procOneFeed = (feed, callback) => {
 }
 
 const procOneCategory = (category, callback) => {
-	console.log('procOneCategory: ', category);
+	console.log('procOneCategory: ', category.slug);
 
 	Feed.model
 		.find({
@@ -105,16 +105,11 @@ const procOneCategory = (category, callback) => {
 		.exec((err, feeds) => {
 			if (err) return callback();
 
-			console.log('before feeds length=', feeds.length);
 			_.remove(feeds, function (f) {
 			  return f.rawHtml;
 			});
 
-			console.log('after feeds length=', feeds.length);
-
 			async.eachLimit(feeds, 1, procOneFeed, callback);
-
-			// return callback();
 		})
 }
 
@@ -132,8 +127,6 @@ const runProcess = (callback) => {
 	], (err, result) => {
 		console.log('run process done err=', err);
 		console.log('run process done result=', JSON.stringify(result));
-
-		console.log('regexHost=', regexHost);
 
 		return callback && callback();
 	});

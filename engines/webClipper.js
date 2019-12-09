@@ -315,8 +315,6 @@ clipper.getPublishDate = (rawHtml) => {
  * @returns {string}
  */
 function removeSiteNameFromTitle(articleTitle, siteName) {
-  debug('removeSiteNameFromTitle title= %s sitename= %s', articleTitle, siteName);
-
   let regex = new RegExp(siteName, 'i');
 
   articleTitle = articleTitle.replace(regex, '');
@@ -662,7 +660,6 @@ clipper.removeBySelectors = (html, selectors) => {
 }
 
 clipper.sanitizeHtml = (html, options = {}) => {
-  debug('sanitize html ...');
   let optSanitize = Object.assign({}, defaultSanitizeHtml(), options);
   try {
     let sanitized = sanitizeHtml(html, optSanitize);
@@ -741,8 +738,6 @@ clipper.getLdJSON = (rawHtml) => {
   ldJson = ldJson.toString('utf8');
   // ldJson = clipper.decodeEntities(ldJson);
 
-  debug('ldJson= %s', ldJson);
-
   try {
     return JSON.parse(ldJson);
   } catch (ex) {
@@ -752,8 +747,6 @@ clipper.getLdJSON = (rawHtml) => {
 }
 
 clipper.addHeroImage = (rawHtml, heroImage) => {
-  debug('heroImage= %o', heroImage);
-
   if (!heroImage) return rawHtml;
 
   let _tryadd = () => {

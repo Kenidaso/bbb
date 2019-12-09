@@ -34,7 +34,6 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 	let { ignoreCache, flow, ignoreSaveCache } = options;
 
 	debug('--> host= %o', host);
-	debug('--> ignoreCache= %s', ignoreCache);
 
 	let keyContent = `rawHtml:${link}`;
 	let keyHost = `host:${host}`;
@@ -124,7 +123,7 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 			(err, result) => {
 				if (err) return next('EFINDHOST', err);
 				if (!result) {
-					debug('WARNING host %s not found', host);
+					debug('WARNING host %s not found: %s', host);
 
 					return next(null, null);
 					// return next('EHOSTNOTFOUND');
@@ -178,7 +177,7 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 				let engineFullPath = path.join(__dirname, enginePath);
 
 				if (!fs.existsSync(engineFullPath)) {
-					debug('WARNING: no engine implement for host', host);
+					debug('WARNING: no engine implement for host: %s', host);
 					// return next('EENGINENOTEXISTS');
 				} else {
 					debug('engineName= %s', engineName);
@@ -270,14 +269,12 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 							update.description = description;
 						}
 
-						debug('update feed %o', update);
-
 						Feed.updateItem(feed, update, {
 							new: true
 						}, (err, newFeed) => {
 							if (err) debug('update feed err= %s', JSON.stringify(err));
 							if (newFeed) {
-								debug('update rawHtml newFeed= %o', newFeed);
+								debug('update rawHtml newFeed done');
 							}
 
 							return cb();
