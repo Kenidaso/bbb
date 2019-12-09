@@ -91,16 +91,9 @@ const getAllTopic = (callback) => {
 }
 
 const save_1_article = (article, callback) => {
-	if (!article.title) {
-		console.log(`\nsave_1_article title not found`);
-		return callback();
-	}
+	if (!article.title) return callback();
 
-	if (!article.linkArticle && !article.originLink) {
-		console.log(`\n----------\nsave_1_article linkArticle & originLink not found`);
-		console.log(`${JSON.stringify(article)}\n-------------\n`);
-		return callback();
-	}
+	if (!article.linkArticle && !article.originLink) return callback();
 
 	async.series({
 		checkOriginLinkAgain: (next) => {
@@ -144,25 +137,16 @@ const save_1_article = (article, callback) => {
 			if (article.linkArticle) {
 				update.metadata = Object.assign({}, update.metadata, { linkStory: article.linkStory });
 			}
-			// if (article.image) update.heroImage = { src: article.image }
+
 			if (article._topic) update.topic = [ article._topic._id ];
 
-			// check redis save
-
 			let keyLinkSaved = `ggn:saved:${article.originLink}`;
-			// redisService.get(keyLinkSaved, (err, value) => {
-			// 	if (!err && value) {
-			// 		console.log(`${article.originLink} already saved, skip ...`);
-			// 		return next();
-			// 	}
-			// })
 
 		  utils.upsertSafe(Feed, find, update, (err, result) => {
 				if (err) {
 					console.log(`save_1_article err= ${err}`);
 				} else {
-					console.log(`\nsave_1_article update= ${JSON.stringify(update)}`);
-					// redisService.set(keyLinkSaved, 1, TTL_LINK_SAVED);
+					console.log(`\nsave_1_article update link= ${update.link}`);
 
 					let objDecay = {
 						slug: result.slug,
@@ -180,10 +164,8 @@ const save_1_article = (article, callback) => {
 					if (result.topic) objDecay.topic = result.topic;
 					if (result.category) objDecay.category = result.category;
 
-					console.log('objDecay=', objDecay);
-
 					decayMongo.decay({ link: 1 }, objDecay, (err, resultDecay) => {
-						console.log('decay er=', err, 'result=', resultDecay);
+						console.log('decay er=', err, 'result=', JSON.stringify(resultDecay));
 					});
 				}
 
@@ -202,8 +184,6 @@ const save_1_story = (story, callback) => {
 		link: story.linkStory,
 		topic: story._topic._id,
 	}
-
-	console.log(`\nsave_1_story update= ${JSON.stringify(update)}`);
 
   utils.upsertSafe(NewsStory, {
 		link: story.image
@@ -264,8 +244,6 @@ const proc_1_topic = (topic, callback) => {
 			return callback(err);
 		}
 
-		console.log(`\n------------------\nproc_1_topic getFeedAndStoryFromTopic ${topic.link} :: results.length= ${results.length} \n------------------\n`);
-
 		if (NODE_ENV !== 'production') {
 			results = _.slice(results, 0, 1);
 
@@ -292,12 +270,6 @@ const proc_1_topic = (topic, callback) => {
 				linkStory: l.linkStory
 			};
 		})
-
-		console.log('allArticle length=', allArticle.length);
-		console.log('allLinkStory length=', allLinkStory.length);
-
-		// console.log('allArticle=', JSON.stringify(allArticle));
-		// console.log('\nallLinkStory=', JSON.stringify(allLinkStory));
 
 		if (NODE_ENV !== 'production') allLinkStory = _.slice(allLinkStory, 0, 1);
 
