@@ -14,7 +14,7 @@ const debug = require('debug')('FeedService');
 
 const utils = require('../../helpers/utils');
 
-let TTL = 60 * 15; // time to live key redis: 900 second = 15 minute
+let TTL = 60 * 2; // time to live key redis: 900 second = 15 minute
 if (NODE_ENV === 'development') TTL = 60 * 60;
 
 let TTL_LINK_FEED = 60 * 60 * 24 * 7; // 7 day
