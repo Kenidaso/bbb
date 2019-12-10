@@ -44,18 +44,20 @@ module.exports = {
 			}
 
 			if (result) {
-				if (update.metadata) {
-					result.metadata = result.metadata || {};
-					result.metadata = Object.assign({}, result.metadata, update.metadata);
-					delete update.metadata;
-				}
+				return callback(err, result);
 
-				result = Object.assign(result, update);
+				// if (update.metadata) {
+				// 	result.metadata = result.metadata || {};
+				// 	result.metadata = Object.assign({}, result.metadata, update.metadata);
+				// 	delete update.metadata;
+				// }
 
-				return result.save((err) => {
-					if (err) return callback(err);
-					return callback(err, result);
-				});
+				// result = Object.assign(result, update);
+
+				// return result.save((err) => {
+				// 	if (err) return callback(err);
+				// 	return callback(err, result);
+				// });
 			}
 
 			let newObj = new List.model(update);
@@ -112,6 +114,7 @@ module.exports = {
 			'danviet.vn',
 			'tapchitaichinh.vn',
 			'vnmedia.vn',
+			'antt.vn',
 			// 'vietnamfinance.vn'
 		]
 
