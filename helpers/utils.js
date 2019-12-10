@@ -109,6 +109,7 @@ module.exports = {
 		let listHost = [
 			'galaxypub.vn',
 			'congan.com.vn',
+			'danviet.vn',
 			// 'vietnamfinance.vn'
 		]
 
