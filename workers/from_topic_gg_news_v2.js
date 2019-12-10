@@ -170,7 +170,7 @@ const save_1_article = (article, callback) => {
 					console.log('resultDecay err=', err, JSON.stringify(resultDecay));
 				});
 
-				if (!result.heroImage
+				/*if (!result.heroImage
 					|| !result.description
 					|| !result.rawHtml
 				) {
@@ -181,7 +181,7 @@ const save_1_article = (article, callback) => {
 
 						return next(null, result);
 					});
-				}
+				}*/
 
 				return next(null, result);
 			})
