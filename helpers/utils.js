@@ -110,6 +110,8 @@ module.exports = {
 			'galaxypub.vn',
 			'congan.com.vn',
 			'danviet.vn',
+			'tapchitaichinh.vn',
+			'vnmedia.vn',
 			// 'vietnamfinance.vn'
 		]
 
