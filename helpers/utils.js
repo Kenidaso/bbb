@@ -44,20 +44,20 @@ module.exports = {
 			}
 
 			if (result) {
-				return callback(err, result);
+				// return callback(err, result);
 
-				// if (update.metadata) {
-				// 	result.metadata = result.metadata || {};
-				// 	result.metadata = Object.assign({}, result.metadata, update.metadata);
-				// 	delete update.metadata;
-				// }
+				if (update.metadata) {
+					result.metadata = result.metadata || {};
+					result.metadata = Object.assign({}, result.metadata, update.metadata);
+					delete update.metadata;
+				}
 
-				// result = Object.assign(result, update);
+				result = Object.assign(result, update);
 
-				// return result.save((err) => {
-				// 	if (err) return callback(err);
-				// 	return callback(err, result);
-				// });
+				return result.save((err) => {
+					if (err) return callback(err);
+					return callback(err, result);
+				});
 			}
 
 			let newObj = new List.model(update);
