@@ -14,6 +14,14 @@ const path = require('path');
 const moment = require('moment');
 const _ = require('lodash');
 
+const program = require('commander');
+program.version('1.0.0');
+
+program
+	.option('-s, --slug [String]', `slug of category, seperate by comma. ex: thoi-su,the-thao,abc-xyz`)
+
+program.parse(process.argv);
+
 keystone.init({
 	headless: true,
 	'user model': 'KsUser',
@@ -62,7 +70,17 @@ const buildRegexHost = (callback) => {
 const getCategories = (callback) => {
 	if (listCategory) return callback();
 
-	Category.model.find({}, '_id slug', (err, categories) => {
+	let find = {};
+
+	if (program.slug) {
+		find['slug'] = {
+			$in: program.slug.split(',')
+		}
+	}
+
+	console.log('find category=', JSON.stringify(find));
+
+	Category.model.find(find, '_id slug', (err, categories) => {
 		if (err) return callback('EGETCATEGORIES', err);
 
 		listCategory = categories;
