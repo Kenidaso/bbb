@@ -34,7 +34,6 @@ module.exports = {
 	},
 
 	upsertSafe: (List, find, update, callback) => {
-		console.log(`[upsertSafe] find= ${JSON.stringify(find)}`);
 		console.log(`[upsertSafe] update= ${JSON.stringify(update)}`);
 
 		List.model.findOne(find, (err, result) => {

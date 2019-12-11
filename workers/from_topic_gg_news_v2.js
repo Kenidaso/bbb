@@ -132,6 +132,10 @@ const save_1_article = (article, callback) => {
 				topic: [article._topic._id],
 			}
 
+			if (!update.category || update.category.length == 0) {
+				console.log('WARNING Category is null, article-', JSON.stringify(article));
+			}
+
 			if (article.linkArticle) {
 				update.metadata = Object.assign({}, update.metadata, { linkArticle: article.linkArticle });
 			}
@@ -288,11 +292,13 @@ const proc_1_topic = (topic, callback) => {
 		if (NODE_ENV !== 'production') allLinkStory = _.slice(allLinkStory, 0, 1);
 
 		async.parallel({
-			proc_all_article: (next) => {
-				async.eachLimit(allArticle, LIMIT_ARTICLE, save_1_article, next);
-			},
+			// proc_all_article: (next) => {
+			// 	async.eachLimit(allArticle, LIMIT_ARTICLE, save_1_article, next);
+			// },
 
 			proc_all_story_link: (next) => {
+				console.log('allLinkStory=', JSON.stringify(allLinkStory));
+
 				async.eachLimit(allLinkStory, LIMIT_LINK_STORY, proc_1_link_story, next);
 			}
 		}, callback);
