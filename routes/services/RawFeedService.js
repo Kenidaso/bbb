@@ -123,7 +123,7 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 			(err, result) => {
 				if (err) return next('EFINDHOST', err);
 				if (!result) {
-					debug('WARNING host %s not found: %s', host);
+					debug('WARNING host %s not found', host);
 
 					return next(null, null);
 					// return next('EHOSTNOTFOUND');

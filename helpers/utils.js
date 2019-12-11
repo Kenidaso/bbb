@@ -115,6 +115,7 @@ module.exports = {
 			'tapchitaichinh.vn',
 			'vnmedia.vn',
 			'antt.vn',
+			'kinhtedothi.vn',
 			// 'vietnamfinance.vn'
 		]
 
