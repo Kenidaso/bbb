@@ -295,6 +295,11 @@ clipper.getDescription = function (rawHtml, content) {
 clipper.getHeroImage = (rawHtml) => {
   const $ = cheerio.load(rawHtml);
   let urlHeroImg = $('[property="og:image"]').attr('content');
+
+  if (!urlHeroImg || urlHeroImg.length == 0) {
+    urlHeroImg = $('[name="thumbnail"]').attr('content');
+  }
+
   return urlHeroImg;
 }
 

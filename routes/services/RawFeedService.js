@@ -259,7 +259,8 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 								}
 							}, {
 								new: true
-							}, () => {
+							}, (err, newFeed) => {
+								if (err) debug('update feed err= %s', JSON.stringify(err));
 								return cb();
 							})
 						})
@@ -274,12 +275,19 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 							update.description = description;
 						}
 
-						Feed.updateItem(feed, update, {
+						Feed.model.findOneAndUpdate({
+							_id: feed._id
+						}, {
+							$set: update
+						}, {
 							new: true
 						}, (err, newFeed) => {
-							if (err) debug('update feed err= %s', JSON.stringify(err));
-							if (newFeed) {
-								debug('update rawHtml newFeed done');
+							if (err) {
+								debug('update feed err= %s', JSON.stringify(err));
+							} else {
+								let keyContentFeed = `rawHtml:${feed.link}`;
+								console.log('trigger delete key redis:', keyContentFeed);
+								RedisService.del(keyContentFeed);
 							}
 
 							return cb();
