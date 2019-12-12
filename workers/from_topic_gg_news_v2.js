@@ -9,6 +9,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const APP_NAME = process.env.APP_NAME || 'local';
 
 const keystone = require('keystone');
+const requireDir = require('require-dir');
 const shortId = require('short-id-gen');
 const async = require('async');
 const fs = require('fs');
@@ -35,6 +36,8 @@ const Article = keystone.list('Article');
 const Feed = keystone.list('Feed');
 
 const engine = require('../engines/googleNews');
+
+const Statics = requireDir('../statics');
 
 const decayMongo = new DecayMongo({
 	fnDecay: (obj) => {
@@ -95,6 +98,15 @@ const save_1_article = (article, callback) => {
 	if (!article.title) return callback();
 
 	if (!article.linkArticle && !article.originLink) return callback();
+
+	if (Statics && Statics.ingoreHost && Statics.ingoreHost.length > 0) {
+		let isIgnore = new RegExp(Statics.ingoreHost.join('|')).test(article.originLink);
+
+		if (isIgnore) {
+			console.log('---> IGNORE link:', article.originLink);
+			return callback();
+		}
+	}
 
 	async.series({
 		checkOriginLinkAgain: (next) => {

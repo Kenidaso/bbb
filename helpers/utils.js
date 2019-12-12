@@ -115,6 +115,7 @@ module.exports = {
 			'vnmedia.vn',
 			'antt.vn',
 			'kinhtedothi.vn',
+			'alobacsi.com',
 			// 'vietnamfinance.vn'
 		]
 
@@ -197,7 +198,11 @@ module.exports = {
 		'com',
 		'vn',
 		'org',
-		'net'
+		'net',
+		'int',
+		'edu',
+		'gov',
+		'mil',
 	],
 
 	getMainDomain: (link) => {
