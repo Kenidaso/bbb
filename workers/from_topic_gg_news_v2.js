@@ -309,7 +309,7 @@ const proc_1_topic = (topic, callback) => {
 			// },
 
 			proc_all_story_link: (next) => {
-				console.log('allLinkStory=', JSON.stringify(allLinkStory));
+				// console.log('allLinkStory=', JSON.stringify(allLinkStory));
 
 				async.eachLimit(allLinkStory, LIMIT_LINK_STORY, proc_1_link_story, next);
 			}
