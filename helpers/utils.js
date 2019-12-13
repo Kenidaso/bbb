@@ -116,6 +116,7 @@ module.exports = {
 			'antt.vn',
 			'kinhtedothi.vn',
 			'alobacsi.com',
+			'antv.gov.vn'
 			// 'vietnamfinance.vn'
 		]
 

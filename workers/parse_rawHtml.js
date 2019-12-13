@@ -47,6 +47,7 @@ let START = moment();
 
 process.on('uncaughtException', (error) => {
   console.log(`====> uncaughtException=`, error);
+  setTimeout(process.exit, 1e3, 0);
 });
 
 const buildRegexHost = (callback) => {
@@ -167,7 +168,7 @@ const startWorker = () => {
 		}
 
 		console.log('start done ...');
-		runProcess(stopWorker);
+		runProcess();
 	})
 }
 
