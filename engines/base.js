@@ -26,6 +26,7 @@ const request = require('request').defaults({
   },
   gzip: true,
   rejectUnauthorized: false,
+  timeout: 30e3
 });
 
 const UA_MOBILE = 'Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Mobile Safari/537.36';

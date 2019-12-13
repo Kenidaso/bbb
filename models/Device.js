@@ -39,27 +39,6 @@ Device.add({
 
 	ip: { type: Types.Text, noedit: true },
 	location: { type: Types.GeoPoint,  },
-
-	// isIE: { type: Types.Boolean },
-	// isChrome: { type: Types.Boolean },
-	// isFirefox: { type: Types.Boolean },
-	// isSafari: { type: Types.Boolean },
-	// isOpera: { type: Types.Boolean },
-	// isMobileSafari: { type: Types.Boolean },
-	// isMobile: { type: Types.Boolean },
-	// isMobileAndroid: { type: Types.Boolean },
-	// isMobileOpera: { type: Types.Boolean },
-	// isMobileWindows: { type: Types.Boolean },
-	// isMobileBlackBerry: { type: Types.Boolean },
-	// isMobileIOS: { type: Types.Boolean },
-	// isIphone: { type: Types.Boolean },
-	// isIpad: { type: Types.Boolean },
-	// isIpod: { type: Types.Boolean },
-	// isWindows: { type: Types.Boolean },
-	// isMac: { type: Types.Boolean },
-	// isLinux: { type: Types.Boolean },
-	// isUbuntu: { type: Types.Boolean },
-	// isSolaris: { type: Types.Boolean },
 });
 
 // Device.schema.add({ specifications: Schema.Types.Mixed });

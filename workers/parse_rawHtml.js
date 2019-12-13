@@ -168,7 +168,7 @@ const startWorker = () => {
 		}
 
 		console.log('start done ...');
-		runProcess();
+		runProcess(stopWorker);
 	})
 }
 
