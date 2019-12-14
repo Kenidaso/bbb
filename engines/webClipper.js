@@ -206,6 +206,7 @@ clipper.removeNewline = function (rawHtml) {
  * @param rawHtml
  */
 clipper.prepareForParse = (rawHtml) => {
+  debug('go prepareForParse ...');
   const $ = cheerio.load(rawHtml);
 
   let $body = $('body');
@@ -234,6 +235,7 @@ clipper.prepareForParse = (rawHtml) => {
  * @returns {string}
  */
 clipper.getAuthor = (html) => {
+  debug('go getAuthor ...');
   const $ = cheerio.load(html);
 
   const metatagAuthor = $('meta[name="author"]').attr('content');
@@ -250,6 +252,7 @@ clipper.getAuthor = (html) => {
  * @returns {string}
  */
 function getSummaryFromMetatags (rawHtml) {
+  debug('go getSummaryFromMetatags ...');
   const $ = cheerio.load(rawHtml);
 
   for (let i = 0; i < metatags.length; i++) {
@@ -273,6 +276,7 @@ function getSummaryFromMetatags (rawHtml) {
  * @returns {string}
  */
 function getSummaryFromContent (content) {
+  debug('go getSummaryFromContent ...');
   const $ = cheerio.load(content);
 
   let interestingParagraphs = $('p').filter(function () {
@@ -293,6 +297,7 @@ clipper.getDescription = function (rawHtml, content) {
 }
 
 clipper.getHeroImage = (rawHtml) => {
+  debug('go getHeroImage ...');
   const $ = cheerio.load(rawHtml);
   let urlHeroImg = $('[property="og:image"]').attr('content');
 
@@ -304,6 +309,7 @@ clipper.getHeroImage = (rawHtml) => {
 }
 
 clipper.getPublishDate = (rawHtml) => {
+  debug('go getPublishDate ...');
   const $ = cheerio.load(rawHtml);
   let publishDate = $('meta[property*="published_time"] , meta[name*="published_time"]').attr('content');
 
@@ -363,6 +369,8 @@ function getSiteName(rawHtml) {
  * @returns {string}
  */
 function getTitleFromMetaTags (rawHtml) {
+  debug('go getTitleFromMetaTags ...');
+
   let $ = cheerio.load(rawHtml);
   let title;
   let siteName = getSiteName(rawHtml);
@@ -395,6 +403,8 @@ function getTitleFromMetaTags (rawHtml) {
  * @returns {string}
  */
 function getTitleFromWindowTitle (rawHtml) {
+  debug('go getTitleFromWindowTitle ...');
+
   let $ = cheerio.load(rawHtml);
   let title = $('title').text();
   let siteName = getSiteName(rawHtml);
@@ -426,6 +436,7 @@ clipper.getTitle = (rawHtml) => {
  * @returns {*}
  */
 function getLikelyCandidate (rawHtml) {
+  debug('go getLikelyCandidate ...');
   let $ = cheerio.load(rawHtml);
   let $body = $('body');
   let candidates = [];
@@ -452,6 +463,8 @@ function getLikelyCandidate (rawHtml) {
 
     return $(sortedByScore[0]).html();
   }
+
+  return null;
 }
 
 /**
@@ -735,13 +748,13 @@ clipper.decodeEntities = (rawHtml) => {
 }
 
 clipper.getLdJSON = (rawHtml) => {
+  debug('go getLdJSON ...');
   const $ = cheerio.load(rawHtml);
   let ldJson = $('[type="application/ld+json"]').html();
 
   if (!ldJson) return null;
 
   ldJson = ldJson.toString('utf8');
-  // ldJson = clipper.decodeEntities(ldJson);
 
   try {
     return JSON.parse(ldJson);
