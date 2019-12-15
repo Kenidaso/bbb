@@ -198,3 +198,6 @@ const stopWorker = () => {
 
 // run
 startWorker();
+
+// cheat
+setTimeout(process.exit, 1e3 * 60 * 30, 0);
