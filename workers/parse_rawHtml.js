@@ -148,6 +148,7 @@ const runProcess = (callback) => {
 		console.log('run process done result=', JSON.stringify(result));
 
 		return callback && callback();
+		// return setTimeout(runProcess, 5e3);
 	});
 }
 
@@ -168,8 +169,8 @@ const startWorker = () => {
 		}
 
 		console.log('start done ...');
-		// runProcess(stopWorker);
-		runProcess(runProcess);
+		runProcess(stopWorker);
+		// runProcess(runProcess);
 	})
 }
 
