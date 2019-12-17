@@ -36,12 +36,14 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 	debug('--> host= %o', host);
 
 	let keyContent = `rawHtml:${link}`;
+	let keyBaoMoi = `linkBaoMoi:${link}`;
 	let keyHost = `host:${host}`;
 
 	let rawHtml = null;
 	let heroImage = null;
 	let description = null;
 	let articleParse = null;
+	let linkBaoMoi = null;
 
 	async.waterfall([
 		// get rawHtml from cache
@@ -65,6 +67,19 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 			})
 		},
 
+		// get linkBaoMoi from cache
+		(next) => {
+			RedisService.get(keyBaoMoi, (err, value) => {
+				if (!err && value) {
+					debug('get linkBaoMoi from cache key= %s', keyBaoMoi);
+
+					linkBaoMoi = value;
+				}
+
+				return next(null);
+			})
+		},
+
 		// get rawHtml from database
 		(next) => {
 			if (NODE_ENV !== 'production') return next();
@@ -79,9 +94,13 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 			}, (err, doc) => {
 				if (err) return next();
 
+				if (doc && doc.linkBaoMoi && doc.linkBaoMoi.length > 0) {
+					RedisService.set(keyBaoMoi, doc.linkBaoMoi);
+					linkBaoMoi = doc.linkBaoMoi;
+				}
+
 				if (doc && doc.rawHtml && doc.rawHtml.length > 0) {
 					RedisService.set(keyContent, doc.rawHtml);
-
 					rawHtml = doc.rawHtml;
 					debug('get content from db key= %s', keyContent);
 					return next('GET_FROM_DB', doc.rawHtml);
@@ -100,6 +119,8 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 				return next(null, null);
 			}
 
+			if (linkBaoMoi) keyHost = `host:baomoi.com`;
+
 			RedisService.get(keyHost, (err, hostInfo) => {
 				if (err || !hostInfo) return next(null, null);
 
@@ -116,8 +137,12 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 		(hostInfo, next) => {
 			if (hostInfo) return next(null, hostInfo);
 
+			let regexHost = new RegExp(host);
+
+			if (linkBaoMoi) regexHost = /baomoi\.com/;
+
 			Host.model.findOne({
-				website: new RegExp(host)
+				website: regexHost
 			},
 			'slug name engine website metadata customClass mainContentSelector removeSelectors fallbackMainContent',
 			(err, result) => {
@@ -186,7 +211,10 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 				}
 			}
 
-			baseEngine.getRawContent(link, hostInfo, engine, (err, result) => {
+			let urlFeed = link;
+			if (linkBaoMoi) urlFeed = linkBaoMoi;
+
+			baseEngine.getRawContent(urlFeed, hostInfo, engine, (err, result) => {
 				if (err) return next('EGETRAWCONTENT', err);
 				if (!result) return next('EGETRAWCONTENT_NORESULT');
 
@@ -202,11 +230,6 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 		// save
 		(next) => {
 			if (!rawHtml) return next();
-
-			if (!ignoreSaveCache) {
-				debug('save cache key= %s', keyContent);
-				RedisService.set(keyContent, rawHtml, TTL_RAW_HTML);
-			}
 
 			Feed.model.findOne({
 				link
@@ -293,7 +316,14 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 							return cb();
 						})
 					}
-				}, next);
+				}, () => {
+					if (!ignoreSaveCache) {
+						debug('save cache key= %s', keyContent);
+						RedisService.set(keyContent, rawHtml, TTL_RAW_HTML);
+					}
+
+					return next();
+				});
 			});
 		}
 	], (err, result) => {

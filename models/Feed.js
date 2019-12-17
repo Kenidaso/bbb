@@ -59,6 +59,8 @@ Feed.add({
 
 	view: { type: Types.Number, default: 0 },
 
+	status: { type: Types.Number, default: 1 }, // 1: active, 0: inactive
+
 	/*
 	{
 		"public_id" : "rdrwfwzzbenze4hzlogk",

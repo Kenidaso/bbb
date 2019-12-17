@@ -82,14 +82,19 @@ keystone.set('nav', {
 	'posts': ['posts', 'post-categories'],
 	'galleries': 'galleries',
 	'ks-users': 'ks-users',
-	'Device': 'Device',
+
+	'System': [
+		'Device',
+		'User'
+	],
+
 	'News': [
 		'categories',
 		'hosts',
 		'Style',
 		'feeds',
 		'Rss',
-		'Html',
+		'Baomoi',
 		'CrawlLog',
 		'CmdExec',
 	],

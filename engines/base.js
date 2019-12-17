@@ -53,6 +53,11 @@ const defaultSanitizeHtml = () => {
 let base = {};
 module.exports = base;
 
+let _listHostUseUAMobile = [
+  'm.vietnamfinance.vn',
+  'm.baomoi.com'
+];
+
 base.fetch = (link, callback) => {
   debug('base fetch link= %s', link);
 
@@ -61,9 +66,14 @@ base.fetch = (link, callback) => {
     method: 'GET'
   }
 
-  if (link.indexOf('m.vietnamfinance.vn') > -1) {
-    options['headers'] = {
-      'user-agent': UA_MOBILE
+  for (let i in _listHostUseUAMobile) {
+    let _host = _listHostUseUAMobile[i]
+    if (link.indexOf(_host) > -1) {
+      options['headers'] = {
+        'user-agent': UA_MOBILE
+      }
+
+      break;
     }
   }
 

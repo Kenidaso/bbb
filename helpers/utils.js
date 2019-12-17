@@ -26,6 +26,13 @@ module.exports = {
 
 	normalizeText: (text = '') => {
 		let result = text.replace(/\s\s/g, ' ').trim();
+		result = result.replace(/\n/g, ' ');
+
+		while (result.indexOf('  ') > -1) {
+			result = result.replace(/\s\s/g, ' ');
+		}
+
+		result = result.replace(/\n/g, ' ');
 		return result;
 	},
 
@@ -116,7 +123,8 @@ module.exports = {
 			'antt.vn',
 			'kinhtedothi.vn',
 			'alobacsi.com',
-			'antv.gov.vn'
+			'antv.gov.vn',
+			'netnews.vn',
 			// 'vietnamfinance.vn'
 		]
 

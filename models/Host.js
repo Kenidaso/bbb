@@ -12,22 +12,7 @@ const RedisService = require('../routes/services/RedisService');
 
 let { minify } = require('../helpers/stringUtils');
 
-const tldsInVn = [ // top level domain
-	'org.vn',
-	'net.vn',
-	'biz.vn',
-	'edu.vn',
-	'gov.vn',
-	'int.vn',
-	'ac.vn',
-	'pro.vn',
-	'info.vn',
-	'health.vn',
-	'name.vn',
-	'com.vn',
-	'com',
-	'vn'
-]
+let utils = require('../helpers/utils');
 
 /**
  * Host Model
@@ -43,8 +28,8 @@ const Host = new keystone.List('Host', {
   	updatedAt: true,
   	updatedBy: true
 	},
-	perPage: 20,
-	defaultColumns: 'name website',
+	perPage: 50,
+	defaultColumns: 'name display website',
 	defaultSort: '-updatedAt'
 });
 
@@ -56,6 +41,7 @@ Host.add({
 		index: true
 	},
 	website: { type: Types.Url, initial: true, index: true, unique: true },
+	display: { type: Types.Text },
 	styles: { type: Types.Relationship, ref: 'Style', initial: true, many: true },
 	customClass: { type: Types.TextArray },
 	engine: { type: String, initial: true }, // tên engine sử dụng
@@ -89,21 +75,7 @@ Host.schema.pre('save', function (next) {
 	}
 
 	// trigger delete key redis
-	const websiteUrl = url.parse(this.website);
-	let { host } = websiteUrl;
-
-	// clear subdomain
-	if (host.split('.').length > 2) {
-		let split = host.split('.');
-		split.shift();
-		let _tmpHost = split.join('.');
-		let findTld = tldsInVn.find((t) => {
-			return t == _tmpHost;
-		})
-
-		if (!findTld) host = _tmpHost;
-	}
-
+	let host = utils.getMainDomain(this.website);
 	let keyHost = `host:${host}`;
 	console.log('trigger delete key redis:', keyHost);
 	RedisService.del(keyHost);
