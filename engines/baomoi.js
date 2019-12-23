@@ -3,6 +3,7 @@ const _ = require('lodash');
 const async = require('async');
 const fs = require('fs');
 const path = require('path');
+const request = require('request');
 
 const fetchHtml = require('./fetchHtml');
 const Utils = require('../helpers/utils');
@@ -224,9 +225,30 @@ const _parseFeed = ($) => {
 	// text.match(/window\.location\.replace\(\"http.*\"\)/)
 }
 
-const getOriginLink = (html) => {
-	let $ = cheerio.load(html);
-	return $('.original__link').attr('href');
+const getOriginLink = (link, callback) => {
+	link = link.replace('/c/', '/r/');
+
+	request({
+		url: link,
+		method: 'GET',
+		gzip: true,
+		rejectUnauthorized: false,
+		timeout: 30e3
+	}, (err, response, body) => {
+		if (err) return callback(null, null);
+
+		let $ = cheerio.load(body);
+		let scripts = $('script');
+
+		if (!scripts || scripts.length < 3) return callback(null, null);
+
+		let scriptRedirect = $(scripts[2]).html();
+
+		let originLink = scriptRedirect.substr(scriptRedirect.indexOf('window.location.replace("')).replace('window.location.replace("', '');
+		originLink = originLink.substr(0, originLink.indexOf('")'));
+
+		return callback(null, originLink);
+	});
 }
 
 const parseRawHtml = (html, link) => {
@@ -283,12 +305,14 @@ const getFeedFromCategoryUrl = (categoryUrl, callback) => {
 			base.fetch(feed.linkBaoMoi, (err, body) => {
 				if (err) return cbMap(null, feed);
 
-				let parseResult = parseRawHtml(body, feed.linkBaoMoi);
+				getOriginLink(feed.linkBaoMoi, (err, originLink) => {
+					if (originLink) feed.link = originLink;
 
-				feed.link = getOriginLink(body);
-				feed.rawHtml = parseResult.rawHtml;
+					let parseResult = parseRawHtml(body, feed.linkBaoMoi);
+					feed.rawHtml = parseResult.rawHtml;
 
-				return cbMap(null, feed);
+					return cbMap(null, feed);
+				});
 			});
 		}, (err, result) => {
 			return callback(null, result);
