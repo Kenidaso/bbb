@@ -102,6 +102,8 @@ const decodeLinkGgn = function (articleLink) {
 
 	if (finalLink[finalLink.length - 1] === '/') finalLink.substr(0, finalLink.length - 1);
 
+	if (finalLink.indexOf('rfi.fr') > -1) return null;
+
 	return finalLink;
 }
 
@@ -111,6 +113,8 @@ const getLinkRedirect = (articleLink, callback) => {
 	if (decode && decode.length > 0) return callback(null, decode);
 
 	let _getLink = (cb) => {
+		console.log(`_getLink articleLink= ${articleLink}`);
+
 		request({
 			url: articleLink,
 			method: 'GET'

@@ -494,6 +494,8 @@ function getContentByLongestLength(rawHtml) {
     }
   });
 
+  if (!$longest) return null;
+
   let content = $longest.html();
 
   // Replace any existing newlines with a space
