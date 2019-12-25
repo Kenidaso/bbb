@@ -805,7 +805,7 @@ clipper.extract = (html, link) => {
   let article = clipper.readability(link, html);
   // let articleContent = clipper.getArticleContent(html, link);
 
-  let content = article.content;
+  let content = article;
   content = clipper.cleanAfterParsing(content, link);
 
   let images = [];
