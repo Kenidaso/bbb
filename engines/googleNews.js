@@ -104,6 +104,8 @@ const decodeLinkGgn = function (articleLink) {
 
 	if (finalLink.indexOf('rfi.fr') > -1) return null;
 
+	finalLink = finalLink.replace('/ufffd', '');
+
 	return finalLink;
 }
 

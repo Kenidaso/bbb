@@ -41,7 +41,7 @@ const utils = require('../helpers/utils');
 
 const defaultSanitizeHtml = () => {
   return {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat([ 'img', 'h1', 'h2', 'header', 'article', 'section', 'footer', 'figure', 'video' ]),
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat([ 'img', 'h1', 'h2', 'header', 'article', 'section', 'footer', 'figure', 'video', 'amp-img' ]),
     allowedAttributes: {
       a: [ 'href', 'name' ],
       img: [ 'src', 'alt' ],

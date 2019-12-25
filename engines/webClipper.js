@@ -803,14 +803,10 @@ clipper.extract = (html, link) => {
   let publishDate = clipper.getPublishDate(rawHtml);
 
   let article = clipper.readability(link, html);
-  let articleContent = clipper.getArticleContent(html, link);
+  // let articleContent = clipper.getArticleContent(html, link);
 
-  let content = articleContent;
-
-  if (article) {
-    article.content = clipper.cleanAfterParsing(article.content, link);
-    if (article.content.length > content.length) content = article.content;
-  }
+  let content = article.content;
+  content = clipper.cleanAfterParsing(content, link);
 
   let images = [];
 
