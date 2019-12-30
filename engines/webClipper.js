@@ -805,7 +805,7 @@ clipper.extract = (html, link) => {
   let article = clipper.readability(link, html);
   // let articleContent = clipper.getArticleContent(html, link);
 
-  let content = article;
+  let content = article.content;
 
   if (content && content.length > 0) {
     content = clipper.cleanAfterParsing(content, link);

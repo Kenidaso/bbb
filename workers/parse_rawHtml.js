@@ -169,8 +169,8 @@ const startWorker = () => {
 		}
 
 		console.log('start done ...');
-		runProcess(stopWorker);
-		// runProcess(runProcess);
+		// runProcess(stopWorker);
+		runProcess(runProcess);
 	})
 }
 
@@ -201,4 +201,4 @@ const stopWorker = () => {
 startWorker();
 
 // cheat
-setTimeout(process.exit, 1e3 * 60 * 30, 0);
+// setTimeout(process.exit, 1e3 * 60 * 30, 0);
