@@ -195,7 +195,7 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 					if (article.image || article.heroImage) heroImage = article.image || article.heroImage;
 					if (article.description || article.excerpt) description = article.description || article.excerpt;
 
-					debug('web clipper done, article= %o', article);
+					// debug('web clipper done, article= %o', article);
 
 					return next(null);
 				});
