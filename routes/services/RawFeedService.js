@@ -29,7 +29,10 @@ module.exports = RawFeed;
 RawFeed.getHtmlContent = (link, options = {}, callback) => {
 	let host = utils.getMainDomain(link);
 
-	if (!host) return callback('ELINKINVALID', 1005);
+	if (!host) {
+		console.log('can not get main domain from link:', link);
+		return callback('ELINKINVALID', 1005);
+	}
 
 	let { ignoreCache, flow, ignoreSaveCache } = options;
 
@@ -191,6 +194,8 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 
 					if (article.image || article.heroImage) heroImage = article.image || article.heroImage;
 					if (article.description || article.excerpt) description = article.description || article.excerpt;
+
+					debug('web clipper done, article= %o', article);
 
 					return next(null);
 				});
