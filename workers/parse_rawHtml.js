@@ -193,7 +193,7 @@ const stopWorker = () => {
 			return process.exit(0);
 		}
 
-		setTimeout(startWorker, 3e3);
+		setTimeout(startWorker, 10e3);
 	});
 }
 
