@@ -61,6 +61,9 @@ let _listHostUseUAMobile = [
 base.fetch = (link, callback) => {
   debug('base fetch link= %s', link);
 
+  link = encodeURI(link);
+  link = link.replace(/ufffd/g, '');
+
   let options = {
     url: link,
     method: 'GET'
@@ -312,8 +315,14 @@ let clean = (content) => {
 
 base.userArticleParse = (link, callback) => {
   base.fetch(link, (err, html) => {
-    if (err) return callback('EFETCHLINK', err);
-    if (!html) return callback('EFETCHHTMLNOTFOUND');
+    if (err) {
+      debug('fetch link %s err= %s result= %s', link, err, html);
+      return callback('EFETCHLINK', err);
+    }
+    if (!html) {
+      debug('can not get html from link %s', link);
+      return callback('EFETCHHTMLNOTFOUND');
+    }
 
     let extractor = clipper.extract(html, link);
 
