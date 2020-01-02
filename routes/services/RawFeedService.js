@@ -85,12 +85,12 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 
 		// get rawHtml from database
 		(next) => {
-			if (NODE_ENV !== 'production') return next();
+			// if (NODE_ENV !== 'production') return next();
 
-			if (ignoreCache) {
-				debug('ignoreCache -> skip get rawHtml from database ...');
-				return next();
-			}
+			// if (ignoreCache) {
+			// 	debug('ignoreCache -> skip get rawHtml from database ...');
+			// 	return next();
+			// }
 
 			Feed.model.findOne({
 				link
@@ -100,6 +100,13 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 				if (doc && doc.linkBaoMoi && doc.linkBaoMoi.length > 0) {
 					RedisService.set(keyBaoMoi, doc.linkBaoMoi);
 					linkBaoMoi = doc.linkBaoMoi;
+				}
+
+				if (NODE_ENV !== 'production') return next();
+
+				if (ignoreCache) {
+					debug('ignoreCache -> skip get rawHtml from database ...');
+					return next();
 				}
 
 				if (doc && doc.rawHtml && doc.rawHtml.length > 0) {

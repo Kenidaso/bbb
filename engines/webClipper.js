@@ -60,11 +60,12 @@ const bodyTags = 'p strong em ol ul h1 h2 h3 h4 h5 h6 code pre'.toUpperCase().sp
 
 const defaultSanitizeHtml = () => {
   return {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat([ 'img', 'h1', 'h2', 'header', 'article', 'section', 'footer', 'figure', 'video' ]),
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat([ 'img', 'h1', 'h2', 'header', 'article', 'section', 'footer', 'figure', 'video', 'amp-img', 'source' ]),
     allowedAttributes: {
       a: [ 'href', 'name' ],
       img: [ 'src', 'alt' ],
       video: [ 'src' ],
+      source: [ 'src', 'type' ],
     },
   }
 }
@@ -710,7 +711,7 @@ clipper.minifyHtml = (rawHtml) => {
       collapseWhitespace: true,
       collapseBooleanAttributes: true,
       removeRedundantAttributes: true,
-      removeEmptyAttributes: true,
+      // removeEmptyAttributes: true,
       removeEmptyElements: true,
 
       decodeEntities: true,

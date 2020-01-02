@@ -42,11 +42,12 @@ const utils = require('../helpers/utils');
 
 const defaultSanitizeHtml = () => {
   return {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat([ 'img', 'h1', 'h2', 'header', 'article', 'section', 'footer', 'figure', 'video', 'amp-img' ]),
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat([ 'img', 'h1', 'h2', 'header', 'article', 'section', 'footer', 'figure', 'video', 'amp-img', 'source' ]),
     allowedAttributes: {
       a: [ 'href', 'name' ],
       img: [ 'src', 'alt' ],
       video: [ 'src' ],
+      source: [ 'src', 'type' ],
     },
   }
 }
@@ -87,6 +88,8 @@ base.fetch = (link, callback) => {
   for (let i in _ignoreGzip) {
     if (link.indexOf(_ignoreGzip[i]) > -1) {
       options['gzip'] = false
+
+      break;
     }
   }
 
@@ -94,6 +97,8 @@ base.fetch = (link, callback) => {
     if (link.indexOf(_useProxy[i]) > -1) {
       let use_proxy = _.sample(proxies);
       options['proxy'] = use_proxy;
+
+      break;
     }
   }
 
@@ -251,12 +256,14 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
       return callback(null, null);
     }
 
-    contentStr = clipper.removeAttributes(contentStr);
-    contentStr = clipper.removeSocialElements(contentStr);
-    contentStr = clipper.removeNavigationalElements(contentStr, link);
-    contentStr = clipper.removeEmptyElements(contentStr);
-    contentStr = clipper.removeNewline(contentStr);
-    contentStr = clipper.sanitizeHtml(contentStr, engine.optSanitizeHtml || {});
+    if (hostInfo.name != 'baomoi') {
+      contentStr = clipper.removeAttributes(contentStr);
+      contentStr = clipper.removeSocialElements(contentStr);
+      contentStr = clipper.removeNavigationalElements(contentStr, link);
+      contentStr = clipper.removeEmptyElements(contentStr);
+      contentStr = clipper.removeNewline(contentStr);
+      contentStr = clipper.sanitizeHtml(contentStr, engine.optSanitizeHtml || defaultSanitizeHtml);
+    }
 
     contentStr = clipper.getBody(contentStr);
     contentStr = clipper.minifyHtml(contentStr);

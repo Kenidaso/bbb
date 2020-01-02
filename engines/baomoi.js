@@ -22,6 +22,7 @@ const removeSelectors = [
   "[class*=\"ads\"]",
   '.article__action',
   '[class*="social"]',
+  '#BaoMoi_Article_OA'
 ]
 const HOST_NAME = 'baomoi';
 const customClass = [];
@@ -192,6 +193,30 @@ const cleanSpecial = ($, content) => {
 	  $(this).removeAttr('onclick');
 	  $(this).remove('script');
 	  $(this).remove('noscript');
+	});
+
+	$('video', content).each(function () {
+		$(this).attr('controls', '');
+
+		let width = $(this).attr('data-width');
+		let height = $(this).attr('data-height');
+		let duration = $(this).attr('data-duration');
+
+		$(this).attr('width', width);
+		$(this).attr('height', height);
+
+		$(this).removeAttr('data-width');
+		$(this).removeAttr('data-height');
+		$(this).removeAttr('data-duration');
+		$(this).removeAttr('data-media-id');
+	});
+
+	$('source', content).each(function () {
+		let dataSrc = $(this).attr('data-src');
+		$(this).attr('src', dataSrc);
+		$(this).removeAttr('data-src');
+
+		$(this).attr('type', 'video/mp4');
 	});
 }
 
