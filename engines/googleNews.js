@@ -61,6 +61,15 @@ const cleanQueryString = (qs) => {
 	return querystring.stringify(qsParsed);
 }
 
+const _ignoreDecode = [
+	'rfi.fr',
+	'voh.com.vn',
+]
+
+const _switchOffHttps = [
+	'vietbao.vn'
+]
+
 const decodeLinkGgn = function (articleLink) {
 	if (!articleLink || articleLink.length == 0) return null;
 
@@ -102,7 +111,19 @@ const decodeLinkGgn = function (articleLink) {
 
 	if (finalLink[finalLink.length - 1] === '/') finalLink.substr(0, finalLink.length - 1);
 
-	if (finalLink.indexOf('rfi.fr') > -1) return null;
+	for (let i in _ignoreDecode) {
+		if (finalLink.indexOf(_ignoreDecode[i]) > -1) {
+			console.log(`[decodeLinkGgn] ignore _ignoreDecode[i] ...`);
+			return null;
+		}
+	}
+
+	// switch https -> http
+	for (let i in _switchOffHttps) {
+		if (finalLink.indexOf(_switchOffHttps[i]) > -1) {
+			finalLink = finalLink.replace('https', 'http');
+		}
+	}
 
 	finalLink = finalLink.replace('/ufffd', '');
 

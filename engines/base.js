@@ -58,6 +58,10 @@ let _listHostUseUAMobile = [
   'm.baomoi.com'
 ];
 
+let _ignoreGzip = [
+  'vietbao.com'
+]
+
 base.fetch = (link, callback) => {
   debug('base fetch link= %s', link);
 
@@ -67,6 +71,12 @@ base.fetch = (link, callback) => {
   let options = {
     url: link,
     method: 'GET'
+  }
+
+  for (let i in _ignoreGzip) {
+    if (link.indexOf(_ignoreGzip[i]) > -1) {
+      options['gzip'] = false
+    }
   }
 
   for (let i in _listHostUseUAMobile) {
