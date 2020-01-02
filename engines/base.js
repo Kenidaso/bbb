@@ -6,6 +6,7 @@ const Entities = require('html-entities').AllHtmlEntities;
 const entities = new Entities();
 const sanitizeHtml = require('sanitize-html');
 const fs = require('fs');
+const _ = require('lodash');
 const path = require('path');
 const async = require('async');
 
@@ -50,6 +51,10 @@ const defaultSanitizeHtml = () => {
   }
 }
 
+const proxies = [
+  'http://atadi:v1etjetl@b0ngh0@l@1@fptapp.atadi.xyz:1201'
+];
+
 let base = {};
 module.exports = base;
 
@@ -62,6 +67,10 @@ let _ignoreGzip = [
   'vietbao.com',
   'nguoivietphone.com',
   'khoahocphattrien.vn'
+]
+
+let _useProxy = [
+  'rfi.fr'
 ]
 
 base.fetch = (link, callback) => {
@@ -81,6 +90,13 @@ base.fetch = (link, callback) => {
     }
   }
 
+  for (let i in _useProxy) {
+    if (link.indexOf(_useProxy[i]) > -1) {
+      let use_proxy = _.sample(proxies);
+      options['proxy'] = use_proxy;
+    }
+  }
+
   for (let i in _listHostUseUAMobile) {
     let _host = _listHostUseUAMobile[i]
     if (link.indexOf(_host) > -1) {
@@ -92,9 +108,15 @@ base.fetch = (link, callback) => {
     }
   }
 
+  console.log('fetch options=', JSON.stringify(options));
+
   request(options, (err, response, body) => {
     if (err) return callback('EFETCHLINK', err);
     if (!body) return callback('EFETCHNOBODY');
+
+    if (body && body.toLowerCase().indexOf(`you don't have permission to access`) > -1) {
+      return callback('ENOTPERMISSIONTOACCESS', body);
+    }
 
     return callback(null, body);
   })

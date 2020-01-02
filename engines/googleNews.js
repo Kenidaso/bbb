@@ -125,6 +125,10 @@ const decodeLinkGgn = function (articleLink) {
 		}
 	}
 
+	if (finalLink.indexOf('https://amp.rfi.fr') > -1) {
+		finalLink = finalLink.replace('https://amp.rfi.fr', 'http://www.rfi.fr');
+	}
+
 	finalLink = finalLink.replace('/ufffd', '');
 
 	return finalLink;
