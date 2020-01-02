@@ -59,7 +59,9 @@ let _listHostUseUAMobile = [
 ];
 
 let _ignoreGzip = [
-  'vietbao.com'
+  'vietbao.com',
+  'nguoivietphone.com',
+  'khoahocphattrien.vn'
 ]
 
 base.fetch = (link, callback) => {

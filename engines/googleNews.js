@@ -67,7 +67,7 @@ const _ignoreDecode = [
 ]
 
 const _switchOffHttps = [
-	'vietbao.vn'
+	'vietbao.vn',
 ]
 
 const decodeLinkGgn = function (articleLink) {
