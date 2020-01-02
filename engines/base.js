@@ -108,7 +108,7 @@ base.fetch = (link, callback) => {
     }
   }
 
-  console.log('fetch options=', JSON.stringify(options));
+  // console.log('fetch options=', JSON.stringify(options));
 
   request(options, (err, response, body) => {
     if (err) return callback('EFETCHLINK', err);
