@@ -66,6 +66,7 @@ const defaultSanitizeHtml = () => {
       img: [ 'src', 'alt' ],
       video: [ 'src' ],
       source: [ 'src', 'type' ],
+      'amp-img': ['src'],
     },
   }
 }

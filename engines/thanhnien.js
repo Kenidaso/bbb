@@ -48,4 +48,9 @@ engine.cleanSpecial = ($, content) => {
 		$(this).attr('src', dataSrc);
 		$(this).removeAttr('data-src');
 	});
+
+	// convert amp-img to img
+	$('amp-img', content).each(function () {
+		this.tagName = 'img';
+	});
 }

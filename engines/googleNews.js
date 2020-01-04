@@ -156,6 +156,7 @@ const getLinkRedirect = (articleLink, callback) => {
 			if (redirectLink) {
 				redirectLink = redirectLink.replace('%E2%80%98', '');
 				redirectLink = redirectLink.replace('‘', '');
+				redirectLink = redirectLink.replace('/u2018', '');
 			}
 
 			return cb(null, redirectLink);
