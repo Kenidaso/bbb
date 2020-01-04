@@ -700,7 +700,7 @@ clipper.wrapWithSpecialClasses = (rawHtml, specialClasses = '') => {
 
   // $('body').children().wrap(`<div class="${classStr}"></div>`);
 
-  return `<div class="${classStr}">${rawHtml}</div>`;
+  return `<div class='${classStr}'>${rawHtml}</div>`;
 }
 
 clipper.minifyHtml = (rawHtml) => {

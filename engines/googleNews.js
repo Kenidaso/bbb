@@ -153,6 +153,11 @@ const getLinkRedirect = (articleLink, callback) => {
 			let $ = cheerio.load(body);
 			let redirectLink = $('c-wiz > div > div > c-wiz > div > a').text();
 
+			if (redirectLink) {
+				redirectLink = redirectLink.replace('%E2%80%98', '');
+				redirectLink = redirectLink.replace('‘', '');
+			}
+
 			return cb(null, redirectLink);
 		})
 	}
