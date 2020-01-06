@@ -68,7 +68,8 @@ let _listHostUseUAMobile = [
 let _ignoreGzip = [
   'vietbao.com',
   'nguoivietphone.com',
-  'khoahocphattrien.vn'
+  'khoahocphattrien.vn',
+  'fili.vn'
 ]
 
 let _useProxy = [
