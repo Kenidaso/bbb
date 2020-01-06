@@ -72,7 +72,8 @@ let _ignoreGzip = [
 ]
 
 let _useProxy = [
-  'rfi.fr'
+  'rfi.fr',
+  'rfa.org'
 ]
 
 base.fetch = (link, callback) => {
