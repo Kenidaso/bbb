@@ -130,6 +130,7 @@ const decodeLinkGgn = function (articleLink) {
 	}
 
 	finalLink = finalLink.replace('/ufffd', '');
+	finalLink = finalLink.replace('%5Cufffd', '');
 
 	return finalLink;
 }
