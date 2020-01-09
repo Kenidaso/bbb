@@ -197,7 +197,7 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 				if (!parseQs.v) return next();
 
 				let linkEmbed = `https://www.youtube.com/embed/${parseQs.v}`
-			  let iframe = `<iframe src="${linkEmbed}"></iframe>`;
+			  let iframe = `<iframe src="${linkEmbed}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
 
 			  debug('youtube.com -> return iframe: %s', iframe);
 
