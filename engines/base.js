@@ -10,6 +10,9 @@ const _ = require('lodash');
 const path = require('path');
 const async = require('async');
 
+const url = require('url');
+const querystring = require('querystring');
+
 const debug = require('debug')('BaseEngine');
 const fatal = require('debug')('FATAL');
 
@@ -156,6 +159,26 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
   config.removeSelectors = config.removeSelectors || [];
 
   if (hostInfo && hostInfo.name) NAME = hostInfo.name;
+
+  if (link.indexOf('youtube.com') > -1) {
+    let parseUrl = url.parse(link);
+    let parseQs = querystring.parse(parseUrl.query);
+
+    if (!parseQs.v) {
+      return {
+        rawHtml: null
+      };
+    }
+
+    let linkEmbed = `https://www.youtube.com/embed/${parseQs.v}`
+    let iframe = `<iframe src="${linkEmbed}"></iframe>`;
+
+    debug('youtube.com -> return iframe: %s', iframe);
+
+    return {
+      rawHtml: iframe
+    }
+  }
 
   fetchEngine(link, (err, html) => {
     if (err) return callback('EFETCHLINK', err);

@@ -3,6 +3,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const keystone = require('keystone');
 const request = require('request');
 const url = require('url');
+const querystring = require('querystring');
 const async = require('async');
 const fs = require('fs');
 const path = require('path');
@@ -187,6 +188,21 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 
 					return next(null);
 				});
+			}
+
+			if (link.indexOf('youtube.com') > -1) {
+				let parseUrl = url.parse(link);
+				let parseQs = querystring.parse(parseUrl.query);
+
+				if (!parseQs.v) return next();
+
+				let linkEmbed = `https://www.youtube.com/embed/${parseQs.v}`
+			  let iframe = `<iframe src="${linkEmbed}"></iframe>`;
+
+			  debug('youtube.com -> return iframe: %s', iframe);
+
+			  rawHtml = iframe;
+			  return next(null);
 			}
 
 			if (!hostInfo) { // no host config, use flow auto
