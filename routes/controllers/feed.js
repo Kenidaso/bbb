@@ -45,3 +45,15 @@ FeedCtrl.getContent = (req, res) => {
 		return Response.success(req, res, result);
 	});
 }
+
+FeedCtrl.upsertFeed = (req, res) => {
+	let { find, update } = req.body;
+
+	if (!find) return Response.error(req, res, 'EINVALIDFIND');
+	if (!update) return Response.error(req, res, 'EINVALIDUPDATE');
+
+	FeedService.upsertFeed(find, update, (err, result) => {
+		if (err) return Response.error(req, res, err, result);
+		return Response.success(req, res, result);
+	});
+}

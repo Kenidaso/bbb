@@ -19,6 +19,7 @@
  */
 
 const keystone = require('keystone');
+
 const middleware = require('./middleware');
 const importRoutes = keystone.importer(__dirname);
 
@@ -37,6 +38,7 @@ const routes = {
 };
 
 const i18n = keystone.get('i18n');
+const acrud = keystone.get('acrud');
 
 // Setup Route Bindings
 exports = module.exports = function (app) {
@@ -78,6 +80,10 @@ exports = module.exports = function (app) {
 	app.get('/feed/:category/:page?', routes.controllers.feed.getFeeds);
 	app.post('/ggn/search', middleware.trackSearch, routes.controllers.search.ggnSearch);
 	app.post('/device/register', routes.controllers.device.register);
+
+	app.post('/feed/upsert', routes.controllers.feed.upsertFeed);
+
+	app.post(acrud.ROUTE, acrud.controller);
 
 	// NOTE: To protect a route so that only admins can see it, use the requireUser middleware:
 	// app.get('/protected', middleware.requireUser, routes.views.protected);

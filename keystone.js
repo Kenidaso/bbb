@@ -7,6 +7,11 @@ const keystone = require('keystone');
 const requireDir = require('require-dir');
 const i18n = require("i18n");
 const async = require('async');
+const acrud = require('./helpers/acrud');
+
+acrud.init({
+  keystone
+});
 
 i18n.configure({
 	// setup some locales - other locales default to en silently
@@ -54,6 +59,7 @@ keystone.init({
 });
 
 keystone.set('i18n', i18n);
+keystone.set('acrud', acrud);
 
 // Load your project's Models
 keystone.import('models');

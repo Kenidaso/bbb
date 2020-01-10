@@ -112,3 +112,32 @@ Feed.getCategories = (callback) => {
 		return callback(null, result);
 	})
 }
+
+Feed.upsertFeed = (find, update, callback) => {
+	FeedModel.findOne(find, (err, result) => {
+		if (err) {
+			console.log('upsertSafe err=', err);
+			return callback(err);
+		}
+
+		if (result) {
+			update['$inc'] = update['$inc'] || {};
+			update['$inc']['__v'] = 1;
+
+			let opts = {
+				new: true
+			}
+
+			return FeedModel.findOneAndUpdate({
+				_id: result._id
+			}, update, opts, callback);
+		}
+
+		let newObj = new FeedModel(update);
+
+		return newObj.save((err) => {
+			if (err) return callback(err);
+			return callback(err, newObj);
+		});
+	});
+}
