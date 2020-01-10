@@ -171,7 +171,7 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
     }
 
     let linkEmbed = `https://www.youtube.com/embed/${parseQs.v}`
-    let iframe = `<iframe src="${linkEmbed}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+    let iframe = `<iframe src="${linkEmbed}" width="560" height="315" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
 
     debug('youtube.com -> return iframe: %s', iframe);
 
