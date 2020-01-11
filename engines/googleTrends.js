@@ -1,11 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-const cheerio = require('cheerio');
-const _ = require('lodash');
-const async = require('async');
 const moment = require('moment');
-const unidecode = require('unidecode');
 
+const debug = require('debug')('GoogleTrends');
 const url = require('url');
 const querystring = require('querystring');
 
@@ -19,8 +14,11 @@ const request = require('request').defaults({
 		'sec-fetch-mode': 'cors',
 		'accept': 'application/json, text/plain, */*',
 		'authority': 'trends.google.com.vn',
-	}
+	},
+  jar: true
 })
+
+let cookie = request.jar();
 
 const fetchRss = require('./fetchRss');
 
@@ -37,7 +35,8 @@ const safeParse = (text) => {
 const trendsDefaultOpts = {
 	// hl: 'vi-VN',
 	hl: 'en-US',
-	tz: '-420'
+	tz: '-420',
+  geo: 'VN'
 }
 
 /*
@@ -1977,12 +1976,22 @@ const trendsDefaultOpts = {
 const dailytrends = (opts, callback) => {
 	// https://trends.google.com.vn/trends/api/dailytrends?hl=en-US&tz=-420&ed=20200107&geo=VN&ns=15
 	// ed=20200107
+
+  opts = Object.assign({}, trendsDefaultOpts, opts);
+
+  let urlDailyTrends = `https://trends.google.com.vn/trends/api/dailytrends?hl=${opts.hl}&tz=${opts.tz}&geo=${opts.geo}&ns=15`;
+
+  if (opts.date) urlDailyTrends += `&ed=${opts.date}`;
+
+  debug('dailytrends url= %s', urlDailyTrends);
+
 	request({
-		url: `https://trends.google.com.vn/trends/api/dailytrends?hl=vi-VN&tz=-420&geo=VN&ns=15`,
+		url: urlDailyTrends,
 		method: 'GET',
 		headers: {
-			'referer': 'https://trends.google.com.vn/trends/trendingsearches/daily?geo=VN'
-		}
+			'referer': `https://trends.google.com.vn/trends/trendingsearches/daily?geo=${opts.geo}`
+		},
+    jar: cookie
 	}, (err, response, body) => {
 		if (err) return callback(err);
 
@@ -4448,12 +4457,31 @@ const realtimetrends = (opts, callback) => {
 	cat=s Sport
 	cat=h Top stories
 	*/
+
+  let categories = {
+    ALL: 'all',
+    BUSSINESS: 'b',
+    ENTERTAINMENT: 'e',
+    HEALTH: 'm',
+    SCI_TECH: 't',
+    SPORT: 's',
+    TOP_STORIES: 'h'
+  }
+
+  opts = Object.assign({}, trendsDefaultOpts, opts);
+  opts.category = categories[opts.category] || categories.ALL;
+
+  let urlRealtime = `https://trends.google.com.vn/trends/api/realtimetrends?hl=${opts.hl}&tz=${opts.tz}&cat=${opts.category}&fi=0&fs=0&geo=${opts.geo}&ri=300&rs=20&sort=0`;
+
+  debug('realtimetrends urlRealtime= %s', urlRealtime);
+
 	request({
-		url: `https://trends.google.com.vn/trends/api/realtimetrends?hl=vi-VN&tz=-420&cat=all&fi=0&fs=0&geo=VN&ri=300&rs=20&sort=0`,
+		url: urlRealtime,
 		method: 'GET',
 		headers: {
-			'referer': `https://trends.google.com.vn/trends/trendingsearches/realtime?geo=VN&category=all`
-		}
+			'referer': `https://trends.google.com.vn/trends/trendingsearches/realtime?geo=${opts.geo}&category=${opts.category}`
+		},
+    jar: cookie
 	}, (err, response, body) => {
 		if (err) return callback(err);
 
@@ -4866,7 +4894,8 @@ const widgetdata_timeline = (opts, callback) => {
 	*/
 	request({
 		url: `https://trends.google.com.vn/trends/api/widgetdata/timeline?hl=vi-VN&tz=-420&req=%7B%22geo%22:%7B%22country%22:%22VN%22%7D,%22time%22:%222020-01-07T02%5C%5C:00%5C%5C:00+2020-01-09T08%5C%5C:05%5C%5C:00%22,%22resolution%22:%22HOUR%22,%22mid%22:%5B%22%2Fg%2F122lf050%22,%22%2Fm%2F0fnff%22,%22%2Fg%2F1tgjhr_8%22,%22%2Fg%2F1pzpdb8fn%22,%22%2Fg%2F11cm14zjjd%22%5D,%22locale%22:%22vi-VN%22%7D&token=APP6_UEAAAAAXhgw0Xo70NQoxg5D1grAxg-X2H4618Ea&tz=-420`,
-		method: 'GET'
+		method: 'GET',
+    jar: cookie
 	}, (err, response, body) => {
 		if (err) return callback(err);
 
@@ -5492,7 +5521,8 @@ const widgetdata_timeline = (opts, callback) => {
 const widgetdata_sparkline = (opts, callback) => {
 	request({
 		url: `https://trends.google.com.vn/trends/api/widgetdata/sparkline?hl=vi-VN&tz=-420&id=VN_lnk_mJ2YQQEwAAABbM_vi&id=VN_lnk_ErC-QQEwAACtQM_vi&id=VN_lnk_KJvcQQEwAAD1aM_vi&id=VN_lnk_lxq2QQEwAAAg6M_vi`,
-		method: 'GET'
+		method: 'GET',
+    jar: cookie
 	}, (err, response, body) => {
 		if (err) return callback(err);
 
@@ -5678,8 +5708,9 @@ const widgetdata_relatedqueries = (opts, callback) => {
 	request({
 		url: `https://trends.google.com.vn/trends/api/widgetdata/relatedqueries?hl=vi-VN&tz=-420&lq=true&token=APP6_UEAAAAAXhgw0MjRA3SxpYjrUsZsP5L-B_XJ25X3`,
 		method: 'POST',
+    jar: cookie,
 		json: true,
-		body: data
+		body: data,
 	}, (err, response, body) => {
 		if (err) return callback(err);
 
@@ -6805,7 +6836,8 @@ const widgetdata_relatedqueries = (opts, callback) => {
 const stories_summary = (opts, callback) => {
 	request({
 		url: `https://trends.google.com.vn/trends/api/stories/summary?hl=vi-VN&tz=-420&cat=h&id=VN_lnk_DSaRQQEwAACd1M_vi&id=VN_lnk_PSasQQEwAACQ1M_vi&id=VN_lnk_cJfaQQEwAACrZM_vi&id=VN_lnk_rfzDQQEwAABvDM_vi&id=VN_lnk_a-DWQQEwAAC8EM_vi&id=VN_lnk_YWXKQQEwAACqlM_vi&id=VN_lnk_Gh2eQQEwAACF7M_vi&id=VN_lnk_atzLQQEwAACgLM_vi&id=VN_lnk_a7nWQQEwAAC8SM_vi&id=VN_lnk_Dy3bQQEwAADV3M_vi&id=VN_lnk_s9KXQQEwAAAlIM_vi&id=VN_lnk_OwLdQQEwAADn8M_vi&id=VN_lnk_wEbZQQEwAAAYtM_vi&id=VN_lnk_VDXbQQEwAACOxM_vi&id=VN_lnk_x0mWQQEwAABQuM_vi&id=VN_lnk_u1LOQQEwAAB0oM_vi&id=VN_lnk_xFnJQQEwAAAMqM_vi&id=VN_lnk_20_YQQEwAAACvM_vi&id=VN_lnk_C_zCQQEwAADIDM_vi&id=VN_lnk_efSwQQEwAADIBM_vi`,
-		method: 'GET'
+		method: 'GET',
+    jar: cookie
 	}, (err, response, body) => {
 		if (err) return callback(err);
 
@@ -7460,7 +7492,8 @@ const stories = (opts, callback) => {
 
 	request({
 		url: `https://trends.google.com.vn/trends/api/stories/${idStory}?hl=${hl}&tz=${tz}`,
-		method: 'GET'
+		method: 'GET',
+    jar: cookie
 	}, (err, response, body) => {
 		if (err) return callback(err);
 
@@ -7692,8 +7725,9 @@ const explore = (opts, callback) => {
       'sec-fetch-mode': 'cors',
       'accept-language': 'en-US,en;q=0.9,vi;q=0.8',
       'referer': `https://trends.google.com.vn/trends/explore?q=barca&geo=VN`,
-      'cookie': 'NID=195%3DIsEs6F1R8HVec7ByYrI1WZbvGKVtgTQ48nvhPgdULLlkXPhIl_sSJ_85egxT7zyTAfhlp2hn8xcUEId2jy0qfP79mamLEkNmWi5Yq7Gv8_L7wqqhUyOaX7bDFmARh2HV6MvNO02-TD30ewTU1czUoQqLphQnokAlWK2AssmIgiE'
-    }
+      // 'cookie': 'NID=195%3DIsEs6F1R8HVec7ByYrI1WZbvGKVtgTQ48nvhPgdULLlkXPhIl_sSJ_85egxT7zyTAfhlp2hn8xcUEId2jy0qfP79mamLEkNmWi5Yq7Gv8_L7wqqhUyOaX7bDFmARh2HV6MvNO02-TD30ewTU1czUoQqLphQnokAlWK2AssmIgiE'
+    },
+    jar: cookie
 	}, (err, response, body) => {
 		if (err) return callback(err);
 
@@ -8248,7 +8282,8 @@ const explore = (opts, callback) => {
 const widgetdata_relatedsearches = (opts, callback) => {
 	request({
 		url: `https://trends.google.com.vn/trends/api/widgetdata/relatedsearches?hl=en-US&tz=-420&req=%7B%22restriction%22:%7B%22geo%22:%7B%22country%22:%22VN%22%7D,%22time%22:%222020-01-04T20%5C%5C:00%5C%5C:00+2020-01-09T08%5C%5C:40%5C%5C:00%22,%22originalTimeRangeForExploreUrl%22:%222020-01-04T20%5C%5C:00%5C%5C:00+2020-01-09T08%5C%5C:40%5C%5C:00%22,%22complexKeywordsRestriction%22:%7B%22keyword%22:%5B%7B%22type%22:%22PHRASE%22,%22value%22:%22barca%22%7D%5D%7D%7D,%22keywordType%22:%22ENTITY%22,%22metric%22:%5B%22TOP%22,%22RISING%22%5D,%22trendinessSettings%22:%7B%22compareTime%22:%222019-12-31T08%5C%5C:00%5C%5C:00+2020-01-04T20%5C%5C:00%5C%5C:00%22%7D,%22requestOptions%22:%7B%22property%22:%22%22,%22backend%22:%22CM%22,%22category%22:0%7D,%22language%22:%22en%22%7D&token=APP6_UEAAAAAXhhFHzyKW_NAj3KOQzUd2S899L4HbloU`,
-		method: 'GET'
+		method: 'GET',
+    jar: cookie
 	}, (err, response, body) => {
 		if (err) return callback(err);
 
@@ -9798,7 +9833,8 @@ const widgetdata_multiline = (opts, callback) => {
 	// chart Interest over time
 	request({
 		url: `https://trends.google.com.vn/trends/api/widgetdata/multiline?hl=en-US&tz=-420&req=%7B%22time%22:%222020-01-04T20%5C%5C:00%5C%5C:00+2020-01-09T08%5C%5C:40%5C%5C:00%22,%22resolution%22:%22HOUR%22,%22locale%22:%22en-US%22,%22comparisonItem%22:%5B%7B%22geo%22:%7B%22country%22:%22VN%22%7D,%22complexKeywordsRestriction%22:%7B%22keyword%22:%5B%7B%22type%22:%22PHRASE%22,%22value%22:%22barca%22%7D%5D%7D%7D%5D,%22requestOptions%22:%7B%22property%22:%22%22,%22backend%22:%22CM%22,%22category%22:0%7D%7D&token=APP6_UEAAAAAXhhFH0N9Bn6YhviRT5ixwEal5KRZZo2-&tz=-420`,
-		method: 'GET'
+		method: 'GET',
+    jar: cookie
 	}, (err, response, body) => {
 		if (err) return callback(err);
 
@@ -12035,7 +12071,8 @@ const widgetdata_comparedgeo = (opts, callback) => {
 	request({
 		// city
 		url: `https://trends.google.com.vn/trends/api/widgetdata/comparedgeo?hl=en-US&tz=-420&req=%7B%22geo%22:%7B%22country%22:%22VN%22%7D,%22comparisonItem%22:%5B%7B%22time%22:%222020-01-04T20%5C%5C:00%5C%5C:00+2020-01-09T08%5C%5C:40%5C%5C:00%22,%22complexKeywordsRestriction%22:%7B%22keyword%22:%5B%7B%22type%22:%22PHRASE%22,%22value%22:%22barca%22%7D%5D%7D%7D%5D,%22resolution%22:%22CITY%22,%22locale%22:%22en-US%22,%22requestOptions%22:%7B%22property%22:%22%22,%22backend%22:%22CM%22,%22category%22:0%7D,%22includeLowSearchVolumeGeos%22:false%7D&token=APP6_UEAAAAAXhhH76CGxNUkMxJsq6BZlsDqGLE9yg-c`,
-		method: 'GET'
+		method: 'GET',
+    jar: cookie
 	}, (err, response, body) => {
 		if (err) return callback(err);
 
@@ -12535,10 +12572,19 @@ const widgetdata_comparedgeo = (opts, callback) => {
 */
 const topcharts = (opts, callback) => {
 	// Year in Search
+  debug('opts= %o', opts);
+
+  opts = Object.assign({}, trendsDefaultOpts, opts);
+  opts.date = opts.date || opts.year || new Date().getFullYear() - 1;
+
+  let urlTopcharts = `https://trends.google.com.vn/trends/api/topcharts?hl=${opts.hl}&tz=${opts.tz}&date=${opts.date}&geo=${opts.geo}&isMobile=false`;
+
+  debug('urlTopcharts= %s', urlTopcharts);
 
 	request({
-		url: `https://trends.google.com.vn/trends/api/topcharts?hl=en-US&tz=-420&date=2019&geo=VN&isMobile=false`,
-		method: 'GET'
+		url: urlTopcharts,
+		method: 'GET',
+    jar: cookie
 	}, (err, response, body) => {
 		if (err) return callback(err);
 
@@ -12549,10 +12595,20 @@ const topcharts = (opts, callback) => {
 	})
 }
 
-const autocomplete = (opts, callback) => {
+const autocomplete = (opts = {}, callback) => {
+  let df = {
+    hl: 'vi',
+    tz: -420
+  }
+
+  opts = Object.assign({}, df, opts);
+
+  if (!opts.keyword) return callback('ENOKEYWORD');
+
   request({
-    url: `https://trends.google.com.vn/trends/api/autocomplete/bar?hl=vi&tz=-420`,
-    method: 'GET'
+    url: `https://trends.google.com.vn/trends/api/autocomplete/${opts.keyword}?hl=${opts.hl}&tz=${opts.tz}`,
+    method: 'GET',
+    jar: cookie
   }, (err, response, body) => {
     if (err) return callback(err);
 
@@ -12578,4 +12634,5 @@ module.exports = {
 	widgetdata_multiline,
 	widgetdata_comparedgeo,
 	topcharts,
+  autocomplete
 }

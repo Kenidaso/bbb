@@ -83,6 +83,13 @@ exports = module.exports = function (app) {
 
 	app.post('/feed/upsert', routes.controllers.feed.upsertFeed);
 
+	app.post('/autocomplete', routes.controllers.gg.autocompleteMerge); // autocomplete by google search
+	app.post('/gg/autocomplete', routes.controllers.gg.autocomplete); // autocomplete by google search
+	app.post('/ggt/yis', routes.controllers.trends.yearInSearch); // Year in Search, top search in year
+	app.post('/ggt/autocomplete', routes.controllers.trends.autocomplete); // autocomplete with region
+	app.post('/ggt/daily', routes.controllers.trends.dailytrends);
+	app.post('/ggt/realtime', routes.controllers.trends.realtimetrends);
+
 	app.post(acrud.ROUTE, acrud.controller);
 
 	// NOTE: To protect a route so that only admins can see it, use the requireUser middleware:

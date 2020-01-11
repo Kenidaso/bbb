@@ -63,7 +63,7 @@
     "lint": "eslint .",
     "ggn": "NODE_ENV=production node workers/from_topic_gg_news_v2",
     "rawhtml": "DEBUG=*routes*,*Service*,*Model*,FATAL,*Engine*,*WebClipper* node workers/parse_rawHtml",
-    "start": "npm run docs && DEBUG=*routes*,*Service*,*Model*,FATAL,*Engine*,*WebClipper* PORT=3222 nodemon keystone.js",
+    "start": "npm run docs && DEBUG=*routes*,*Service*,*Model*,FATAL,*Engine*,*WebClipper*,*Google* PORT=3222 nodemon keystone.js",
     "docs": "apidoc -i routes/controllers -o public/docs",
     "test-clipper": "DEBUG=*WebClipper* mocha test-web-clipper.mocha.js",
     "postinstall": "npm install apidoc -g && cp cheats/FileChangeMessage.js node_modules/keystone/fields/components &&  cp cheats/cloudinaryResize.js node_modules/keystone/admin/client/utils && cp cheats/CloudinaryImagesField.js node_modules/keystone/fields/types/cloudinaryimages && cp cheats/CloudinaryImageField.js node_modules/keystone/fields/types/cloudinaryimage && cp -f ./public/images/newspaper.png ./node_modules/keystone/admin/public/images/logo.png && cp -f cheats/Brand.js node_modules/keystone/admin/client/Signin/components/Brand.js"
