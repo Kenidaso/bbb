@@ -5,8 +5,26 @@ const _ = require('lodash');
 
 const engine = require('../../engines/google');
 const trends = require('../../engines/googleTrends');
+const sports = require('../../engines/googleSport');
+
+const RedisService = require('./RedisService');
 
 const utils = require('../../helpers/utils');
+
+const TTL_STANDING = 60 * 60 * 12; // 12 hours
+
+const mapSlugLeague = {
+	'premier-league': 'PREMIER_LEAGUE',
+	'championship-one': 'PREMIER_LEAGUE',
+	'la-liga': 'PREMIER_LEAGUE',
+	'la-liga-2': 'PREMIER_LEAGUE',
+	'serie-a': 'SERIE_A',
+	'serie-b': 'SERIE_A',
+	'bundesliga': 'BUNDESLIGA',
+	'bundesliga-2': 'BUNDESLIGA',
+	'ligue-1': 'BUNDESLIGA',
+	'ligue-2':'BUNDESLIGA',
+}
 
 const autocomplete = (keyword, callback) => {
 	engine.autocomplete(keyword, (err, result) => {
@@ -59,7 +77,29 @@ const autocompleteMerge = (keyword, callback) => {
 	})
 }
 
+const standingOfLeague = (options, callback) => {
+	options.type = mapSlugLeague[options.slug] || 'PREMIER_LEAGUE';
+
+	let key = `ggsport:standingOfLeague:${JSON.stringify(options)}`;
+
+	RedisService.get(key, (err, value) => {
+		if (/*NODE_ENV === 'production' && */!err && value) {
+			console.log('get from cache key=', key);
+			return callback(null, value);
+		}
+
+		sports.standingOfLeague(options, (err, result) => {
+			if (err) return callback(err);
+
+			RedisService.set(key, result, TTL_STANDING);
+
+			return callback(null, result);
+		});
+	})
+}
+
 module.exports = {
 	autocomplete,
-	autocompleteMerge
+	autocompleteMerge,
+	standingOfLeague
 }

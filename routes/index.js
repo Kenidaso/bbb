@@ -90,6 +90,8 @@ exports = module.exports = function (app) {
 	app.post('/ggt/daily', routes.controllers.trends.dailytrends);
 	app.post('/ggt/realtime', routes.controllers.trends.realtimetrends);
 
+	app.post('/gg/standing-of-league', routes.controllers.gg.standingOfLeague);
+
 	app.post(acrud.ROUTE, acrud.controller);
 
 	// NOTE: To protect a route so that only admins can see it, use the requireUser middleware:

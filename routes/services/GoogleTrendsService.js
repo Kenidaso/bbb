@@ -27,7 +27,7 @@ const yearInSearch = (options = {}, callback) => {
 	let key = `ggtrends:yearinsearch:${JSON.stringify(options)}`;
 
 	RedisService.get(key, (err, value) => {
-		if (NODE_ENV === 'production' && !err && value) {
+		if (/*NODE_ENV === 'production' && */!err && value) {
 			console.log('get from cache key=', key);
 			return callback(null, utils.safeParse(value));
 		}

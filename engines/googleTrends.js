@@ -1978,6 +1978,7 @@ const dailytrends = (opts, callback) => {
 	// ed=20200107
 
   opts = Object.assign({}, trendsDefaultOpts, opts);
+  opts.date = opts.date || moment().utcOffset(420).format('YYYYMMDD');
 
   let urlDailyTrends = `https://trends.google.com.vn/trends/api/dailytrends?hl=${opts.hl}&tz=${opts.tz}&geo=${opts.geo}&ns=15`;
 
