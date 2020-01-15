@@ -91,6 +91,10 @@ exports = module.exports = function (app) {
 	app.post('/ggt/realtime', routes.controllers.trends.realtimetrends);
 
 	app.post('/gg/standing-of-league', routes.controllers.gg.standingOfLeague);
+	app.post('/gg/stat-of-league', routes.controllers.gg.statOfLeague);
+	app.post('/gg/news-of-league', routes.controllers.gg.newsOfLeague);
+	app.post('/gg/player-of-league', routes.controllers.gg.playerOfLeague);
+	app.post('/gg/match-of-league', routes.controllers.gg.matchOfLeague);
 
 	app.post(acrud.ROUTE, acrud.controller);
 

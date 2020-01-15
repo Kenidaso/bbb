@@ -11,7 +11,11 @@ const RedisService = require('./RedisService');
 
 const utils = require('../../helpers/utils');
 
-const TTL_STANDING = 60 * 60 * 12; // 12 hours
+const TTL_STANDING = 60 * 60 * 2; // 2 hours
+const TTL_STAT = 60 * 60 * 2; // 2 hours
+const TTL_NEWS = 60 * 60 * 1; // 2 hours
+const TTL_PLAYER = 60 * 60 * 24 * 7; // 1 week
+const TTL_MATCH = 60 * 60 * 24 * 1; // 1 day
 
 const mapSlugLeague = {
 	'premier-league': 'PREMIER_LEAGUE',
@@ -83,7 +87,7 @@ const standingOfLeague = (options, callback) => {
 	let key = `ggsport:standingOfLeague:${JSON.stringify(options)}`;
 
 	RedisService.get(key, (err, value) => {
-		if (/*NODE_ENV === 'production' && */!err && value) {
+		if (NODE_ENV === 'production' && !err && value) {
 			console.log('get from cache key=', key);
 			return callback(null, value);
 		}
@@ -91,7 +95,101 @@ const standingOfLeague = (options, callback) => {
 		sports.standingOfLeague(options, (err, result) => {
 			if (err) return callback(err);
 
+			if (NODE_ENV !== 'production') console.log('result=', result);
+
 			RedisService.set(key, result, TTL_STANDING);
+
+			return callback(null, result);
+		});
+	})
+}
+
+const statOfLeague = (options, callback) => {
+	options.type = mapSlugLeague[options.slug] || 'PREMIER_LEAGUE';
+
+	let key = `ggsport:statOfLeague:${JSON.stringify(options)}`;
+
+	RedisService.get(key, (err, value) => {
+		if (NODE_ENV === 'production' && !err && value) {
+			console.log('get from cache key=', key);
+			return callback(null, value);
+		}
+
+		sports.statOfLeague(options, (err, result) => {
+			if (err) return callback(err);
+
+			if (NODE_ENV !== 'production') console.log('result=', result);
+
+			RedisService.set(key, result, TTL_STAT);
+
+			return callback(null, result);
+		});
+	})
+}
+
+const newsOfLeague = (options, callback) => {
+	options.type = mapSlugLeague[options.slug] || 'PREMIER_LEAGUE';
+
+	let key = `ggsport:newsOfLeague:${JSON.stringify(options)}`;
+
+	RedisService.get(key, (err, value) => {
+		if (NODE_ENV === 'production' && !err && value) {
+			console.log('get from cache key=', key);
+			return callback(null, value);
+		}
+
+		sports.newsOfLeague(options, (err, result) => {
+			if (err) return callback(err);
+
+			if (NODE_ENV !== 'production') console.log('result=', result);
+
+			RedisService.set(key, result, TTL_NEWS);
+
+			return callback(null, result);
+		});
+	})
+}
+
+const playerOfLeague = (options, callback) => {
+	options.type = mapSlugLeague[options.slug] || 'PREMIER_LEAGUE';
+
+	let key = `ggsport:playerOfLeague:${JSON.stringify(options)}`;
+
+	RedisService.get(key, (err, value) => {
+		if (NODE_ENV === 'production' && !err && value) {
+			console.log('get from cache key=', key);
+			return callback(null, value);
+		}
+
+		sports.playerOfLeague(options, (err, result) => {
+			if (err) return callback(err);
+
+			if (NODE_ENV !== 'production') console.log('result=', result);
+
+			RedisService.set(key, result, TTL_PLAYER);
+
+			return callback(null, result);
+		});
+	})
+}
+
+const matchOfLeague = (options, callback) => {
+	options.type = mapSlugLeague[options.slug] || 'PREMIER_LEAGUE';
+
+	let key = `ggsport:matchOfLeague:${JSON.stringify(options)}`;
+
+	RedisService.get(key, (err, value) => {
+		if (NODE_ENV === 'production' && !err && value) {
+			console.log('get from cache key=', key);
+			return callback(null, value);
+		}
+
+		sports.matchOfLeague(options, (err, result) => {
+			if (err) return callback(err);
+
+			if (NODE_ENV !== 'production') console.log('result=', result);
+
+			RedisService.set(key, result, TTL_MATCH);
 
 			return callback(null, result);
 		});
@@ -101,5 +199,9 @@ const standingOfLeague = (options, callback) => {
 module.exports = {
 	autocomplete,
 	autocompleteMerge,
-	standingOfLeague
+	standingOfLeague,
+	statOfLeague,
+	newsOfLeague,
+	playerOfLeague,
+	matchOfLeague
 }

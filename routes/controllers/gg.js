@@ -30,3 +30,39 @@ GgCtrl.standingOfLeague = (req, res) => {
 		return Response.success(req, res, results);
 	})
 }
+
+GgCtrl.statOfLeague = (req, res) => {
+	let options = req.body;
+
+	GoogleService.statOfLeague(options, (err, results) => {
+		if (err) return Response.error(req, res, err, results);
+		return Response.success(req, res, results);
+	})
+}
+
+GgCtrl.newsOfLeague = (req, res) => {
+	let options = req.body;
+
+	GoogleService.newsOfLeague(options, (err, results) => {
+		if (err) return Response.error(req, res, err, results);
+		return Response.success(req, res, results);
+	})
+}
+
+GgCtrl.playerOfLeague = (req, res) => {
+	let options = req.body;
+
+	GoogleService.playerOfLeague(options, (err, results) => {
+		if (err) return Response.error(req, res, err, results);
+		return Response.success(req, res, results);
+	})
+}
+
+GgCtrl.matchOfLeague = (req, res) => {
+	let options = req.body;
+
+	GoogleService.matchOfLeague(options, (err, results) => {
+		if (err) return Response.error(req, res, err, results);
+		return Response.success(req, res, results);
+	})
+}
