@@ -295,6 +295,7 @@ const playerOfLeague = (opt, callback) => {
 
 			if (dataBase64 && dataBase64.length > 0) {
 				$(`#${lastId}`).attr('src', dataBase64);
+				console.log(`${count}: #${lastId}`);
 			}
 
 			let array = text.substr(text.lastIndexOf(';') + 1);
