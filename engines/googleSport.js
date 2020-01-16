@@ -84,10 +84,10 @@ const NEWS_ASYNC_EMIDS = {
 
 const default_Option = {
 	ct: 'VN',
-	hl: 'en',
+	// hl: 'en',
+	hl: 'vi',
 	tz: 'Asia/Saigon',
 	et: 'lg',
-
 }
 
 const matchOfLeague = (opt, callback) => {
