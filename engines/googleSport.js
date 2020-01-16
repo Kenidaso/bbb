@@ -79,8 +79,8 @@ const EMID = {
 
 const LMID = {
 	PREMIER_LEAGUE: '/m/02_tc',
-	// SERIE_A: '/g/11h02jy6ph',
-	BUNDESLIGA: '/m/037169'
+	SERIE_A: '/m/03zv9',
+	BUNDESLIGA: '/m/037169',
 }
 
 const NEWS_ASYNC_EMIDS = {
@@ -295,7 +295,7 @@ const playerOfLeague = (opt, callback) => {
 
 			if (dataBase64 && dataBase64.length > 0) {
 				$(`#${lastId}`).attr('src', dataBase64);
-				console.log(`${count}: #${lastId}`);
+				// console.log(`${count}: #${lastId}`);
 			}
 
 			let array = text.substr(text.lastIndexOf(';') + 1);
