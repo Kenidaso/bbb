@@ -57,7 +57,7 @@ wiki: Xpath= //*[@id="rhs"]/div/div[1]/div[1]/div[1]/div
 const moment = require('moment');
 const request = require('request').defaults({
 	headers: {
-		'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36',
+		'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1',
 		'sec-fetch-site': 'same-origin',
 		'sec-fetch-mode': 'cors',
 	},
@@ -109,7 +109,8 @@ const matchOfLeague = (opt, callback) => {
 
 	request({
 		url: urlGet,
-		method: 'GET'
+		method: 'GET',
+		jar: cookie
 	}, (err, response, body) => {
 		if (err) return callback(err);
 
@@ -172,7 +173,8 @@ const newsOfLeague = (opt, callback) => {
 
 	request({
 		url: urlGet,
-		method: 'GET'
+		method: 'GET',
+		jar: cookie
 	}, (err, response, body) => {
 		if (err) return callback(err);
 
