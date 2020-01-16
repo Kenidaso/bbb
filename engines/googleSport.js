@@ -53,8 +53,12 @@ https://www.google.com/async/lr_tm_mt?yv=3&async=sp:2,lmid:,emid:/m/0xbm,ftm:,st
 
 search tên cầu thủ + "stats", query id="rso" hoac [data-attrid="kc:/sports/pro_athlete:stats"], xpath: //*[@id="tsuid33"]/span/div/div/div
 wiki: Xpath= //*[@id="rhs"]/div/div[1]/div[1]/div[1]/div
+
+Giờ hiển thị trên bảng là Indochina Time
+
 */
 const moment = require('moment');
+const cheerio = require('cheerio');
 const request = require('request').defaults({
 	headers: {
 		'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1',
@@ -63,6 +67,7 @@ const request = require('request').defaults({
 	},
   jar: true
 })
+const fs = require('fs');
 
 let cookie = request.jar();
 
@@ -90,6 +95,15 @@ const default_Option = {
 	et: 'lg',
 }
 
+const safeParse = (str) => {
+	if (typeof str === 'object') return str;
+	try {
+		return JSON.parse(str);
+	} catch {
+		return null;
+	}
+}
+
 const matchOfLeague = (opt, callback) => {
 	opt = Object.assign({}, default_Option, opt);
 
@@ -106,6 +120,8 @@ const matchOfLeague = (opt, callback) => {
 	}
 
 	console.log('matchOfLeague url=', urlGet);
+
+	// moment.tz(moment('Sat, 1/18/2020 7:30 PM +07:00', 'ddd, MM/DD/YYYY hh:mm A Z'), "Asia/Saigon").format()
 
 	request({
 		url: urlGet,
@@ -243,7 +259,6 @@ const playerOfLeague = (opt, callback) => {
 		method: 'GET'
 	}, (err, response, body) => {
 		if (err) return callback(err);
-
 		if (!body || body.length == 0) return callback();
 
 		let split = body.split('\n');
@@ -253,7 +268,46 @@ const playerOfLeague = (opt, callback) => {
 		let html = split[3].slice(5);
 		html = html.substr(0, html.length - 5);
 
-		return callback(err, html);
+		let $ = cheerio.load(html);
+		let lastId = null;
+		let count = 0;
+
+		for (let i = 11; i < split.length; i++) {
+			count++;
+			let text = split[i];
+			let dataBase64 = null;
+
+			let start = text.indexOf(';') + 1;
+			let end = text.lastIndexOf(';') + 1;
+
+			dataBase64 = text.substr(start, end - start);
+
+			let lastEqual = dataBase64.lastIndexOf('=');
+			let lastSlash = dataBase64.lastIndexOf('/');
+
+			if (lastEqual > -1) {
+				dataBase64 = dataBase64.substr(0, lastEqual + 1);
+			} else {
+				if (lastSlash > 15) {
+					dataBase64 = dataBase64.substr(0, lastSlash + 1);
+				}
+			}
+
+			if (dataBase64 && dataBase64.length > 0) {
+				$(`#${lastId}`).attr('src', dataBase64);
+			}
+
+			let array = text.substr(text.lastIndexOf(';') + 1);
+			array = safeParse(array);
+			if (array && array.length > 1) lastId = array[1];
+		}
+
+		let $style = $('style').html();
+		let $body = $('body').html();
+
+		let final = `<style>${$style}</style>${$body}`;
+
+		return callback(err, final);
 	})
 }
 
