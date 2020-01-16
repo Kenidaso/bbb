@@ -281,6 +281,15 @@ const playerOfLeague = (opt, callback) => {
 			let end = text.lastIndexOf(';') + 1;
 
 			dataBase64 = text.substr(start, end - start);
+			if (dataBase64 && dataBase64.length < 20) {
+				end = text.lastIndexOf('[');
+
+				if (end > -1) {
+					dataBase64 = text.substr(start, end - start);
+				} else {
+					dataBase64 = text.substr(start);
+				}
+			}
 
 			let lastEqual = dataBase64.lastIndexOf('=');
 			let lastSlash = dataBase64.lastIndexOf('/');
@@ -295,12 +304,14 @@ const playerOfLeague = (opt, callback) => {
 
 			if (dataBase64 && dataBase64.length > 0) {
 				$(`#${lastId}`).attr('src', dataBase64);
-				// console.log(`${count}: #${lastId}`);
+				// console.log(`i= ${i} :: count= ${count} :: #${lastId} - ${dataBase64} \n`);
 			}
 
 			let array = text.substr(text.lastIndexOf(';') + 1);
 			array = safeParse(array);
-			if (array && array.length > 1) lastId = array[1];
+			if (array && array.length > 1) {
+				lastId = array[1];
+			}
 		}
 
 		let $style = $('style').html();

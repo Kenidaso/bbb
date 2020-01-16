@@ -95,7 +95,7 @@ const standingOfLeague = (options, callback) => {
 		sports.standingOfLeague(options, (err, result) => {
 			if (err) return callback(err);
 
-			if (NODE_ENV !== 'production') console.log('result=', result);
+			// if (NODE_ENV !== 'production') console.log('result=', result);
 
 			RedisService.set(key, result, TTL_STANDING);
 
@@ -118,7 +118,7 @@ const statOfLeague = (options, callback) => {
 		sports.statOfLeague(options, (err, result) => {
 			if (err) return callback(err);
 
-			if (NODE_ENV !== 'production') console.log('result=', result);
+			// if (NODE_ENV !== 'production') console.log('result=', result);
 
 			RedisService.set(key, result, TTL_STAT);
 
@@ -141,7 +141,7 @@ const newsOfLeague = (options, callback) => {
 		sports.newsOfLeague(options, (err, result) => {
 			if (err) return callback(err);
 
-			if (NODE_ENV !== 'production') console.log('result=', result);
+			// if (NODE_ENV !== 'production') console.log('result=', result);
 
 			RedisService.set(key, result, TTL_NEWS);
 
@@ -164,7 +164,7 @@ const playerOfLeague = (options, callback) => {
 		sports.playerOfLeague(options, (err, result) => {
 			if (err) return callback(err);
 
-			if (NODE_ENV !== 'production') console.log('result=', result);
+			// if (NODE_ENV !== 'production') console.log('result=', result);
 
 			RedisService.set(key, result, TTL_PLAYER);
 
@@ -187,7 +187,7 @@ const matchOfLeague = (options, callback) => {
 		sports.matchOfLeague(options, (err, result) => {
 			if (err) return callback(err);
 
-			if (NODE_ENV !== 'production') console.log('result=', result);
+			// if (NODE_ENV !== 'production') console.log('result=', result);
 
 			RedisService.set(key, result, TTL_MATCH);
 
