@@ -2,10 +2,11 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 
 const async = require('async');
 const _ = require('lodash');
+const fs = require('fs');
 
 const engine = require('../../engines/google');
 const trends = require('../../engines/googleTrends');
-const sports = require('../../engines/googleSport');
+const football = require('../../engines/googleFootball');
 
 const RedisService = require('./RedisService');
 
@@ -16,19 +17,6 @@ const TTL_STAT = 60 * 60 * 2; // 2 hours
 const TTL_NEWS = 60 * 60 * 1; // 2 hours
 const TTL_PLAYER = 60 * 60 * 24 * 7; // 1 week
 const TTL_MATCH = 60 * 60 * 24 * 1; // 1 day
-
-const mapSlugLeague = {
-	'premier-league': 'PREMIER_LEAGUE',
-	'championship-one': 'PREMIER_LEAGUE',
-	'la-liga': 'PREMIER_LEAGUE',
-	'la-liga-2': 'PREMIER_LEAGUE',
-	'serie-a': 'SERIE_A',
-	'serie-b': 'SERIE_A',
-	'bundesliga': 'BUNDESLIGA',
-	'bundesliga-2': 'BUNDESLIGA',
-	'ligue-1': 'BUNDESLIGA',
-	'ligue-2':'BUNDESLIGA',
-}
 
 const autocomplete = (keyword, callback) => {
 	engine.autocomplete(keyword, (err, result) => {
@@ -82,8 +70,6 @@ const autocompleteMerge = (keyword, callback) => {
 }
 
 const standingOfLeague = (options, callback) => {
-	options.type = mapSlugLeague[options.slug] || 'PREMIER_LEAGUE';
-
 	let key = `ggsport:standingOfLeague:${JSON.stringify(options)}`;
 
 	RedisService.get(key, (err, value) => {
@@ -92,10 +78,12 @@ const standingOfLeague = (options, callback) => {
 			return callback(null, value);
 		}
 
-		sports.standingOfLeague(options, (err, result) => {
+		football.standingOfLeague(options, (err, result) => {
 			if (err) return callback(err);
 
-			// if (NODE_ENV !== 'production') console.log('result=', result);
+			if (NODE_ENV !== 'production') {
+				fs.writeFileSync('football_standing.html', result);
+			}
 
 			RedisService.set(key, result, TTL_STANDING);
 
@@ -105,8 +93,6 @@ const standingOfLeague = (options, callback) => {
 }
 
 const statOfLeague = (options, callback) => {
-	options.type = mapSlugLeague[options.slug] || 'PREMIER_LEAGUE';
-
 	let key = `ggsport:statOfLeague:${JSON.stringify(options)}`;
 
 	RedisService.get(key, (err, value) => {
@@ -115,10 +101,12 @@ const statOfLeague = (options, callback) => {
 			return callback(null, value);
 		}
 
-		sports.statOfLeague(options, (err, result) => {
+		football.statOfLeague(options, (err, result) => {
 			if (err) return callback(err);
 
-			// if (NODE_ENV !== 'production') console.log('result=', result);
+			if (NODE_ENV !== 'production') {
+				fs.writeFileSync('football_stat.html', result);
+			}
 
 			RedisService.set(key, result, TTL_STAT);
 
@@ -128,7 +116,7 @@ const statOfLeague = (options, callback) => {
 }
 
 const newsOfLeague = (options, callback) => {
-	options.type = mapSlugLeague[options.slug] || 'PREMIER_LEAGUE';
+	// return callback('ENOTIMPLEMENTYET');
 
 	let key = `ggsport:newsOfLeague:${JSON.stringify(options)}`;
 
@@ -138,10 +126,12 @@ const newsOfLeague = (options, callback) => {
 			return callback(null, value);
 		}
 
-		sports.newsOfLeague(options, (err, result) => {
+		football.newsOfLeague(options, (err, result) => {
 			if (err) return callback(err);
 
-			// if (NODE_ENV !== 'production') console.log('result=', result);
+			if (NODE_ENV !== 'production') {
+				fs.writeFileSync('football_news.html', result);
+			}
 
 			RedisService.set(key, result, TTL_NEWS);
 
@@ -151,8 +141,6 @@ const newsOfLeague = (options, callback) => {
 }
 
 const playerOfLeague = (options, callback) => {
-	options.type = mapSlugLeague[options.slug] || 'PREMIER_LEAGUE';
-
 	let key = `ggsport:playerOfLeague:${JSON.stringify(options)}`;
 
 	RedisService.get(key, (err, value) => {
@@ -161,10 +149,12 @@ const playerOfLeague = (options, callback) => {
 			return callback(null, value);
 		}
 
-		sports.playerOfLeague(options, (err, result) => {
+		football.playerOfLeague(options, (err, result) => {
 			if (err) return callback(err);
 
-			// if (NODE_ENV !== 'production') console.log('result=', result);
+			if (NODE_ENV !== 'production') {
+				fs.writeFileSync('football_player.html', result);
+			}
 
 			RedisService.set(key, result, TTL_PLAYER);
 
@@ -174,8 +164,6 @@ const playerOfLeague = (options, callback) => {
 }
 
 const matchOfLeague = (options, callback) => {
-	options.type = mapSlugLeague[options.slug] || 'PREMIER_LEAGUE';
-
 	let key = `ggsport:matchOfLeague:${JSON.stringify(options)}`;
 
 	RedisService.get(key, (err, value) => {
@@ -184,10 +172,12 @@ const matchOfLeague = (options, callback) => {
 			return callback(null, value);
 		}
 
-		sports.matchOfLeague(options, (err, result) => {
+		football.matchOfLeague(options, (err, result) => {
 			if (err) return callback(err);
 
-			// if (NODE_ENV !== 'production') console.log('result=', result);
+			if (NODE_ENV !== 'production') {
+				fs.writeFileSync('football_match.html', result);
+			}
 
 			RedisService.set(key, result, TTL_MATCH);
 

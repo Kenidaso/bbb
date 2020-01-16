@@ -71,17 +71,7 @@ const fs = require('fs');
 
 let cookie = request.jar();
 
-const EMID = {
-	PREMIER_LEAGUE: '/g/11fj6snmjm',
-	SERIE_A: '/g/11h02jy6ph',
-	BUNDESLIGA: '/g/11fk0cxp0k'
-}
-
-const LMID = {
-	PREMIER_LEAGUE: '/m/02_tc',
-	SERIE_A: '/m/03zv9',
-	BUNDESLIGA: '/m/037169',
-}
+const FOOTBALL_LEAGUE = require('./footballLeague');
 
 const NEWS_ASYNC_EMIDS = {
 	PREMIER_LEAGUE: 'emids:/m/02_tc,en:Ngoại hạng Anh,et:lg,lmid:/m/02_tc,mmid:,sp:2,_fmt:prog,_id:news-tab--347155782,_jsfs:Ffpdje',
@@ -107,8 +97,13 @@ const safeParse = (str) => {
 const matchOfLeague = (opt, callback) => {
 	opt = Object.assign({}, default_Option, opt);
 
-	let emid = EMID[opt.type];
-	let lmid = LMID[opt.type];
+	let slug = opt.slug;
+
+	if (!FOOTBALL_LEAGUE[slug]) return callback(null, null);
+
+	let emid = FOOTBALL_LEAGUE[slug].emid;
+	let lmid = FOOTBALL_LEAGUE[slug].lmid;
+
 	let dtoint = moment().add(-3, 'd').utcOffset(0).format('YYYY-MM-DDTHH:00:00') + 'Z';
 
 	// opt.date = opt.date || moment().utcOffset(0).format();
@@ -139,14 +134,24 @@ const matchOfLeague = (opt, callback) => {
 		let html = split[3].slice(6);
 		html = html.substr(0, html.length - 5);
 
-		return callback(err, html);
+		let result = {
+			rawHtml: html
+		}
+
+		return callback(err, result);
 	})
 }
 
 const standingOfLeague = (opt, callback) => {
 	opt = Object.assign({}, default_Option, opt);
 
-	let emid = EMID[opt.type];
+	let slug = opt.slug;
+
+	if (!FOOTBALL_LEAGUE[slug]) return callback(null, null);
+
+	let emid = FOOTBALL_LEAGUE[slug].emid;
+	let lmid = FOOTBALL_LEAGUE[slug].lmid;
+
 	let date = moment().add(-2, 'd').utcOffset(0).format('YYYY-MM-DDTHH:00:00') + 'Z';
 
 	// let urlGet = `https://www.google.com/async/lr_lg_fp?async=sp:2,ct:${opt.ct},hl:${opt.hl},tab:st,tz:${opt.tz},emid:${emid},_id:liveresults-sports-immersive__updatable-league-matches,_fmt:pc`;
@@ -170,19 +175,28 @@ const standingOfLeague = (opt, callback) => {
 		let html = split[3].slice(6);
 		html = html.substr(0, html.length - 5);
 
-		return callback(err, html);
+		let result = {
+			rawHtml: html
+		}
+
+		return callback(err, result);
 	})
 }
 
 const newsOfLeague = (opt, callback) => {
 	opt = Object.assign({}, default_Option, opt);
 
-	let emid = EMID[opt.type];
-	let async_emid = NEWS_ASYNC_EMIDS[opt.type];
+	let slug = opt.slug;
+
+	if (!FOOTBALL_LEAGUE[slug]) return callback(null, null);
+
+	let emid = FOOTBALL_LEAGUE[slug].emid;
+	let lmid = FOOTBALL_LEAGUE[slug].lmid;
+	let title_vn = FOOTBALL_LEAGUE[slug].title_vn;
 
 	// let urlGet = `https://www.google.com/async/lr_lg_fp?async=sp:2,ct:${opt.ct},hl:${opt.hl},tab:nw,tz:${opt.tz},emid:${emid},_id:liveresults-sports-immersive__updatable-league-matches,_fmt:pc`;
 
-	let urlGet = `https://www.google.com/search?yv=3&q=&asearch=lr_nt&async=${async_emid}`;
+	let urlGet = `https://www.google.com/search?yv=3&q=&asearch=lr_nt&async=emids:${lmid},en:${title_vn},et:lg,lmid:${lmid},mmid:,sp:2,_fmt:prog,_id:news-tab--347155782,_jsfs:Ffpdje`;
 	urlGet = encodeURI(urlGet);
 
 	console.log('newsOfLeague url=', urlGet);
@@ -205,14 +219,24 @@ const newsOfLeague = (opt, callback) => {
 
 		html = html.substr(0, html.length - 5);
 
-		return callback(err, html);
+		let result = {
+			rawHtml: html
+		}
+
+		return callback(err, result);
 	})
 }
 
 const statOfLeague = (opt, callback) => {
 	opt = Object.assign({}, default_Option, opt);
 
-	let emid = EMID[opt.type];
+	let slug = opt.slug;
+
+	if (!FOOTBALL_LEAGUE[slug]) return callback(null, null);
+
+	let emid = FOOTBALL_LEAGUE[slug].emid;
+	let lmid = FOOTBALL_LEAGUE[slug].lmid;
+
 	let date = moment().add(-2, 'd').utcOffset(0).format('YYYY-MM-DDTHH:00:00') + 'Z';
 
 	// vet=12ahUKEwjQvdeM0ILnAhWFfn0KHVc-CHQQo-sBegQIARAW..i&ei=b3UdXpP5G9u6rQHi06TYAQ&yv=3&q=&
@@ -238,15 +262,24 @@ const statOfLeague = (opt, callback) => {
 		let html = split[3].slice(5);
 		html = html.substr(0, html.length - 5);
 
-		return callback(err, html);
+		let result = {
+			rawHtml: html
+		}
+
+		return callback(err, result);
 	})
 }
 
 const playerOfLeague = (opt, callback) => {
 	opt = Object.assign({}, default_Option, opt);
 
-	let emid = EMID[opt.type];
-	let lmid = LMID[opt.type];
+	let slug = opt.slug;
+
+	if (!FOOTBALL_LEAGUE[slug]) return callback(null, null);
+
+	let emid = FOOTBALL_LEAGUE[slug].emid;
+	let lmid = FOOTBALL_LEAGUE[slug].lmid;
+
 	let date = moment().add(-2, 'd').utcOffset(0).format('YYYY-MM-DDTHH:00:00') + 'Z';
 
 	// ct:VN,hl:vi,tz:Asia/Saigon,dtoint:2020-01-12T14:00:00Z,dtointmid:/g/11fj6snmjm,emid:/g/11fj6snmjm,et:lg,gndr:MALE,lmid:/m/02_tc,rtab:20,sp:2,_fmt:prog,_id:tab-1-20,_jsfs:Ffpdje
@@ -319,7 +352,11 @@ const playerOfLeague = (opt, callback) => {
 
 		let final = `<style>${$style}</style>${$body}`;
 
-		return callback(err, final);
+		let result = {
+			rawHtml: final
+		}
+
+		return callback(err, result);
 	})
 }
 
