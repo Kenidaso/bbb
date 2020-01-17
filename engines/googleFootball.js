@@ -93,6 +93,16 @@ const safeParse = (str) => {
 	}
 }
 
+const _parseDataMatchOfLeague = (html) => {
+	let result = {}
+
+	let $ = cheerio.load(html);
+
+
+
+	return result;
+}
+
 const matchOfLeague = (opt, callback) => {
 	opt = Object.assign({}, default_Option, opt);
 
@@ -133,8 +143,22 @@ const matchOfLeague = (opt, callback) => {
 		let html = split[3].slice(6);
 		html = html.substr(0, html.length - 5);
 
+		let $ = cheerio.load(html);
+
+		// add target bank to link youtube
+		$('a[href*="youtube.com"]').each(function () {
+			$(this).attr('target', '_blank');
+		});
+
+		let $style = cheerio.html($('style'));
+		let $body = $('body').html();
+
+		let final = `${$style}${$body}`;
+		// let data = _parseDataMatchOfLeague($body)
+
 		let result = {
-			rawHtml: html
+			rawHtml: final,
+			// data
 		}
 
 		return callback(err, result);
@@ -346,10 +370,10 @@ const playerOfLeague = (opt, callback) => {
 			}
 		}
 
-		let $style = $('style').html();
+		let $style = cheerio.html($('style'));
 		let $body = $('body').html();
 
-		let final = `<style>${$style}</style>${$body}`;
+		let final = `${$style}${$body}`;
 
 		let result = {
 			rawHtml: final
@@ -368,6 +392,7 @@ const statOfPlayer = (opt, callback) => {
 		url: urlStatPlayer,
 		method: 'GET',
 		headers: {
+			// use desktop
 			'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36'
 		},
 		jar: cookie

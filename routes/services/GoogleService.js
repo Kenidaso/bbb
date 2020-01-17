@@ -75,7 +75,7 @@ const standingOfLeague = (options, callback) => {
 	RedisService.get(key, (err, value) => {
 		if (NODE_ENV === 'production' && !err && value) {
 			console.log('get from cache key=', key);
-			return callback(null, value);
+			return callback(null, utils.safeParse(value));
 		}
 
 		football.standingOfLeague(options, (err, result) => {
@@ -98,7 +98,7 @@ const statOfLeague = (options, callback) => {
 	RedisService.get(key, (err, value) => {
 		if (NODE_ENV === 'production' && !err && value) {
 			console.log('get from cache key=', key);
-			return callback(null, value);
+			return callback(null, utils.safeParse(value));
 		}
 
 		football.statOfLeague(options, (err, result) => {
@@ -123,7 +123,7 @@ const newsOfLeague = (options, callback) => {
 	RedisService.get(key, (err, value) => {
 		if (NODE_ENV === 'production' && !err && value) {
 			console.log('get from cache key=', key);
-			return callback(null, value);
+			return callback(null, utils.safeParse(value));
 		}
 
 		football.newsOfLeague(options, (err, result) => {
@@ -146,7 +146,7 @@ const playerOfLeague = (options, callback) => {
 	RedisService.get(key, (err, value) => {
 		if (NODE_ENV === 'production' && !err && value) {
 			console.log('get from cache key=', key);
-			return callback(null, value);
+			return callback(null, utils.safeParse(value));
 		}
 
 		football.playerOfLeague(options, (err, result) => {
@@ -169,14 +169,14 @@ const matchOfLeague = (options, callback) => {
 	RedisService.get(key, (err, value) => {
 		if (NODE_ENV === 'production' && !err && value) {
 			console.log('get from cache key=', key);
-			return callback(null, value);
+			return callback(null, utils.safeParse(value));
 		}
 
 		football.matchOfLeague(options, (err, result) => {
 			if (err) return callback(err);
 
 			if (NODE_ENV !== 'production') {
-				fs.writeFileSync('football_match.html', result);
+				fs.writeFileSync('football_match.html', result.rawHtml);
 			}
 
 			RedisService.set(key, result, TTL_MATCH);
@@ -192,7 +192,7 @@ const statOfPlayer = (options, callback) => {
 	RedisService.get(key, (err, value) => {
 		if (NODE_ENV === 'production' && !err && value) {
 			console.log('get from cache key=', key);
-			return callback(null, value);
+			return callback(null, utils.safeParse(value));
 		}
 
 		football.statOfPlayer(options, (err, result) => {
