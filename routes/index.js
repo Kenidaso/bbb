@@ -95,6 +95,7 @@ exports = module.exports = function (app) {
 	app.post('/gg/news-of-league', routes.controllers.gg.newsOfLeague);
 	app.post('/gg/player-of-league', routes.controllers.gg.playerOfLeague);
 	app.post('/gg/match-of-league', routes.controllers.gg.matchOfLeague);
+	app.post('/gg/player-stat', routes.controllers.gg.statOfPlayer);
 
 	app.post(acrud.ROUTE, acrud.controller);
 

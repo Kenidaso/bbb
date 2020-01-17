@@ -66,3 +66,12 @@ GgCtrl.matchOfLeague = (req, res) => {
 		return Response.success(req, res, results);
 	})
 }
+
+GgCtrl.statOfPlayer = (req, res) => {
+	let options = req.body;
+
+	GoogleService.statOfPlayer(options, (err, results) => {
+		if (err) return Response.error(req, res, err, results);
+		return Response.success(req, res, results);
+	})
+}

@@ -1,61 +1,60 @@
 /*
-sp:2,tab:lb,emid:/g/11fk0cxp0k,rbpt:undefined,ct:VN,hl:en,tz:Asia/Saigon,dtoint:2020-01-17T19:30:00Z,dtointmid:/g/11fk0cxp0k,_id:liveresults-sports-immersive__league-fullpage,_pms:s,_jsfs:Ffpdje,_fmt:pc
+	sp:2,tab:lb,emid:/g/11fk0cxp0k,rbpt:undefined,ct:VN,hl:en,tz:Asia/Saigon,dtoint:2020-01-17T19:30:00Z,dtointmid:/g/11fk0cxp0k,_id:liveresults-sports-immersive__league-fullpage,_pms:s,_jsfs:Ffpdje,_fmt:pc
 
-https://www.google.com/async/lr_lg_fp?async=
-emid:/g/11fj6snmjm,tz:Asia/Saigon,tab:st,_id:liveresults-sports-immersive__league-fullpage,_fmt:pc
-
-
-https://www.google.com/async/lr_lm_mt
-emid:/g/11fj6snmjm,moa:2019-12-01T14:00:00Z,_id:liveresults-sports-immersive__updatable-league-matches,_fmt:pc
-
-https://www.google.com/async/lr_sma_tb
-
-tab:mt --> match
-tab:st --> standing
-tab:nw --> news
-tab:lb --> stat (leader board)
-tab:pl --> player
+	https://www.google.com/async/lr_lg_fp?async=
+	emid:/g/11fj6snmjm,tz:Asia/Saigon,tab:st,_id:liveresults-sports-immersive__league-fullpage,_fmt:pc
 
 
-https://www.google.com/async/lr_sma_tb?vet=12ahUKEwjMoZmLp4LnAhWRWisKHcibAy0Qo-sBegQIARAW..i&ei=c0odXs2RKMG89QPBirTwBA&yv=3&q=&async=ct:VN,hl:en,tz:Asia%2FSaigon,dtoint:2020-01-17T19%3A30%3A00Z,dtointmid:%2Fg%2F11fk0cxp0k,emid:%2Fg%2F11fk0cxp0k,et:lg,gndr:MALE,lmid:%2Fm%2F037169,rtab:19,sp:2,_fmt:prog,_id:tab-1-19,_jsfs:Ffpdje
+	https://www.google.com/async/lr_lm_mt
+	emid:/g/11fj6snmjm,moa:2019-12-01T14:00:00Z,_id:liveresults-sports-immersive__updatable-league-matches,_fmt:pc
+
+	https://www.google.com/async/lr_sma_tb
+
+	tab:mt --> match
+	tab:st --> standing
+	tab:nw --> news
+	tab:lb --> stat (leader board)
+	tab:pl --> player
 
 
-cau thu: player
-https://www.google.com/async/lr_sma_tb?vet=12ahUKEwjMoZmLp4LnAhWRWisKHcibAy0Qo-sBegQIARAa..i&ei=c0odXs2RKMG89QPBirTwBA&yv=3&q=&async=ct:VN,hl:en,tz:Asia/Saigon,dtoint:2020-01-17T19:30:00Z,dtointmid:/g/11fk0cxp0k,emid:/g/11fk0cxp0k,et:lg,gndr:MALE,lmid:/m/037169,rtab:20,sp:2,_fmt:prog,_id:tab-1-20,_jsfs:Ffpdje
+	https://www.google.com/async/lr_sma_tb?vet=12ahUKEwjMoZmLp4LnAhWRWisKHcibAy0Qo-sBegQIARAW..i&ei=c0odXs2RKMG89QPBirTwBA&yv=3&q=&async=ct:VN,hl:en,tz:Asia%2FSaigon,dtoint:2020-01-17T19%3A30%3A00Z,dtointmid:%2Fg%2F11fk0cxp0k,emid:%2Fg%2F11fk0cxp0k,et:lg,gndr:MALE,lmid:%2Fm%2F037169,rtab:19,sp:2,_fmt:prog,_id:tab-1-19,_jsfs:Ffpdje
 
-standing - bang xep hang
-https://www.google.com/async/lr_sma_tb?vet=12ahUKEwjQvdeM0ILnAhWFfn0KHVc-CHQQo-sBegQIARAS..i&ei=b3UdXpP5G9u6rQHi06TYAQ&yv=3&q=&async=ct:VN,hl:vi,tz:Asia/Saigon,dtoint:2020-01-12T14:00:00Z,dtointmid:/g/11fj6snmjm,emid:/g/11fj6snmjm,et:lg,gndr:UNKNOWN_GENDER,lmid:/m/02_tc,rtab:3,sp:2,_fmt:prog,_id:tab-1-3,_jsfs:Ffpdje
 
-stat : thong so giai dau
-https://www.google.com/async/lr_sma_tb?vet=12ahUKEwjQvdeM0ILnAhWFfn0KHVc-CHQQo-sBegQIARAW..i&ei=b3UdXpP5G9u6rQHi06TYAQ&yv=3&q=&async=ct:VN,hl:vi,tz:Asia/Saigon,dtoint:2020-01-12T14:00:00Z,dtointmid:/g/11fj6snmjm,emid:/g/11fj6snmjm,et:lg,gndr:MALE,lmid:/m/02_tc,rtab:19,sp:2,_fmt:prog,_id:tab-1-19,_jsfs:Ffpdje
+	cau thu: player
+	https://www.google.com/async/lr_sma_tb?vet=12ahUKEwjMoZmLp4LnAhWRWisKHcibAy0Qo-sBegQIARAa..i&ei=c0odXs2RKMG89QPBirTwBA&yv=3&q=&async=ct:VN,hl:en,tz:Asia/Saigon,dtoint:2020-01-17T19:30:00Z,dtointmid:/g/11fk0cxp0k,emid:/g/11fk0cxp0k,et:lg,gndr:MALE,lmid:/m/037169,rtab:20,sp:2,_fmt:prog,_id:tab-1-20,_jsfs:Ffpdje
 
-cau thu : player
-https://www.google.com/async/lr_sma_tb?vet=12ahUKEwjQvdeM0ILnAhWFfn0KHVc-CHQQo-sBegQIARAa..i&ei=b3UdXpP5G9u6rQHi06TYAQ&yv=3&q=&async=ct:VN,hl:vi,tz:Asia/Saigon,dtoint:2020-01-12T14:00:00Z,dtointmid:/g/11fj6snmjm,emid:/g/11fj6snmjm,et:lg,gndr:MALE,lmid:/m/02_tc,rtab:20,sp:2,_fmt:prog,_id:tab-1-20,_jsfs:Ffpdje
+	standing - bang xep hang
+	https://www.google.com/async/lr_sma_tb?vet=12ahUKEwjQvdeM0ILnAhWFfn0KHVc-CHQQo-sBegQIARAS..i&ei=b3UdXpP5G9u6rQHi06TYAQ&yv=3&q=&async=ct:VN,hl:vi,tz:Asia/Saigon,dtoint:2020-01-12T14:00:00Z,dtointmid:/g/11fj6snmjm,emid:/g/11fj6snmjm,et:lg,gndr:UNKNOWN_GENDER,lmid:/m/02_tc,rtab:3,sp:2,_fmt:prog,_id:tab-1-3,_jsfs:Ffpdje
 
-news - tin tuc
-https://www.google.com/search?vet=12ahUKEwjm05Sg0oLnAhUUbn0KHSF0BEUQo-sBegQIARA8..i&ei=s3cdXt_5EdT6rQGn96rgCg&yv=3&q=&asearch=lr_nt&async=emids:/m/02_tc,en:Ngoại hạng Anh,et:lg,lmid:/m/02_tc,mmid:,sp:2,_fmt:prog,_id:news-tab--347155782,_jsfs:Ffpdje
+	stat : thong so giai dau
+	https://www.google.com/async/lr_sma_tb?vet=12ahUKEwjQvdeM0ILnAhWFfn0KHVc-CHQQo-sBegQIARAW..i&ei=b3UdXpP5G9u6rQHi06TYAQ&yv=3&q=&async=ct:VN,hl:vi,tz:Asia/Saigon,dtoint:2020-01-12T14:00:00Z,dtointmid:/g/11fj6snmjm,emid:/g/11fj6snmjm,et:lg,gndr:MALE,lmid:/m/02_tc,rtab:19,sp:2,_fmt:prog,_id:tab-1-19,_jsfs:Ffpdje
 
--------------------
-1 CLB : Arsenal --> /m/0xbm
+	cau thu : player
+	https://www.google.com/async/lr_sma_tb?vet=12ahUKEwjQvdeM0ILnAhWFfn0KHVc-CHQQo-sBegQIARAa..i&ei=b3UdXpP5G9u6rQHi06TYAQ&yv=3&q=&async=ct:VN,hl:vi,tz:Asia/Saigon,dtoint:2020-01-12T14:00:00Z,dtointmid:/g/11fj6snmjm,emid:/g/11fj6snmjm,et:lg,gndr:MALE,lmid:/m/02_tc,rtab:20,sp:2,_fmt:prog,_id:tab-1-20,_jsfs:Ffpdje
 
-https://www.google.com/async/lr_tm_fp?yv=3&q=t|/m/0xbm|mt|fp&async=sp:2,lmid:,tab:mt,emid:/m/0xbm,rbpt:undefined,ct:VN,hl:vi,tz:Asia/Saigon,dtoint:2020-01-12T14:00:00Z,dtointmid:/m/02_tc,_id:liveresults-sports-immersive__team-fullpage,_pms:s,_jsfs:Ffpdje,_fmt:pc
----> trả full page những trận đấu của Arsenal
+	news - tin tuc
+	https://www.google.com/search?vet=12ahUKEwjm05Sg0oLnAhUUbn0KHSF0BEUQo-sBegQIARA8..i&ei=s3cdXt_5EdT6rQGn96rgCg&yv=3&q=&asearch=lr_nt&async=emids:/m/02_tc,en:Ngoại hạng Anh,et:lg,lmid:/m/02_tc,mmid:,sp:2,_fmt:prog,_id:news-tab--347155782,_jsfs:Ffpdje
 
-search news của 1 CLB
-https://www.google.com/search?yv=3&q=&asearch=lr_nt&async=emids:/m/0xbm,en:Arsenal,et:tm,lmid:/m/02_tc,mmid:,sp:2,_fmt:prog,_id:news-tab-1928531459,_jsfs:Ffpdje
+	-------------------
+	1 CLB : Arsenal --> /m/0xbm
 
-tất cả cầu thủ của CLB
-https://www.google.com/async/lr_sma_tb?yv=3&q=&async=ct:VN,hl:vi,tz:Asia/Saigon,dtoint:2020-01-12T14:00:00Z,dtointmid:/m/02_tc,emid:/m/0xbm,et:tm,gndr:MALE,lmid:,rtab:20,sp:2,_fmt:prog,_id:tab-2-20,_jsfs:Ffpdje
+	https://www.google.com/async/lr_tm_fp?yv=3&q=t|/m/0xbm|mt|fp&async=sp:2,lmid:,tab:mt,emid:/m/0xbm,rbpt:undefined,ct:VN,hl:vi,tz:Asia/Saigon,dtoint:2020-01-12T14:00:00Z,dtointmid:/m/02_tc,_id:liveresults-sports-immersive__team-fullpage,_pms:s,_jsfs:Ffpdje,_fmt:pc
+	---> trả full page những trận đấu của Arsenal
 
-Các trận diễn ra trong thời gian của CLB
-https://www.google.com/async/lr_tm_mt?yv=3&async=sp:2,lmid:,emid:/m/0xbm,ftm:,stm:,et:t,emids:/g/11fls39rn6;/g/11hdstp7df;/g/11h3_zl351;/g/11hyk35nbf;/g/11fn2l02ry;/g/11fls36gnk;/g/11h_t58fqh;/g/11fls3h3gr;/g/11fn2l375n;/g/11fls39mf1;/g/11fls3804l;/g/11fn2l5gq6;/g/11fls36gnj;/g/11hyk3j6hb;/g/11hyk3fjsf;/g/11h_20hn_6;/g/11h3_zjhyt;/g/11hyk36p00;/g/11fls39rn4;/g/11fls383pl;/g/11h3_zjhyw;/g/11j3s1dt_m;/g/11hyk369j1;/g/11hyk369j4;/g/11fls3cz87;/g/11j1j0kwb7;/g/11fls3ff16;/g/11hyk3hpsr;/g/11hf3c_wj2;/g/11fls37gyj;/g/11j495r6wx;/g/11hyk3cfqm;/g/11fls3d_6d;/g/11fls35_gp;/g/11fls3ff13;/g/11h3_zdzrr;/g/11h3_zg4yz;/g/11fls39jk1;/g/11hyk3hsbr;/g/11hyk39qc2,moa:2020-05-02T14:00:00Z,_id:liveresults-sports-immersive__updatable-team-matches,_pms:s,_jsfs:Ffpdje,_fmt:pc
----> co the bo emids
+	search news của 1 CLB
+	https://www.google.com/search?yv=3&q=&asearch=lr_nt&async=emids:/m/0xbm,en:Arsenal,et:tm,lmid:/m/02_tc,mmid:,sp:2,_fmt:prog,_id:news-tab-1928531459,_jsfs:Ffpdje
 
-search tên cầu thủ + "stats", query id="rso" hoac [data-attrid="kc:/sports/pro_athlete:stats"], xpath: //*[@id="tsuid33"]/span/div/div/div
-wiki: Xpath= //*[@id="rhs"]/div/div[1]/div[1]/div[1]/div
+	tất cả cầu thủ của CLB
+	https://www.google.com/async/lr_sma_tb?yv=3&q=&async=ct:VN,hl:vi,tz:Asia/Saigon,dtoint:2020-01-12T14:00:00Z,dtointmid:/m/02_tc,emid:/m/0xbm,et:tm,gndr:MALE,lmid:,rtab:20,sp:2,_fmt:prog,_id:tab-2-20,_jsfs:Ffpdje
 
-Giờ hiển thị trên bảng là Indochina Time
+	Các trận diễn ra trong thời gian của CLB
+	https://www.google.com/async/lr_tm_mt?yv=3&async=sp:2,lmid:,emid:/m/0xbm,ftm:,stm:,et:t,emids:/g/11fls39rn6;/g/11hdstp7df;/g/11h3_zl351;/g/11hyk35nbf;/g/11fn2l02ry;/g/11fls36gnk;/g/11h_t58fqh;/g/11fls3h3gr;/g/11fn2l375n;/g/11fls39mf1;/g/11fls3804l;/g/11fn2l5gq6;/g/11fls36gnj;/g/11hyk3j6hb;/g/11hyk3fjsf;/g/11h_20hn_6;/g/11h3_zjhyt;/g/11hyk36p00;/g/11fls39rn4;/g/11fls383pl;/g/11h3_zjhyw;/g/11j3s1dt_m;/g/11hyk369j1;/g/11hyk369j4;/g/11fls3cz87;/g/11j1j0kwb7;/g/11fls3ff16;/g/11hyk3hpsr;/g/11hf3c_wj2;/g/11fls37gyj;/g/11j495r6wx;/g/11hyk3cfqm;/g/11fls3d_6d;/g/11fls35_gp;/g/11fls3ff13;/g/11h3_zdzrr;/g/11h3_zg4yz;/g/11fls39jk1;/g/11hyk3hsbr;/g/11hyk39qc2,moa:2020-05-02T14:00:00Z,_id:liveresults-sports-immersive__updatable-team-matches,_pms:s,_jsfs:Ffpdje,_fmt:pc
+	---> co the bo emids
 
+	search tên cầu thủ + "stats", query id="rso" hoac [data-attrid="kc:/sports/pro_athlete:stats"], xpath: //*[@id="tsuid33"]/span/div/div/div
+	wiki: Xpath= //*[@id="rhs"]/div/div[1]/div[1]/div[1]/div
+
+	Giờ hiển thị trên bảng là Indochina Time
 */
 const moment = require('moment');
 const cheerio = require('cheerio');
@@ -360,10 +359,42 @@ const playerOfLeague = (opt, callback) => {
 	})
 }
 
+const statOfPlayer = (opt, callback) => {
+	if (!opt || !opt.name) return callback('ENONAME');
+
+	let urlStatPlayer = `https://www.google.com/search?q=${opt.name} stats&expnd=1&sa=X&biw=1800&bih=365`;
+
+	request({
+		url: urlStatPlayer,
+		method: 'GET',
+		headers: {
+			'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36'
+		},
+		jar: cookie
+	}, (err, response, body) => {
+		if (err) return callback(err);
+
+		let $ = cheerio.load(body);
+
+		let playerStat = $('[data-attrid="kc:/sports/pro_athlete:stats"]');
+		$('ol li label', playerStat).remove();
+
+		let rawHtmlStat = playerStat.html();
+
+		let result = {
+			rawHtmlStat,
+			data: {}
+		}
+
+		return callback(null, result);
+	})
+}
+
 module.exports = {
 	matchOfLeague,
 	standingOfLeague,
 	newsOfLeague,
 	statOfLeague,
-	playerOfLeague
+	playerOfLeague,
+	statOfPlayer
 }

@@ -186,6 +186,31 @@ const matchOfLeague = (options, callback) => {
 	})
 }
 
+const statOfPlayer = (options, callback) => {
+	let key = `ggsport:statOfPlayer:${JSON.stringify(options)}`;
+
+	RedisService.get(key, (err, value) => {
+		if (NODE_ENV === 'production' && !err && value) {
+			console.log('get from cache key=', key);
+			return callback(null, value);
+		}
+
+		football.statOfPlayer(options, (err, result) => {
+			if (err) return callback(err);
+
+			if (NODE_ENV !== 'production') {
+				fs.writeFileSync('football_player_stat.html', result.rawHtmlStat);
+				fs.writeFileSync('football_player_info.html', result.rawHtmlInfo);
+				// console.log('rawHtmlStat=', result.rawHtmlStat);
+			}
+
+			RedisService.set(key, result, TTL_MATCH);
+
+			return callback(null, result);
+		});
+	})
+}
+
 module.exports = {
 	autocomplete,
 	autocompleteMerge,
@@ -193,5 +218,6 @@ module.exports = {
 	statOfLeague,
 	newsOfLeague,
 	playerOfLeague,
-	matchOfLeague
+	matchOfLeague,
+	statOfPlayer
 }
