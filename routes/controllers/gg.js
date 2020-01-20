@@ -75,3 +75,48 @@ GgCtrl.statOfPlayer = (req, res) => {
 		return Response.success(req, res, results);
 	})
 }
+
+GgCtrl.timelineOfMatch = (req, res) => {
+	let options = req.body;
+
+	GoogleService.timelineOfMatch(options, (err, results) => {
+		if (err) return Response.error(req, res, err, results);
+		return Response.success(req, res, results);
+	})
+}
+
+GgCtrl.lineupsOfMatch = (req, res) => {
+	let options = req.body;
+
+	GoogleService.lineupsOfMatch(options, (err, results) => {
+		if (err) return Response.error(req, res, err, results);
+		return Response.success(req, res, results);
+	})
+}
+
+GgCtrl.statsOfMatch = (req, res) => {
+	let options = req.body;
+
+	GoogleService.statsOfMatch(options, (err, results) => {
+		if (err) return Response.error(req, res, err, results);
+		return Response.success(req, res, results);
+	})
+}
+
+GgCtrl.newsOfMatch = (req, res) => {
+	let options = req.body;
+
+	GoogleService.newsOfMatch(options, (err, results) => {
+		if (err) return Response.error(req, res, err, results);
+		return Response.success(req, res, results);
+	})
+}
+
+GgCtrl.layoutHeaderOfMatch = (req, res) => {
+	let options = req.body;
+
+	GoogleService.layoutHeaderOfMatch(options, (err, results) => {
+		if (err) return Response.error(req, res, err, results);
+		return Response.success(req, res, results);
+	})
+}

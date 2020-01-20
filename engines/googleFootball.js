@@ -67,6 +67,7 @@ const request = require('request').defaults({
   jar: true
 })
 const fs = require('fs');
+const _ = require('lodash');
 
 let cookie = request.jar();
 
@@ -94,11 +95,162 @@ const safeParse = (str) => {
 }
 
 const _parseDataMatchOfLeague = (html) => {
-	let result = {}
-
 	let $ = cheerio.load(html);
 
+	let totalRound = -1;
+	let roundStart = -1;
+	let roundEnd = -1;
 
+	let headings = $('[role="heading"]');
+	let totalRoundText = $(headings[0]).text().trim().match(/\d{1,2}\/\d{1,2}/);
+
+	if (totalRoundText && totalRoundText.length > 0) {
+		totalRoundText = totalRoundText[0];
+		roundStart = Number(totalRoundText.split('/')[0]);
+		totalRound = Number(totalRoundText.split('/')[1]);
+	}
+
+	totalRoundText = $(headings[headings.length - 1]).text().trim().match(/\d{1,2}\/\d{1,2}/);
+
+	if (totalRoundText && totalRoundText.length > 0) {
+		totalRoundText = totalRoundText[0];
+		roundEnd = Number(totalRoundText.split('/')[0]);
+	}
+
+	let GMT = '+7:00'; // default
+	let utcOffset = 420;
+	let timeDisplayText = $('.imso-ani > .imso-ani').text().trim().toLowerCase();
+
+	if (timeDisplayText.indexOf('việt nam') > -1) {
+		GMT = '+7:00';
+		utcOffset = 420;
+	}
+
+	let listRound = [];
+	let rounds = $('#liveresults-sports-immersive__updatable-league-matches > div');
+
+	_.forEach(rounds, (round) => {
+		let roundNumber = $('[role="heading"]', round).text().trim().match(/\d{1,2}\/\d{1,2}/);
+		if (roundNumber && roundNumber.length > 0) {
+			roundNumber = roundNumber[0];
+			roundNumber = Number(roundNumber.split('/')[0]);
+		}
+
+		let matchs = [];
+		let matchsInRound = $('[role="listitem"]', round);
+
+		_.forEach(matchsInRound, (match) => {
+			let rows = $('tr', match);
+
+			let info = $('td', rows[2])[2]
+
+			let isFullTimeText = $('.imspo_mt__match-status', info).text().trim().toUpperCase();
+			isFullTime = isFullTimeText == 'KT' || isFullTimeText == 'FT' ? true : false;
+
+			let host = rows[4];
+			let client = rows[5];
+
+			let host_tds = $('td', host);
+			let client_tds = $('td', client);
+
+			let host_club_lmid = $(host_tds[0]).attr('data-df-team-mid');
+			let host_logo_src = $('td img', host).attr('src');
+			let host_name = $('td span', host).text().trim();
+			let host_score = Number($($('td div', host)[0]).text().trim());
+
+			let client_club_lmid = $(client_tds[0]).attr('data-df-team-mid');
+			let client_logo_src = $('td img', client).attr('src');
+			let client_name = $('td span', client).text().trim();
+			let client_score = Number($($('td div', client)[0]).text().trim());
+
+			let winner = 'tie';
+
+			if (host_score > client_score) winner = host_name;
+			if (host_score < client_score) winner = client_name;
+
+			let scoreText = `${host_score} - ${client_score}`;
+
+			if (!isFullTime) {
+				winner = null;
+				host_score = null;
+				client_score = null;
+				scoreText = null;
+			}
+
+			let imsoLoa = $('.imso-loa', match);
+
+			let matchMid = $(imsoLoa).attr('data-df-match-mid');
+			let mid = $(imsoLoa).attr('data-mid');
+			let date = $(imsoLoa).attr('data-start-time');
+
+			let imsoHov = $('.imso-hov', match);
+			let hveid = $(imsoHov).attr('data-hveid');
+			let ved = $(imsoHov).attr('data-ved');
+
+			let video = null;
+			let a = $('a', info);
+
+			if (a) {
+				let label = $(a).attr('aria-label');
+				let link = $(a).attr('href');
+				let urlPing = 'https://www.google.com' + $(a).attr('ping'); // /url?sa=t&source=web&rct=j&url=https://www.youtube.com/watch%3Fv%3DXlU0Rwc4mXo%26feature%3Donebox&ved=2ahUKEwiCoL6T4YnnAhVHcCsKHdizC0wQs056BAgBEAY
+
+				let thumbnail = $('img', a).attr('src'); // //ssl.gstatic.com/onebox/media/sports/videos/liga/-sRKeoDzDvXYayG9_192x108.jpg
+				let durationText = $('span', a).text().trim(); // ► 1:31 --> convert to seccond
+
+				video = {
+					label,
+					link,
+					urlPing,
+					thumbnail,
+					durationText
+				}
+			}
+
+			let objMatch = {
+				host: {
+					name: host_name,
+					lmid: host_club_lmid,
+					score: host_score,
+					logoSrc: host_logo_src
+				},
+
+				client: {
+					name: client_name,
+					lmid: client_club_lmid,
+					score: client_score,
+					logoSrc: client_logo_src
+				},
+
+				scoreText,
+				winner,
+				isFullTime,
+				matchMid,
+				mid,
+				hveid,
+				ved,
+				date,
+			}
+
+			if (video) objMatch['video'] = video;
+
+			matchs.push(objMatch);
+		})
+
+		let objRound = {
+			roundNumber,
+			matchs
+		}
+
+		listRound.push(objRound);
+	})
+
+	let result = {
+		roundStart,
+		roundEnd,
+		totalRound,
+		listRound,
+	}
 
 	return result;
 }
@@ -108,7 +260,7 @@ const matchOfLeague = (opt, callback) => {
 
 	let slug = opt.slug;
 
-	if (!FOOTBALL_LEAGUE[slug]) return callback(null, null);
+	if (!FOOTBALL_LEAGUE[slug]) return callback('ELEAGUENOTFOUND');
 
 	let emid = FOOTBALL_LEAGUE[slug].emid;
 	let lmid = FOOTBALL_LEAGUE[slug].lmid;
@@ -150,15 +302,18 @@ const matchOfLeague = (opt, callback) => {
 			$(this).attr('target', '_blank');
 		});
 
+		// hide time of table
+
+
 		let $style = cheerio.html($('style'));
 		let $body = $('body').html();
 
 		let final = `${$style}${$body}`;
-		// let data = _parseDataMatchOfLeague($body)
+		let data = _parseDataMatchOfLeague($body);
 
 		let result = {
 			rawHtml: final,
-			// data
+			data
 		}
 
 		return callback(err, result);
@@ -415,11 +570,244 @@ const statOfPlayer = (opt, callback) => {
 	})
 }
 
+const timelineOfMatch = (opt, callback) => {
+	opt = Object.assign({}, default_Option, opt);
+
+	let slugLeague = opt.slugLeague;
+	let matchMid = opt.matchMid;
+
+	if (!matchMid) return callback('EMISSMATCHMID');
+	if (!FOOTBALL_LEAGUE[slugLeague]) return callback('ELEAGUENOTFOUND');
+
+	let emid = FOOTBALL_LEAGUE[slugLeague].emid;
+	let lmid = FOOTBALL_LEAGUE[slugLeague].lmid;
+
+	let urlGet = `https://www.google.com/async/lr_sma_tb?yv=3&q=&async=ct:${opt.ct},hl:${opt.hl},tz:${opt.tz},dtoint:,dtointmid:,emid:${matchMid},et:mt,gndr:UNKNOWN_GENDER,lmid:${lmid},rtab:7,sp:2,_fmt:prog,_id:tab-3-7,_jsfs:Ffpdje`;
+
+	console.log(`timelineOfMatch urlGet= ${urlGet}`);
+
+	request({
+		url: urlGet,
+		method: 'GET',
+		jar: cookie
+	}, (err, response, body) => {
+		if (err) return callback(err);
+
+		if (!body || body.length == 0) return callback();
+
+		let split = body.split('\n');
+
+		if (!split || split.length < 4) return callback();
+
+		let html = split[3].slice(5);
+		html = html.substr(0, html.length - 5);
+
+		let result = {
+			rawHtml: html
+		}
+
+		return callback(null, result);
+	})
+}
+
+const lineupsOfMatch = (opt, callback) => {
+	opt = Object.assign({}, default_Option, opt);
+
+	let slugLeague = opt.slugLeague;
+	let matchMid = opt.matchMid;
+
+	if (!matchMid) return callback('EMISSMATCHMID');
+	if (!FOOTBALL_LEAGUE[slugLeague]) return callback('ELEAGUENOTFOUND');
+
+	let emid = FOOTBALL_LEAGUE[slugLeague].emid;
+	let lmid = FOOTBALL_LEAGUE[slugLeague].lmid;
+
+	let urlGet = `https://www.google.com/async/lr_sma_tb?yv=3&q=&async=ct:${opt.ct},hl:${opt.hl},tz:${opt.tz},dtoint:,dtointmid:,emid:${matchMid},et:mt,gndr:UNKNOWN_GENDER,lmid:${lmid},rtab:6,sp:2,_fmt:prog,_id:tab-3-6,_jsfs:Ffpdje`;
+
+	console.log(`lineupsOfMatch urlGet= ${urlGet}`);
+
+	request({
+		url: urlGet,
+		method: 'GET',
+		jar: cookie
+	}, (err, response, body) => {
+		if (err) return callback(err);
+
+		if (!body || body.length == 0) return callback();
+
+		let split = body.split('\n');
+
+		if (!split || split.length < 4) return callback();
+
+		let html = split[3].slice(5);
+		html = html.substr(0, html.length - 5);
+
+		let result = {
+			rawHtml: html
+		}
+
+		return callback(null, result);
+	})
+}
+
+const statsOfMatch = (opt, callback) => {
+	opt = Object.assign({}, default_Option, opt);
+
+	let slugLeague = opt.slugLeague;
+	let matchMid = opt.matchMid;
+
+	if (!matchMid) return callback('EMISSMATCHMID');
+	if (!FOOTBALL_LEAGUE[slugLeague]) return callback('ELEAGUENOTFOUND');
+
+	let emid = FOOTBALL_LEAGUE[slugLeague].emid;
+	let lmid = FOOTBALL_LEAGUE[slugLeague].lmid;
+
+	let urlGet = `https://www.google.com/async/lr_sma_tb?yv=3&q=&async=ct:${opt.ct},hl:${opt.hl},tz:${opt.tz},dtoint:,dtointmid:,emid:${matchMid},et:mt,gndr:UNKNOWN_GENDER,lmid:${lmid},rtab:10,sp:2,_fmt:prog,_id:tab-3-10,_jsfs:Ffpdje`;
+
+	console.log(`statsOfMatch urlGet= ${urlGet}`);
+
+	request({
+		url: urlGet,
+		method: 'GET',
+		jar: cookie
+	}, (err, response, body) => {
+		if (err) return callback(err);
+
+		if (!body || body.length == 0) return callback();
+
+		let split = body.split('\n');
+
+		if (!split || split.length < 4) return callback();
+
+		let html = split[3].slice(6);
+		html = html.substr(0, html.length - 5);
+
+		let result = {
+			rawHtml: html
+		}
+
+		return callback(null, result);
+	})
+}
+
+const newsOfMatch = (opt, callback) => {
+	opt = Object.assign({}, default_Option, opt);
+
+	let slugLeague = opt.slugLeague;
+	let matchMid = opt.matchMid;
+
+	let hostName = opt.hostName;
+	let clientName = opt.clientName;
+
+	if (!matchMid) return callback('EMISSMATCHMID');
+	if (!FOOTBALL_LEAGUE[slugLeague]) return callback('ELEAGUENOTFOUND');
+
+	let emid = FOOTBALL_LEAGUE[slugLeague].emid;
+	let lmid = FOOTBALL_LEAGUE[slugLeague].lmid;
+
+	let urlGet = `https://www.google.com/search?yv=3&q=&asearch=lr_nt&async=emids:/m/0hvjr;/m/04ltf,en:${hostName};${clientName},et:mt,lmid:${lmid},mmid:${matchMid},sp:2,_fmt:prog,_id:news-tab-1826535093,_jsfs:Ffpdje`;
+
+	console.log(`newsOfMatch urlGet= ${urlGet}`);
+
+	request({
+		url: urlGet,
+		method: 'GET',
+		jar: cookie
+	}, (err, response, body) => {
+		if (err) return callback(err);
+
+		if (!body || body.length == 0) return callback();
+
+		let split = body.split('\n');
+
+		if (!split || split.length < 4) return callback();
+
+		let html = split[3].slice(4);
+		html = html.substr(0, html.length - 5);
+
+		let result = {
+			rawHtml: html
+		}
+
+		return callback(null, result);
+	})
+}
+
+const layoutHeaderOfMatch = (opt, callback) => {
+	opt = Object.assign({}, default_Option, opt);
+
+	let slugLeague = opt.slugLeague;
+	let matchMid = opt.matchMid;
+
+	if (!matchMid) return callback('EMISSMATCHMID');
+	if (!FOOTBALL_LEAGUE[slugLeague]) return callback('ELEAGUENOTFOUND');
+
+	let emid = FOOTBALL_LEAGUE[slugLeague].emid;
+	let lmid = FOOTBALL_LEAGUE[slugLeague].lmid;
+
+	let urlGet = `https://www.google.com/async/lr_mt_fp?yv=3&async=sp:2,lmid:${lmid},tab:tl,emid:${matchMid},rbpt:undefined,ct:${opt.ct},hl:${opt.hl},tz:${opt.tz},_id:liveresults-sports-immersive__match-fullpage,_pms:s,_jsfs:Ffpdje,_fmt:pc`;
+
+	console.log(`layoutHeaderOfMatch urlGet= ${urlGet}`);
+
+	request({
+		url: urlGet,
+		method: 'GET',
+		jar: cookie
+	}, (err, response, body) => {
+		if (err) return callback(err);
+
+		if (!body || body.length == 0) return callback();
+
+		let split = body.split('\n');
+
+		if (!split || split.length < 4) return callback();
+
+		let html = split[3].slice(6);
+		html = html.substr(0, html.length - 5);
+
+		let $ = cheerio.load(html);
+
+		$('svg').remove();
+		$('[jsaction="jsa.back"]').remove();
+		$('.lr-imso-fix .imso-eib').remove();
+		$('.tb_u').remove();
+		$('.imspo_mff__mff-tnss').remove();
+
+		let $style = cheerio.html($('style'));
+		let $body = $('body').html();
+
+		let final = `${$style}${$body}`;
+
+		let result = {
+			rawHtml: final
+		}
+
+		return callback(null, result);
+	})
+}
+
+const newsOfClub = () => {
+
+}
+
+const playerOfClub = () => {
+
+}
+
+const matchOfClub = () => {
+
+}
+
 module.exports = {
 	matchOfLeague,
 	standingOfLeague,
 	newsOfLeague,
 	statOfLeague,
 	playerOfLeague,
-	statOfPlayer
+	statOfPlayer,
+	timelineOfMatch,
+	lineupsOfMatch,
+	statsOfMatch,
+	newsOfMatch,
+	layoutHeaderOfMatch,
 }

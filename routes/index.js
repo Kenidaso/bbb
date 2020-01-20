@@ -96,6 +96,11 @@ exports = module.exports = function (app) {
 	app.post('/gg/player-of-league', routes.controllers.gg.playerOfLeague);
 	app.post('/gg/match-of-league', routes.controllers.gg.matchOfLeague);
 	app.post('/gg/player-stat', routes.controllers.gg.statOfPlayer);
+	app.post('/gg/timeline-of-match', routes.controllers.gg.timelineOfMatch);
+	app.post('/gg/lineups-of-match', routes.controllers.gg.lineupsOfMatch);
+	app.post('/gg/stats-of-match', routes.controllers.gg.statsOfMatch);
+	app.post('/gg/news-of-match', routes.controllers.gg.newsOfMatch);
+	app.post('/gg/layout-header-of-match', routes.controllers.gg.layoutHeaderOfMatch);
 
 	app.post(acrud.ROUTE, acrud.controller);
 

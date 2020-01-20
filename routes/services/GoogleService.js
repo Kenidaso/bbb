@@ -17,6 +17,21 @@ const TTL_STAT = 60 * 60 * 2; // 2 hours
 const TTL_NEWS = 60 * 60 * 1; // 2 hours
 const TTL_PLAYER = 60 * 60 * 24 * 7; // 1 week
 const TTL_MATCH = 60 * 60 * 24 * 1; // 1 day
+const TTL_LINEUPS = 60 * 60 * 2;
+const TTL_TIMELINE = 60 * 60 * 2;
+const TTL_STATSMATCH = 60 * 60 * 2;
+const TTL_NEWSMATCH = 60 * 60 * 2;
+const TTL_LAYOUTHEADERMATCH = 60 * 60 * 2;
+
+const TTL_LONG = 60 * 60 * 24 * 14;
+
+const parseCache = (data) => {
+	if (!data) return null;
+
+	let _tmp = utils.safeParse(data);
+
+	return _tmp ? _tmp : data;
+}
 
 const autocomplete = (keyword, callback) => {
 	engine.autocomplete(keyword, (err, result) => {
@@ -177,6 +192,7 @@ const matchOfLeague = (options, callback) => {
 
 			if (NODE_ENV !== 'production') {
 				fs.writeFileSync('football_match.html', result.rawHtml);
+				console.log('data=', JSON.stringify(result.data));
 			}
 
 			RedisService.set(key, result, TTL_MATCH);
@@ -204,7 +220,124 @@ const statOfPlayer = (options, callback) => {
 				// console.log('rawHtmlStat=', result.rawHtmlStat);
 			}
 
-			RedisService.set(key, result, TTL_MATCH);
+			RedisService.set(key, result, TTL_LONG);
+
+			return callback(null, result);
+		});
+	})
+}
+
+const timelineOfMatch = (options, callback) => {
+	let key = `ggsport:timelineOfMatch:${JSON.stringify(options)}`;
+
+	RedisService.get(key, (err, value) => {
+		if (NODE_ENV === 'production' && !err && value) {
+			console.log('get from cache key=', key);
+			return callback(null, utils.safeParse(value));
+		}
+
+		football.timelineOfMatch(options, (err, result) => {
+			if (err) return callback(err);
+
+			if (NODE_ENV !== 'production') {
+				fs.writeFileSync('football_timeline_of_match.html', result.rawHtml);
+				// console.log('rawHtmlStat=', result.rawHtmlStat);
+			}
+
+			RedisService.set(key, result, TTL_TIMELINE);
+
+			return callback(null, result);
+		});
+	})
+}
+
+const lineupsOfMatch = (options, callback) => {
+	let key = `ggsport:lineupsOfMatch:${JSON.stringify(options)}`;
+
+	RedisService.get(key, (err, value) => {
+		if (NODE_ENV === 'production' && !err && value) {
+			console.log('get from cache key=', key);
+			return callback(null, utils.safeParse(value));
+		}
+
+		football.lineupsOfMatch(options, (err, result) => {
+			if (err) return callback(err);
+
+			if (NODE_ENV !== 'production') {
+				fs.writeFileSync('football_lineups_of_match.html', result.rawHtml);
+				// console.log('rawHtmlStat=', result.rawHtmlStat);
+			}
+
+			RedisService.set(key, result, TTL_LINEUPS);
+
+			return callback(null, result);
+		});
+	})
+}
+
+const statsOfMatch = (options, callback) => {
+	let key = `ggsport:statsOfMatch:${JSON.stringify(options)}`;
+
+	RedisService.get(key, (err, value) => {
+		if (NODE_ENV === 'production' && !err && value) {
+			console.log('get from cache key=', key);
+			return callback(null, parseCache(value));
+		}
+
+		football.statsOfMatch(options, (err, result) => {
+			if (err) return callback(err);
+
+			if (NODE_ENV !== 'production') {
+				fs.writeFileSync('football_stats_of_match.html', result.rawHtml);
+			}
+
+			RedisService.set(key, result, TTL_STATSMATCH);
+
+			return callback(null, result);
+		});
+	})
+}
+
+const newsOfMatch = (options, callback) => {
+	let key = `ggsport:newsOfMatch:${JSON.stringify(options)}`;
+
+	RedisService.get(key, (err, value) => {
+		if (NODE_ENV === 'production' && !err && value) {
+			console.log('get from cache key=', key);
+			return callback(null, parseCache(value));
+		}
+
+		football.newsOfMatch(options, (err, result) => {
+			if (err) return callback(err);
+
+			if (NODE_ENV !== 'production') {
+				fs.writeFileSync('football_news_of_match.html', result.rawHtml);
+			}
+
+			RedisService.set(key, result, TTL_NEWSMATCH);
+
+			return callback(null, result);
+		});
+	})
+}
+
+const layoutHeaderOfMatch = (options, callback) => {
+	let key = `ggsport:layoutHeaderOfMatch:${JSON.stringify(options)}`;
+
+	RedisService.get(key, (err, value) => {
+		if (NODE_ENV === 'production' && !err && value) {
+			console.log('get from cache key=', key);
+			return callback(null, parseCache(value));
+		}
+
+		football.layoutHeaderOfMatch(options, (err, result) => {
+			if (err) return callback(err);
+
+			if (NODE_ENV !== 'production') {
+				fs.writeFileSync('football_layoutheader_of_match.html', result.rawHtml);
+			}
+
+			RedisService.set(key, result, TTL_LAYOUTHEADERMATCH);
 
 			return callback(null, result);
 		});
@@ -219,5 +352,10 @@ module.exports = {
 	newsOfLeague,
 	playerOfLeague,
 	matchOfLeague,
-	statOfPlayer
+	statOfPlayer,
+	timelineOfMatch,
+	lineupsOfMatch,
+	statsOfMatch,
+	newsOfMatch,
+	layoutHeaderOfMatch,
 }
