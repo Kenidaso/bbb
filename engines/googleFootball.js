@@ -350,7 +350,8 @@ const standingOfLeague = (opt, callback) => {
 
 		if (!split || split.length < 4) return callback();
 
-		let html = split[3].slice(6);
+		let iSlice = split[3].indexOf('<style');
+		let html = split[3].slice(iSlice);
 		html = html.substr(0, html.length - 5);
 
 		let result = {
