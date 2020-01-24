@@ -3,6 +3,11 @@
 // node test ggnews_rss
 // node test ggnews_topic
 // node test ggnews_story
+// node test reqmongo
+// node test vnexpress_rss
+// node test requpsertfeed
+
+require('dotenv').config();
 
 process.env.PORT = 1234;
 
@@ -14,6 +19,9 @@ const task = myArgs[0].toLowerCase();
 
 let ggNewsService = require('./routes/services/GoogleNewsService');
 let GGNews = require('./engines/googleNews');
+let vnexpress = require('./engines/vnexpress');
+
+let utils = require('./helpers/utils');
 
 let GGN_TOPIC = 'https://news.google.com/topics/CAAqIggKIhxDQkFTRHdvSkwyMHZNRGxqTjNjd0VnSmxiaWdBUAE?hl=en-US&gl=US&ceid=US%3Aen';
 GGN_TOPIC = 'https://news.google.com/topics/CAAqIggKIhxDQkFTRHdvSkwyMHZNREZqY21RMUVnSjJhU2dBUAE?hl=vi&gl=VN&ceid=VN%3Avi';
@@ -65,6 +73,43 @@ let ggNews_Story = (callback) => {
 	GGNews.getFeedFromStory(GGN_STORY, callback, isGetOriginLink);
 }
 
+let reqMongo = (callback) => {
+	utils.reqMongo('Rss', 'find', {
+		"q": {
+			"status": 1
+		},
+		"f": {
+			"slug": 1,
+			"host": 1,
+			"category": 1,
+			"url": 1,
+			"title": 1
+		}
+	}, callback)
+}
+
+let reqUpsertFeed = (callback) => {
+	let find = {
+		"slug": "show-truyen-hinh-han-bi-len-an-vi-loi-dung-vu-sulli-tu-sat-123"
+	}
+
+	let update = {
+		"$set": {
+      "title": "Show truyền hình Hàn bị lên án vì lợi dụng vụ Sulli tự sát"
+    },
+    "$addToSet": {
+    	"category": "5db1e80887a90f0caed1c699"
+    }
+	}
+
+	utils.reqUpsertFeed(find, update, callback);
+}
+
+let getVnexpressRss = (callback) => {
+	let linkRss = 'https://vnexpress.net/rss/thoi-su.rss';
+	vnexpress.getNewsFromRss(linkRss, callback);
+}
+
 console.clear();
 
 console.log('begin ...');
@@ -73,6 +118,9 @@ switch (task) {
 	case 'ggnews_rss': return ggNews_RSS(_done);
 	case 'ggnews_topic': return ggNews_Topic(_done);
 	case 'ggnews_story': return ggNews_Story(_done);
+	case 'reqmongo': return reqMongo(_done);
+	case 'vnexpress_rss': return getVnexpressRss(_done);
+	case 'requpsertfeed': return reqUpsertFeed(_done);
 	default:
 		console.log('Task not exists');
 		return _done();

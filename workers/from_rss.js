@@ -7,7 +7,6 @@ const utils = require('../helpers/utils');
 process.env.PORT = utils.randInt(3000, 4000);
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
-const keystone = require('keystone');
 const shortId = require('short-id-gen');
 const async = require('async');
 const fs = require('fs');
@@ -17,32 +16,33 @@ const moment = require('moment');
 const LIMIT_RSS = Number(process.env.LIMIT_RSS) || 1;
 const LIMIT_NEWS = Number(process.env.LIMIT_NEWS) || 1;
 
-keystone.init({
-	'headless': true,
-	'user model': 'KsUser',
-	'auto update': false,
-	'cookie secret': shortId.generate(16),
-});
-
-keystone.import('../models');
+let roundGetRss = 0;
+let RSSes = null;
 
 const getAllRss = (callback) => {
-	const RssModel = keystone.list('Rss').model;
+	roundGetRss++;
+	if (RSSes && roundGetRss % 10 != 0) return callback(null, RSSes);
 
-	const fields = '-_id slug category host url title';
-
-	RssModel
-		.find()
-		.select(fields)
-		.populate('category', '_id slug title')
-		.populate('host', '_id name website engine metadata')
-		.exec((err, rsses) => {
-			if (err) return callback('EFINDRSS', err);
-
-			if (NODE_ENV != 'production') rsses = rsses.slice(0, 1);
-
-			return callback(null, rsses);
-		});
+	utils.reqMongo('Rss', 'find', {
+		"q": {
+			"status": 1
+		},
+		"f": {
+			"slug": 1,
+			"host": 1,
+			"categories": 1,
+			"url": 1,
+			"title": 1
+		},
+		"p": {
+      "path": "host",
+      "fields": "slug name website engine"
+    }
+	}, (err, result) => {
+		if (err) return callback(err);
+		RSSes = result;
+		return callback(null, RSSes);
+	})
 }
 
 const procEachRss = (rsses, callback) => {
@@ -84,60 +84,38 @@ const procEachRss = (rsses, callback) => {
 
 const procOneNews = (engine, objRss, callback) => {
 	async.series({
-		// get content from link rss
-		get_content_news: (next) => {
-			console.log('----> objRss=', JSON.stringify(objRss));
-			engine.getContent(objRss, (err, result) => {
-				return next(null);
-			});
-		},
-
 		save_news: (next) => {
-			if (!objRss._content) return next('ENOCONTENT');
+			let objNewFeed = {
+				link: objRss.link,
+				title: objRss.title,
+				description: objRss.description,
+				publishDate: objRss.pubDate,
+				host: objRss._objRss.host._id,
+			}
 
-			const FeedModel = keystone.list('Feed').model;
+			let find = {
+				link: objNewFeed.link
+			}
 
-			FeedModel.findOne({
-				link: objRss.link
-			}, (err, feed) => {
-				if (err) return next(err);
-
-				if (feed) {
-					console.log('feed exists');
-					return next();
+			let update = {
+				$set: objNewFeed,
+				$addToSet: {
+					category: {
+						$each: objRss._objRss.categories
+					}
 				}
+			}
 
-				let objNewFeed = {
-					link: objRss.link,
-					title: objRss.title,
-					publishDate: moment(objRss.pubDate).toDate(),
-					description: objRss.description,
-					contentOrder: objRss._content.contentOrder,
-					images: objRss._content.images,
-					heroImage: objRss._content.heroImage,
-					videos: objRss._content.videos,
+			// return next(null, { find, update });
 
-					host: objRss._objRss.host._id,
-					category: objRss._objRss.category._id,
-				}
-
-				console.log('objNewFeed=', JSON.stringify(objNewFeed));
-
-				let newFeed = new FeedModel(objNewFeed);
-
-				newFeed.save(next);
-			});
+			utils.reqUpsertFeed(find, update, callback)
 		}
 	}, (err, result) => {
 		console.log('procOneNews err=', err);
-		console.log('procOneNews result=', result);
+		console.log('procOneNews result=', JSON.stringify(result));
 
 		return callback(err, result);
 	});
-}
-
-const getContent = (engine, link, callback) => {
-	engine.getContent(link, callback);
 }
 
 const runProcess = (callback) => {
@@ -150,24 +128,10 @@ const runProcess = (callback) => {
 		console.log('run process done err=', err);
 		console.log('run process done result=', JSON.stringify(result));
 
-		return callback && callback();
+		return setTimeout(runProcess, 30e3);
+
+		// return callback && callback();
 	});
 }
 
-const startWorker = () => {
-	keystone.start(x => {
-		console.log('start done ...');
-
-		runProcess(stopWorker);
-	});
-}
-
-const stopWorker = () => {
-	keystone.closeDatabaseConnection((err, result) => {
-		console.log('stop worker done');
-		return process.exit(0);
-		// return startWorker();
-	});
-}
-
-startWorker();
+runProcess();

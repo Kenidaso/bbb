@@ -235,7 +235,13 @@ _A.controller = (req, res) => {
 				if (sk) query.skip(sk);
 				if (l) query.limit(l);
 				if (f) query.select(f);
-				if (p) query.populate(p);
+				if (p) {
+					if (typeof p === 'object') {
+						query.populate(p.path, p.fields);
+					} else {
+						query.populate(p);
+					}
+				}
 				if (dp) query.deepPopulate(dp.path, dp.option);
 				if (s) query.sort(s);
 

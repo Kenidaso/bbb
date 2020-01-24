@@ -133,7 +133,26 @@ Feed.upsertFeed = (find, update, callback) => {
 			}, update, opts, callback);
 		}
 
-		let newObj = new FeedModel(update);
+		let _update = update['$set'];
+		if (update['$addToSet']) {
+			let set = update['$addToSet'];
+			/*
+			"category": {
+			    "$each": [
+			        "5db1e80887a90f0caed1c699"
+			    ]
+			}
+			*/
+			for (let field in set) {
+				if (typeof set[field] === 'object') {
+					if (set[field]['$each']) _update[field] = set[field]['$each'];
+				} else {
+					_update[field] = set[field];
+				}
+			}
+		}
+
+		let newObj = new FeedModel(_update);
 
 		return newObj.save((err) => {
 			if (err) return callback(err);

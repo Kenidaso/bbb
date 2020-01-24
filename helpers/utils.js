@@ -238,5 +238,56 @@ module.exports = {
 		if (tld) host += `.${tld}`;
 
 		return host;
+	},
+
+	reqMongo: (collection, action, query, callback) => {
+		let reqUrl = `${process.env.API_URL}/acrud/${collection}/${action}`;
+
+		request({
+			url: reqUrl,
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': process.env.ACRUD_APIKEY
+			},
+			json: true,
+			body: query
+		}, (err, response, body) => {
+			if (err) return callback(err);
+
+			let _body = module.exports.safeParse(body);
+			if (!_body) return callback('EBODYPARSE', body);
+			if (_body.err) return callback(_body);
+			if (!_body.result) return callback('ENORESULT', _body);
+
+			return callback(null, _body.result);
+		})
+	},
+
+	reqUpsertFeed: (find, update, callback) => {
+		if (!find || Object.keys(find).length === 0) return callback('EINVALIDFIND');
+		if (!update || Object.keys(find).length === 0) return callback('EINVALIDUPDATE');
+
+		if (!update['$set']) return callback('EUPDATESETNOTFOUND');
+
+		let upsertUrl = `${process.env.API_URL}/feed/upsert`;
+
+		request({
+			url: upsertUrl,
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				// 'Authorization': process.env.ACRUD_APIKEY
+			},
+			json: true,
+			body: {
+				find,
+				update
+			}
+		}, (err, response, body) => {
+			if (err) return callback(err);
+
+			return callback(null, module.exports.safeParse(body));
+		})
 	}
 };

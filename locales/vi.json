@@ -12,5 +12,6 @@
 	"engine is not defined": "engine is not defined",
 	"unable to verify the first certificate": "unable to verify the first certificate",
 	"connection 7 to 206.189.144.26:19128 timed out": "connection 7 to 206.189.144.26:19128 timed out",
-	"connection 8 to 206.189.144.26:19128 timed out": "connection 8 to 206.189.144.26:19128 timed out"
+	"connection 8 to 206.189.144.26:19128 timed out": "connection 8 to 206.189.144.26:19128 timed out",
+	"Feed validation failed": "Feed validation failed"
 }
