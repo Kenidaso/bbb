@@ -27,7 +27,7 @@ const fetch = (opts = {}, callback = noop) => {
 		url: opts.link,
 		method: opts.method || 'GET',
 		headers: Object.assign({}, {
-			'if-modified-since': `${moment().utcOffset(0).format(MODIFIED_SINCE_FORMAT)} GMT`
+			// 'if-modified-since': `${moment().utcOffset(0).format(MODIFIED_SINCE_FORMAT)} GMT`
 		}, opts.headers || {})
 	}, (err, response, body) => {
 		if (err) return callback(err);

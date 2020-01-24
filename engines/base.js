@@ -33,6 +33,8 @@ const request = require('request').defaults({
   timeout: 30e3
 });
 
+const fetchRss = require('./fetchRss');
+
 const UA_MOBILE = 'Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Mobile Safari/537.36';
 
 const minify = require('html-minifier').minify;
@@ -443,7 +445,66 @@ base.grabArticle = (link, hostInfo = {}, engine = {}, callback) => {
   })
 }
 
+base.validateRssResult = (result) => {
+  if (!result) return false;
 
+  let { rss } = result;
+  if (!rss) return false;
+
+  let { channel } = rss;
+  if (!channel || channel.length == 0) return false;
+
+  channel = channel[0];
+
+  let { item } = channel;
+  if (!item || item.length == 0) return false;
+
+  return true;
+}
+
+base.getNewsFromRss = (rssUrl, callback) => {
+  let task = (cb) => {
+    console.log(`[base] fetching rss ... ${rssUrl}`);
+
+    fetchRss({
+      link: rssUrl
+    }, (err, result) => {
+      if (err) return cb(err);
+
+      // console.log('result rss=', result);
+
+      let isValid = base.validateRssResult(result);
+
+      if (!isValid) return cb('ENOITEMINRSS');
+
+      let items = result.rss.channel[0].item;
+      items = items.map((item) => {
+        for (let key in item) {
+          let value = item[key][0];
+          if (value && key == 'description') {
+            try {
+              let $ = cheerio.load(item[key][0]);
+              value = $(value).text().trim();
+            } catch {
+
+            }
+          }
+
+          item[key] = value;
+        }
+
+        return item;
+      });
+
+      return cb(null, items);
+    });
+  }
+
+  async.retry({
+    times: 1,
+    interval: 5e3
+  }, task, callback);
+}
 
 
 

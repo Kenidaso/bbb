@@ -8,6 +8,7 @@ const moment = require('moment');
 const fs = require('fs');
 const path = require('path');
 
+const base = require('./base');
 const fetchRss = require('./fetchRss');
 const utils = require('../helpers/utils');
 
@@ -103,33 +104,16 @@ const getContent = (objRss = {}, callback) => {
   });
 }
 
-const validateRssResult = (result) => {
-  if (!result) return false;
-
-  let { rss } = result;
-  if (!rss) return false;
-
-  let { channel } = rss;
-  if (!channel || channel.length == 0) return false;
-
-  channel = channel[0];
-
-  let { item } = channel;
-  if (!item || item.length == 0) return false;
-
-  return true;
-}
-
 const getNewsFromRss = (rssUrl, callback) => {
   let task = (cb) => {
-    console.log('fetching rss ...');
+    console.log(`[${NAME}] fetching rss ... ${rssUrl}`);
 
     fetchRss({
       link: rssUrl
     }, (err, result) => {
       if (err) return cb(err);
 
-      let isValid = validateRssResult(result);
+      let isValid = base.validateRssResult(result);
 
       if (!isValid) return cb('ENOITEMINRSS');
 

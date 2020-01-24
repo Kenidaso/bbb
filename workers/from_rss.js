@@ -13,6 +13,8 @@ const fs = require('fs');
 const path = require('path');
 const moment = require('moment');
 
+const baseEngine = require('../engines/base');
+
 const LIMIT_RSS = Number(process.env.LIMIT_RSS) || 1;
 const LIMIT_NEWS = Number(process.env.LIMIT_NEWS) || 1;
 
@@ -33,7 +35,8 @@ const getAllRss = (callback) => {
 
 	let query = {
 		"q": {
-			"status": 1
+			// "status": 1
+			"status": 0
 		},
 		"f": {
 			"slug": 1,
@@ -73,15 +76,25 @@ const procEachRss = (rsses, callback) => {
 		const enginePath = `../engines/${engineName}.js`;
 
 		console.log('enginePath=', enginePath);
+		let engine = null;
 
-		if (!fs.existsSync(path.join(__dirname, enginePath))) return cb('EENGINENOTEXISTS', objRss);
+		if (!fs.existsSync(path.join(__dirname, enginePath))) {
+			engine = baseEngine;
+			// return cb('EENGINENOTEXISTS', objRss);
+		} else {
+			engine = require(enginePath);
+		}
 
-		let engine = require(enginePath);
-
-		if (!engine.getNewsFromRss) return cb('EENGINEMODULENOTFOUND', objRss);
+		if (!engine.getNewsFromRss) {
+			engine.getNewsFromRss = baseEngine.getNewsFromRss;
+			// return cb('EENGINEMODULENOTFOUND', objRss);
+		}
 
 		engine.getNewsFromRss(objRss.url, (err, newses = []) => {
-			if (err) return cb(err);
+			if (err) {
+				// return cb(err);
+				return cb();
+			}
 
 			if (NODE_ENV != 'production') newses = newses.slice(0, 2);
 
@@ -112,10 +125,26 @@ const procOneNews = (engine, objRss, callback) => {
 			}
 
 			if (objRss.image) {
-				objNewFeed['heroImage'] = {
-					url: objRss.image
+				if (typeof objRss.image == 'string') {
+					objNewFeed['heroImage'] = {
+						url: objRss.image,
+						format: 'jpg',
+						public_id: objRss.image.replace('.jpg', '')
+					}
+				}
+
+				if (typeof objRss.image == 'object') {
+					objNewFeed['heroImage'] = {
+						url: objRss.image.url,
+						width: objRss.image.width,
+						height: objRss.image.height,
+						format: 'jpg',
+						public_id: objRss.image.url.replace('.jpg', '')
+					}
 				}
 			}
+
+			if (objRss.rawHtml) objNewFeed['rawHtml'] = objRss.rawHtml;
 
 			let find = {
 				link: objNewFeed.link
@@ -130,7 +159,7 @@ const procOneNews = (engine, objRss, callback) => {
 				}
 			}
 
-			// return next(null, { find, update });
+			return next(null, { find, update });
 
 			utils.reqUpsertFeed(find, update, callback)
 		}
@@ -151,6 +180,8 @@ const runProcess = (callback) => {
 	], (err, result) => {
 		console.log('run process done err=', err);
 		console.log('run process done result=', JSON.stringify(result));
+
+		if (process.env.NODE_ENV != 'production') return process.exit(0);
 
 		return setTimeout(runProcess, 30e3);
 
