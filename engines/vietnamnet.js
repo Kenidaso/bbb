@@ -45,8 +45,6 @@ engine.getNewsFromRss = (rssUrl, callback) => {
 
       let isValid = base.validateRssResult(result);
 
-      console.log('result=', JSON.stringify(result));
-
       if (!isValid) return cb('ENOITEMINRSS');
 
       let items = result.rss.channel[0].item;

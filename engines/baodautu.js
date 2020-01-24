@@ -30,7 +30,7 @@ const validateRssResult = (result) => {
 
 const getNewsFromRss = (rssUrl, callback) => {
   let task = (cb) => {
-    console.log(`[${NAME}] fetching rss ...`);
+    console.log(`[${NAME}] fetching rss ${rssUrl} ...`);
 
     fetchRss({
       link: rssUrl

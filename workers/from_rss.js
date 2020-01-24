@@ -29,6 +29,8 @@ program
 
 program.parse(process.argv);
 
+let ROUND = 0;
+
 const getAllRss = (callback) => {
 	roundGetRss++;
 	if (RSSes && roundGetRss % 10 != 0) return callback(null, RSSes);
@@ -178,12 +180,15 @@ const procOneNews = (engine, objRss, callback) => {
 }
 
 const runProcess = (callback) => {
-	console.log('process ...');
+	ROUND++;
+	console.log(`process ROUND ${ROUND}...`);
+	console.time(`process ROUND ${ROUND}`);
 
 	async.waterfall([
 		getAllRss,
 		procEachRss,
 	], (err, result) => {
+		console.timeEnd(`process ROUND ${ROUND}`);
 		console.log('run process done err=', err);
 		console.log('run process done result=', JSON.stringify(result));
 
