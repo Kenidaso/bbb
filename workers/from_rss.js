@@ -59,6 +59,8 @@ const getAllRss = (callback) => {
 		}
 	}
 
+	if (NODE_ENV != 'production') query.q.status = 0;
+
 	utils.reqMongo('Rss', 'find', query, (err, result) => {
 		if (err) return callback(err);
 		RSSes = result;
@@ -144,7 +146,11 @@ const procOneNews = (engine, objRss, callback) => {
 				}
 			}
 
-			if (objRss.rawHtml) objNewFeed['rawHtml'] = objRss.rawHtml;
+			if (objRss.rawHtml) {
+				objNewFeed['rawHtml'] = objRss.rawHtml.replace(/\r\n/g, '');
+				objNewFeed['rawHtml'] = objRss.rawHtml.replace(/\r/g, '');
+				objNewFeed['rawHtml'] = objRss.rawHtml.replace(/\n/g, '');
+			}
 
 			let find = {
 				link: objNewFeed.link

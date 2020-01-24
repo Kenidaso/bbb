@@ -289,5 +289,10 @@ module.exports = {
 
 			return callback(null, module.exports.safeParse(body));
 		})
+	},
+
+	clone: (obj) => {
+		if (typeof obj != 'object') return null;
+		return JSON.parse(JSON.stringify(obj));
 	}
 };

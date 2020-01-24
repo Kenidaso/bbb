@@ -8,6 +8,7 @@ const async = require('async');
 
 const base = require('./base');
 const fetchRss = require('./fetchRss');
+const utils = require('../helpers/utils');
 
 let engine = {};
 module.exports = engine;
@@ -25,7 +26,26 @@ engine.getNewsFromRss = (rssUrl, callback) => {
     }, (err, result) => {
       if (err) return cb(err);
 
+      if (result && result.vnn) {
+        result = result.vnn;
+        let _rss = utils.clone(result.rss);
+
+        if (_rss && Array.isArray(_rss)) {
+          _rss = _rss[0];
+          result.rss = {};
+
+          if (_rss.channel && _rss.channel[0].vnn && _rss.channel[0].vnn[0].item) {
+            result.rss['channel'] = [];
+            result.rss.channel.push({
+              item: result.channel[0].vnn[0].item
+            })
+          }
+        }
+      }
+
       let isValid = base.validateRssResult(result);
+
+      console.log('result=', JSON.stringify(result));
 
       if (!isValid) return cb('ENOITEMINRSS');
 
