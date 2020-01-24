@@ -22,7 +22,7 @@ const Rss = new keystone.List('Rss', {
 
 Rss.add({
 	title: { type: String, reqired: true, initial: true },
-	url: { type: Types.Url, required: true, initial: true },
+	url: { type: Types.Url, required: true, initial: true, index: true },
 	categories: { type: Types.Relationship, ref: 'Category', initial: true, many: true },
 	host: { type: Types.Relationship, ref: 'Host', initial: true },
 	status: { type: Number, index: true, default: 1 }

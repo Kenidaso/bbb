@@ -19,11 +19,19 @@ const LIMIT_NEWS = Number(process.env.LIMIT_NEWS) || 1;
 let roundGetRss = 0;
 let RSSes = null;
 
+const program = require('commander');
+program.version('1.0.0');
+
+program
+	.option('-h, --host [String]', `host want to get rss, ex: vnexpress.net`)
+
+program.parse(process.argv);
+
 const getAllRss = (callback) => {
 	roundGetRss++;
 	if (RSSes && roundGetRss % 10 != 0) return callback(null, RSSes);
 
-	utils.reqMongo('Rss', 'find', {
+	let query = {
 		"q": {
 			"status": 1
 		},
@@ -38,7 +46,17 @@ const getAllRss = (callback) => {
       "path": "host",
       "fields": "slug name website engine"
     }
-	}, (err, result) => {
+	}
+
+	if (program.host) {
+		// "q": { "name" : { $regex: "Ghost", $options: 'gi' } }
+		query.q['url'] = {
+			$regex: program.host,
+			$options: 'gi'
+		}
+	}
+
+	utils.reqMongo('Rss', 'find', query, (err, result) => {
 		if (err) return callback(err);
 		RSSes = result;
 		return callback(null, RSSes);
@@ -93,6 +111,12 @@ const procOneNews = (engine, objRss, callback) => {
 				host: objRss._objRss.host._id,
 			}
 
+			if (objRss.image) {
+				objNewFeed['heroImage'] = {
+					url: objRss.image
+				}
+			}
+
 			let find = {
 				link: objNewFeed.link
 			}
@@ -106,7 +130,7 @@ const procOneNews = (engine, objRss, callback) => {
 				}
 			}
 
-			// return next(null, { find, update });
+			return next(null, { find, update });
 
 			utils.reqUpsertFeed(find, update, callback)
 		}
