@@ -130,7 +130,7 @@ const procOneNews = (engine, objRss, callback) => {
 				}
 			}
 
-			return next(null, { find, update });
+			// return next(null, { find, update });
 
 			utils.reqUpsertFeed(find, update, callback)
 		}
