@@ -35,8 +35,8 @@ const getAllRss = (callback) => {
 
 	let query = {
 		"q": {
-			// "status": 1
-			"status": 0
+			"status": 1
+			// "status": 0
 		},
 		"f": {
 			"slug": 1,
@@ -159,7 +159,7 @@ const procOneNews = (engine, objRss, callback) => {
 				}
 			}
 
-			return next(null, { find, update });
+			// return next(null, { find, update });
 
 			utils.reqUpsertFeed(find, update, callback)
 		}
