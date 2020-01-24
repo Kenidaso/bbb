@@ -5,6 +5,7 @@ let linkRss = 'https://vnexpress.net/rss/tin-moi-nhat.rss';
 // linkRss = 'https://baodautu.vn/trang-chu.rss';
 linkRss = 'https://vietnamnet.vn/rss/giai-tri.rss';
 linkRss = 'https://tuoitre.vn/rss/tin-moi-nhat.rss';
+linkRss = 'http://cafef.vn/tai-chinh-quoc-te.rss';
 
 // fetchRss({
 // 	link: linkRss

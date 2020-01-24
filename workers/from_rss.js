@@ -104,6 +104,7 @@ const procEachRss = (rsses, callback) => {
 
 			async.eachLimit(newses, LIMIT_NEWS, (news, cbEach) => {
 				news._objRss = objRss;
+				news.link = news.link.trim();
 
 				console.log('news link=', news.link);
 
@@ -167,6 +168,7 @@ const procOneNews = (engine, objRss, callback) => {
 				}
 			}
 
+			// console.log('--> update=', JSON.stringify(update));
 			// return next(null, { find, update });
 
 			utils.reqUpsertFeed(find, update, callback)

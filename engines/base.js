@@ -471,7 +471,7 @@ base.getNewsFromRss = (rssUrl, callback) => {
     }, (err, result) => {
       if (err) return cb(err);
 
-      // console.log('result rss=', result);
+      // console.log('result rss=', JSON.stringify(result));
 
       let isValid = base.validateRssResult(result);
 
