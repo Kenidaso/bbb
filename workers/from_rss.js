@@ -104,7 +104,7 @@ const procEachRss = (rsses, callback) => {
 
 			async.eachLimit(newses, LIMIT_NEWS, (news, cbEach) => {
 				news._objRss = objRss;
-				news.link = news.link.trim();
+				if (news.link) news.link = news.link.trim();
 
 				console.log('news link=', news.link);
 
