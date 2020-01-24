@@ -103,7 +103,7 @@ const procEachRss = (rsses, callback) => {
 			async.eachLimit(newses, LIMIT_NEWS, (news, cbEach) => {
 				news._objRss = objRss;
 
-				console.log('news=', JSON.stringify(news));
+				console.log('news link=', news.link);
 
 				procOneNews(engine, news, cbEach);
 			}, (err, result) => {
