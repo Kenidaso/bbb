@@ -69,7 +69,7 @@ const test_upsertSafe = (callback) => {
 			return next(null, {});
 
 			NewsTopic.model.findOne({
-				_id: '5db844173cff191fd6ed7598'
+				_id: '5dc0704f8e2a6a0004a3a963' // doanh nghiep
 			}, next);
 		},
 		(topic, next) => {
@@ -83,7 +83,8 @@ const test_upsertSafe = (callback) => {
 				link: 'https:/abc.com',
 				title: 'test',
 				publishDate: new Date(),
-				topic: [ '5dbe979fa3c49a09c70c83d7' ],
+				topic: [ '5dc070998e2a6a0004a3a965', '5dc070e68e2a6a0004a3a967' ], // giai tri
+				// topic: [ '5dc070b78e2a6a0004a3a966' ], // the thao
 
 				// 'metadata.raw': 'abc',
 				// 'metadata.html': 'xyz',
@@ -104,5 +105,4 @@ const test_upsertSafe = (callback) => {
 			utils.upsertSafe(Article, find, update, callback);
 		}
 	], callback);
-
 }

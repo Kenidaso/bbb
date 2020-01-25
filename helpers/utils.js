@@ -58,6 +58,23 @@ module.exports = {
 					delete update.metadata;
 				}
 
+				for (let k in update) {
+					let items = update[k];
+
+					if (Array.isArray(items)) {
+						result[k] = result[k] || [];
+
+						for (let i in items) {
+							if (result[k].indexOf(items[i]) < 0) {
+								console.log('push ', items[i]);
+								result[k] = result[k].concat(items[i]);
+							}
+						}
+
+						delete update[k];
+					}
+				}
+
 				result = Object.assign(result, update);
 
 				return result.save((err) => {
