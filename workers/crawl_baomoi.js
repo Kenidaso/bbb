@@ -166,7 +166,7 @@ const save_1_article = (article, callback) => {
 
 	let update = {
 		title: article.title,
-		publishDate: moment(article.publishDate).toDate(),
+		publishDate: moment(article.publishDate).utcOffset(420).toDate(),
 		link: article.link,
 		description: article.description,
 

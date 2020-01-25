@@ -54,6 +54,10 @@ const getNewsFromRss = (rssUrl, callback) => {
             }
           }
 
+          if (value && key == 'pubDate') {
+            value += '+7';
+          }
+
           item[key] = value;
         }
 
