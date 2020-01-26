@@ -229,7 +229,7 @@ const save_1_article = (article, callback) => {
 					return next(null, result);
 				}
 
-				console.log(`save_1_article done link= ${update.link}`);
+				console.log(`save_1_article done link= ${update['$set'].link}`);
 
 				let objDecay = {
 					slug: result.slug,
