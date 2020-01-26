@@ -60,13 +60,15 @@ module.exports = {
 
 				// for (let k in update) {
 				// 	let items = update[k];
+				// 	console.log('k=', k, 'items=', items);
 
 				// 	if (Array.isArray(items)) {
 				// 		result[k] = result[k] || [];
 
 				// 		for (let i in items) {
-				// 			if (result[k].indexOf(items[i]) < 0) {
-				// 				result[k] = result[k].concat(items[i]);
+				// 			if (result[k].indexOf(items[i].toString()) < 0) {
+				// 				console.log('k=', k, 'items[i]=', items[i].toString());
+				// 				result[k] = result[k].concat(items[i].toString());
 				// 			}
 				// 		}
 
@@ -85,6 +87,59 @@ module.exports = {
 			let newObj = new List.model(update);
 
 			// console.log('upsertSafe newObj=', newObj);
+
+			return newObj.save((err) => {
+				if (err) return callback(err);
+				return callback(err, newObj);
+			});
+		});
+	},
+
+	upsertSafe_v2: (List, find, update, callback) => {
+		console.log(`[upsertSafe_v2] update= ${JSON.stringify(update)}`);
+		const Model = List.model;
+
+		if (!update || !update['$set']) return callback('EINVALIDUPDATE');
+
+		Model.findOne(find, (err, result) => {
+			if (err) {
+				console.log('upsertSafe_v2 err=', err);
+				return callback(err);
+			}
+
+			if (result) {
+				update['$inc'] = update['$inc'] || {};
+				update['$inc']['__v'] = 1;
+
+				let opts = {
+					new: true
+				}
+
+				return Model.findOneAndUpdate({
+					_id: result._id
+				}, update, opts, callback);
+			}
+
+			let _update = update['$set'];
+			if (update['$addToSet']) {
+				let set = update['$addToSet'];
+				/*
+				"category": {
+				    "$each": [
+				        "5db1e80887a90f0caed1c699"
+				    ]
+				}
+				*/
+				for (let field in set) {
+					if (typeof set[field] === 'object') {
+						if (set[field]['$each']) _update[field] = set[field]['$each'];
+					} else {
+						_update[field] = set[field];
+					}
+				}
+			}
+
+			let newObj = new Model(_update);
 
 			return newObj.save((err) => {
 				if (err) return callback(err);

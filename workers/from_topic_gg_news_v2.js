@@ -1,4 +1,5 @@
 // NODE_ENV=production node workers/from_topic_gg_news_v2
+// NODE_ENV=production node workers/from_topic_gg_news_v2 -s ho-chi-minh
 
 require('dotenv').config();
 
@@ -83,12 +84,20 @@ const noop = () => {};
 const LIMIT_ARTICLE = Number(process.env.LIMIT_ARTICLE) || 1;
 const LIMIT_LINK_STORY = Number(process.env.LIMIT_LINK_STORY) || 1;
 const LIMIT_TOPIC = Number(process.env.LIMIT_TOPIC) || 1;
-const MONTH_CUTOFF = Number(process.env.MONTH_CUTOFF) || 6;
+const MONTH_CUTOFF = Number(process.env.MONTH_CUTOFF) || 12;
 
 const TTL_ARTICLELINK = 60 * 60 * 24 * 7; // 7 days
 const TTL_LINK_SAVED = 60 * 60 * 24 * 7; // 7 days
 
 let START = moment();
+
+const program = require('commander');
+program.version('1.0.0');
+
+program
+	.option('-s, --slug [String]', `slug of category's BaoMoi, seperate by comma. ex: thoi-su,the-thao,abc-xyz`)
+
+program.parse(process.argv);
 
 process.on('uncaughtException', (error) => {
   console.log(`====> uncaughtException=`, error);
@@ -102,7 +111,30 @@ const pickNameStory = (obj) => {
 }
 
 const getAllTopic = (callback) => {
-	NewsTopic.model.find({ status: 1 }, '_id slug description link name category', (err, topics) => {
+	let query = {
+		status: 1
+		// status: 0
+	}
+
+	if (program.slug) {
+		let slugs = program.slug.split(',');
+
+		if (slugs.length == 1) {
+			query['slug'] = slugs[0];
+		} else {
+			query['slug'] = {
+				$in: slugs
+			}
+		}
+	}
+
+	if (NODE_ENV !== 'production') {
+		query.status = 0;
+	}
+
+	// console.log('query=', query);
+
+	NewsTopic.model.find(query, '_id slug description link name category', (err, topics) => {
 		return callback(err, topics);
 	});
 }
@@ -120,6 +152,8 @@ const save_1_article = (article, callback) => {
 			return callback();
 		}
 	}
+
+	console.log('-> save article=', JSON.stringify(article));
 
 	async.series({
 		checkOriginLinkAgain: (next) => {
@@ -147,14 +181,25 @@ const save_1_article = (article, callback) => {
 			}
 
 			let update = {
-				title: article.title,
-				sectionTitle: article.sectionTitle || '',
-				publishDate: moment(article.publishDate).toDate(),
-				link: article.originLink,
-				description: article.description,
-				category: article._topic.category,
-				storyLink: article.linkStory,
-				topic: [article._topic._id],
+				$set: {
+					title: article.title,
+					sectionTitle: article.sectionTitle || '',
+					publishDate: moment(article.publishDate).toDate(),
+					link: article.originLink,
+					description: article.description,
+					storyLink: article.linkStory,
+					// category: article._topic.category,
+					// topic: [article._topic._id],
+				},
+
+				$addToSet: {
+					// topic: {
+					// 	$each: [ article._topic._id ]
+					// },
+					category: {
+						$each: article._topic.category
+					},
+				}
 			}
 
 			if (!update.category || update.category.length == 0) {
@@ -162,17 +207,23 @@ const save_1_article = (article, callback) => {
 			}
 
 			if (article.linkArticle) {
-				update.metadata = Object.assign({}, update.metadata, { linkArticle: article.linkArticle });
+				// update.metadata = Object.assign({}, update.metadata, { linkArticle: article.linkArticle });
+				update['$set']['metadata.linkArticle'] =  article.linkArticle;
 			}
-			if (article.linkArticle) {
-				update.metadata = Object.assign({}, update.metadata, { linkStory: article.linkStory });
+			if (article.linkStory) {
+				// update.metadata = Object.assign({}, update.metadata, { linkStory: article.linkStory });
+				update['$set']['metadata.linkStory'] =  article.linkStory;
 			}
 
-			if (article._topic) update.topic = [ article._topic._id ];
+			if (article._topic) {
+				update['$addToSet']['topic'] = {
+					$each: [ article._topic._id ]
+				}
+			}
 
 			let keyLinkSaved = `ggn:saved:${article.originLink}`;
 
-		  utils.upsertSafe(Feed, find, update, (err, result) => {
+		  utils.upsertSafe_v2(Feed, find, update, (err, result) => {
 				if (err) {
 					console.log(`save_1_article err= ${err}`);
 					return next(null, result);
@@ -316,10 +367,12 @@ const proc_1_topic = (topic, callback) => {
 
 		if (NODE_ENV !== 'production') allLinkStory = _.slice(allLinkStory, 0, 1);
 
+		// console.log('allArticle=', JSON.stringify(allArticle));
+
 		async.parallel({
-			// proc_all_article: (next) => {
-			// 	async.eachLimit(allArticle, LIMIT_ARTICLE, save_1_article, next);
-			// },
+			proc_all_article: (next) => {
+				async.eachLimit(allArticle, LIMIT_ARTICLE, save_1_article, next);
+			},
 
 			proc_all_story_link: (next) => {
 				// console.log('allLinkStory=', JSON.stringify(allLinkStory));
@@ -450,6 +503,8 @@ const stopWorker = () => {
 	}, (err, result) => {
 		console.log('stop worker done');
 		console.timeEnd('run-worker');
+
+		if (NODE_ENV != 'production') return process.exit(0);
 
 		if (moment().diff(START, 'm') >= 30) {
 			return process.exit(0);
