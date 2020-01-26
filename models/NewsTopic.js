@@ -25,7 +25,8 @@ NewsTopic.add({
 		type: Types.Select,
 		options: 'TOPIC, LOCATION',
 		default: 'TOPIC',
-		index: true
+		index: true,
+		initial: true
 	},
 	status: { type: Types.Number, default: 1 },
 });
