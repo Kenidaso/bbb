@@ -30,7 +30,9 @@ const request = require('request').defaults({
   },
   gzip: true,
   rejectUnauthorized: false,
-  timeout: 30e3
+  timeout: 30e3,
+  maxRedirects: 20,
+  followRedirect: false
 });
 
 const fetchRss = require('./fetchRss');
@@ -82,12 +84,19 @@ let _useProxy = [
   'rfa.org'
 ]
 
+let _ignoreFollowRedirect = [
+  'plo.vn'
+]
+
 base.fetch = (link, callback) => {
   debug('base fetch link= %s', link);
 
   link = encodeURI(link);
   link = link.replace(/ufffd/g, '');
-  link = link.replace(/\/u.{4}/g, '');
+  // link = link.replace(/\/u.{4}/g, '');
+  // link = link.replace('/u00f0', '');
+
+  console.log('link=', link);
 
   let options = {
     url: link,
@@ -122,10 +131,13 @@ base.fetch = (link, callback) => {
     }
   }
 
-  // console.log('fetch options=', JSON.stringify(options));
+  console.log('fetch options=', JSON.stringify(options));
 
   request(options, (err, response, body) => {
     if (err) return callback('EFETCHLINK', err);
+
+    console.log('statusCode=', response.statusCode);
+
     if (!body) return callback('EFETCHNOBODY');
 
     if (body && body.toLowerCase().indexOf(`you don't have permission to access`) > -1) {
