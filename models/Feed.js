@@ -101,4 +101,10 @@ Feed.schema.pre('save', function (next) {
 	return next();
 });
 
+Feed.schema.index( {
+	topic: 1
+}, function (err, result) {
+   console.log(`Feed index topic done: ${result}`);
+});
+
 Feed.register();

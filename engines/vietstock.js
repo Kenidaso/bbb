@@ -1,4 +1,4 @@
-const NAME = 'baodautu';
+const NAME = 'vietstock';
 
 const request = require('request');
 const cheerio = require('cheerio');
@@ -54,8 +54,8 @@ const getNewsFromRss = (rssUrl, callback) => {
             }
           }
 
-          if (value && key == 'pubDate') {
-            value += '+7';
+          if (value && key === 'a10:link') {
+            value = value['$']['href'];
           }
 
           item[key] = value;

@@ -87,6 +87,7 @@ base.fetch = (link, callback) => {
 
   link = encodeURI(link);
   link = link.replace(/ufffd/g, '');
+  link = link.replace(/\/u.{4}/g, '');
 
   let options = {
     url: link,

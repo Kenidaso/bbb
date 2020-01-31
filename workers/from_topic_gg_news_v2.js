@@ -202,7 +202,7 @@ const save_1_article = (article, callback) => {
 				}
 			}
 
-			if (!update.category || update.category.length == 0) {
+			if (!article._topic.category || article._topic.category.length == 0) {
 				console.log('WARNING Category is null, article-', JSON.stringify(article));
 			}
 
