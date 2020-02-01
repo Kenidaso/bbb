@@ -32,7 +32,7 @@ const request = require('request').defaults({
   rejectUnauthorized: false,
   timeout: 30e3,
   maxRedirects: 20,
-  followRedirect: false
+  // followRedirect: false
 });
 
 const fetchRss = require('./fetchRss');
@@ -106,6 +106,14 @@ base.fetch = (link, callback) => {
   for (let i in _ignoreGzip) {
     if (link.indexOf(_ignoreGzip[i]) > -1) {
       options['gzip'] = false
+
+      break;
+    }
+  }
+
+  for (let i in _ignoreFollowRedirect) {
+    if (link.indexOf(_ignoreFollowRedirect[i]) > -1) {
+      options['followRedirect'] = false
 
       break;
     }
