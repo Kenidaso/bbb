@@ -56,6 +56,7 @@ const getNewsFromRss = (rssUrl, callback) => {
 
           if (value && key === 'a10:link') {
             value = value['$']['href'];
+            item['link'] = value;
           }
 
           item[key] = value;
