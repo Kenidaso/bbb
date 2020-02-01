@@ -37,7 +37,7 @@ engine.getNewsFromRss = (rssUrl, callback) => {
           if (_rss.channel && _rss.channel[0] && _rss.channel[0].vnn && _rss.channel[0].vnn[0] && _rss.channel[0].vnn[0].item) {
             result.rss['channel'] = [];
             result.rss.channel.push({
-              item: result.channel[0].vnn[0].item
+              item: _rss.channel[0].vnn[0].item
             })
           }
         }
