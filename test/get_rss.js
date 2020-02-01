@@ -7,6 +7,7 @@ linkRss = 'https://vietnamnet.vn/rss/giai-tri.rss';
 linkRss = 'https://tuoitre.vn/rss/tin-moi-nhat.rss';
 linkRss = 'http://cafef.vn/tai-chinh-quoc-te.rss';
 linkRss = 'https://vietstock.vn/144/chung-khoan.rss';
+linkRss = 'https://thanhnien.vn/rss/doi-song/quyen-duoc-biet.rss';
 
 // fetchRss({
 // 	link: linkRss
