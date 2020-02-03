@@ -1,5 +1,6 @@
 const parseXml = require('xml2js').parseString;
 const moment = require('moment');
+const async = require('async');
 
 const request = require('request').defaults({
 	headers: {
@@ -13,7 +14,9 @@ const request = require('request').defaults({
 		accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
 		'sec-fetch-site': 'cross-site',
 		'accept-language': 'en-US,en;q=0.9,vi;q=0.8,fr-FR;q=0.7,fr;q=0.6,la;q=0.5',
-	}
+	},
+
+	timeout: 30e3
 });
 
 const MODIFIED_SINCE_FORMAT = 'ddd, DD MMM YYYY HH:mm:ss'
@@ -33,9 +36,13 @@ const fetch = (opts = {}, callback = noop) => {
 		if (err) return callback(err);
 		if (!body) return callback(null, null);
 
-		parseXml(body, (errParse, result) => {
-			return callback(errParse, result);
-		});
+		let wrapped = async.timeout(parseXml, 10e3);
+
+		wrapped(body, callback);
+
+		// parseXml(body, (errParse, result) => {
+		// 	return callback(errParse, result);
+		// });
 	});
 }
 

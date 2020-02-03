@@ -84,14 +84,12 @@ const procEachRss = (rsses, callback) => {
 
 		if (!fs.existsSync(path.join(__dirname, enginePath))) {
 			engine = baseEngine;
-			// return cb('EENGINENOTEXISTS', objRss);
 		} else {
 			engine = require(enginePath);
 		}
 
 		if (!engine.getNewsFromRss) {
 			engine.getNewsFromRss = baseEngine.getNewsFromRss;
-			// return cb('EENGINEMODULENOTFOUND', objRss);
 		}
 
 		engine.getNewsFromRss(objRss.url, (err, newses = []) => {
@@ -106,7 +104,7 @@ const procEachRss = (rsses, callback) => {
 				news._objRss = objRss;
 				if (news.link) news.link = news.link.trim();
 
-				console.log('news link=', news.link);
+				console.log(`[ROUND ${ROUND}] news link= ${news.link}`);
 
 				procOneNews(engine, news, cbEach);
 			}, (err, result) => {
