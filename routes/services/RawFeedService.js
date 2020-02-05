@@ -243,7 +243,11 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 			if (linkBaoMoi) urlFeed = linkBaoMoi;
 
 			baseEngine.getRawContent(urlFeed, hostInfo, engine, (err, result) => {
-				if (err) return next('EGETRAWCONTENT', err);
+				if (err) {
+					// console.log('err=', err);
+					// console.log('result=', result);
+					return next(err, result);
+				}
 				if (!result) return next('EGETRAWCONTENT_NORESULT');
 
 				rawHtml = result.rawHtml;

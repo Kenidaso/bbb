@@ -16,18 +16,25 @@ const querystring = require('querystring');
 const debug = require('debug')('BaseEngine');
 const fatal = require('debug')('FATAL');
 
+const UA_DESKTOP = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36';
+
+const headers_default = {
+  'cache-control': 'max-age=0',
+  'upgrade-insecure-requests': 1,
+  dnt: 1,
+  'user-agent': UA_DESKTOP,
+  'sec-fetch-mode': 'navigate',
+  'sec-fetch-user': '?1',
+  accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+  'sec-fetch-site': 'cross-site',
+  'accept-language': 'en-US,en;q=0.9,vi;q=0.8,fr-FR;q=0.7,fr;q=0.6,la;q=0.5',
+}
+
 const request = require('request').defaults({
-  headers: {
-    'cache-control': 'max-age=0',
-    'upgrade-insecure-requests': 1,
-    dnt: 1,
-    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36',
-    'sec-fetch-mode': 'navigate',
-    'sec-fetch-user': '?1',
-    accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-    'sec-fetch-site': 'cross-site',
-    'accept-language': 'en-US,en;q=0.9,vi;q=0.8,fr-FR;q=0.7,fr;q=0.6,la;q=0.5',
-  },
+  // headers: {
+  //   'user-agent': UA_DESKTOP,
+  // },
+  headers: headers_default,
   gzip: true,
   rejectUnauthorized: false,
   timeout: 30e3,
@@ -76,7 +83,8 @@ let _ignoreGzip = [
   'vietbao.com',
   'nguoivietphone.com',
   'khoahocphattrien.vn',
-  'fili.vn'
+  'fili.vn',
+  'vietstock.vn'
 ]
 
 let _useProxy = [
@@ -86,6 +94,10 @@ let _useProxy = [
 
 let _ignoreFollowRedirect = [
   'plo.vn'
+]
+
+let _ignoreHeadersDefault = [
+  // 'vietstock.vn'
 ]
 
 base.fetch = (link, callback) => {
@@ -139,10 +151,25 @@ base.fetch = (link, callback) => {
     }
   }
 
-  console.log('fetch options=', JSON.stringify(options));
+  // let flagIgnoreHeaderDefault = false;
+
+  // for (let i in _ignoreHeadersDefault) {
+  //   let _host = _ignoreHeadersDefault[i]
+  //   if (link.indexOf(_host) > -1) {
+  //     flagIgnoreHeaderDefault = true;
+  //     break;
+  //   }
+  // }
+
+  // options['headers'] = flagIgnoreHeaderDefault ? {} : headers_default;
+
+  debug('fetch options= %s', JSON.stringify(options));
 
   request(options, (err, response, body) => {
-    if (err) return callback('EFETCHLINK', err);
+    if (err) {
+      debug('base fetch err= %o', err);
+      return callback('EFETCHLINK', err);
+    }
 
     console.log('statusCode=', response.statusCode);
 
@@ -204,7 +231,7 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
   }
 
   fetchEngine(link, (err, html) => {
-    if (err) return callback('EFETCHLINK', err);
+    if (err) return callback(err, html);
 
     let $ = cheerio.load(html);
 

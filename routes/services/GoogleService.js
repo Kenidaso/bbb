@@ -12,16 +12,16 @@ const RedisService = require('./RedisService');
 
 const utils = require('../../helpers/utils');
 
-const TTL_STANDING = 60 * 60 * 2; // 2 hours
-const TTL_STAT = 60 * 60 * 2; // 2 hours
-const TTL_NEWS = 60 * 60 * 1; // 2 hours
+const TTL_STANDING = 60 * 60 * 1; // 1 hour
+const TTL_STAT = 60 * 60 * 1; // 1 hour
+const TTL_NEWS = 60 * 60 * 1; // 1 hour
 const TTL_PLAYER = 60 * 60 * 24 * 7; // 1 week
-const TTL_MATCH = 60 * 60 * 24 * 1; // 1 day
-const TTL_LINEUPS = 60 * 60 * 2;
-const TTL_TIMELINE = 60 * 60 * 2;
-const TTL_STATSMATCH = 60 * 60 * 2;
-const TTL_NEWSMATCH = 60 * 60 * 2;
-const TTL_LAYOUTHEADERMATCH = 60 * 60 * 2;
+const TTL_MATCH = 60 * 60 * 1; // 1 hour
+const TTL_LINEUPS = 60 * 60 * 1;
+const TTL_TIMELINE = 60 * 60 * 1;
+const TTL_STATSMATCH = 60 * 60 * 1;
+const TTL_NEWSMATCH = 60 * 60 * 1;
+const TTL_LAYOUTHEADERMATCH = 60 * 60 * 1;
 
 const TTL_LONG = 60 * 60 * 24 * 14;
 

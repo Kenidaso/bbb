@@ -5,6 +5,9 @@ const messageCode = Statics.messageCode;
 
 module.exports = {
   error: (req, res, error, result) => {
+    // console.log(typeof error, 'error=', error);
+    // console.log(typeof result, 'result=', result);
+
     if (typeof error == 'string') { // EDEFAULT
       result = result || {};
 
@@ -12,10 +15,19 @@ module.exports = {
         result = { errorCode: result }
       }
 
-      let { errorCode, message, data, statusCode, codeDebug } = result;
-      codeDebug = error.startsWith('E') ? error :  codeDebug;
+      if (typeof result === 'object') {
+        let { errorCode, message, data, statusCode, codeDebug } = result;
+        codeDebug = error.startsWith('E') ? error :  codeDebug;
 
-      return Error(req, res, errorCode, codeDebug, data, message, statusCode);
+        message = message || result.toString() || JSON.stringify(result);
+        data = data || result;
+
+        return Error(req, res, errorCode, codeDebug, data, message, statusCode);
+      }
+
+      let codeDebug = error.startsWith('E') ? error :  undefined;
+
+      return Error(req, res, undefined, codeDebug, undefined, result, undefined);
     }
 
     if (typeof error == 'object') {
@@ -25,6 +37,7 @@ module.exports = {
 
     return Error(req, res);
   },
+
   success: Success
 }
 
