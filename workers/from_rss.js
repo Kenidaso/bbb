@@ -35,7 +35,7 @@ let STORE_LINK_UPSERT = {}
 
 const getAllRss = (callback) => {
 	roundGetRss++;
-	if (RSSes && roundGetRss % 10 != 0) return callback(null, RSSes);
+	if (RSSes && roundGetRss % 50 != 0) return callback(null, RSSes);
 
 	let query = {
 		"q": {
@@ -106,7 +106,7 @@ const procEachRss = (rsses, callback) => {
 				news._objRss = objRss;
 				if (news.link) news.link = news.link.trim();
 
-				console.log(`[ROUND ${ROUND}] news link= ${news.link}`);
+				// console.log(`[ROUND ${ROUND}] news link= ${news.link}`);
 
 				procOneNews(engine, news, cbEach);
 			}, (err, result) => {
@@ -119,7 +119,10 @@ const procEachRss = (rsses, callback) => {
 }
 
 const procOneNews = (engine, objRss, callback) => {
-	if (STORE_LINK_UPSERT[objRss.link]) return callback();
+	if (STORE_LINK_UPSERT[objRss.link]) {
+		console.log(`ignore ${objRss.link}`);
+		return callback();
+	}
 
 	async.series({
 		save_news: (next) => {
@@ -173,13 +176,18 @@ const procOneNews = (engine, objRss, callback) => {
 			// console.log('--> update=', JSON.stringify(update));
 			// return next(null, { find, update });
 
-			utils.reqUpsertFeed(find, update, callback)
+			console.log(`[ROUND ${ROUND}] news link= ${objRss.link}`);
+
+			utils.reqUpsertFeed(find, update, next)
 		}
 	}, (err, result) => {
-		console.log('procOneNews err=', err);
-		console.log('procOneNews result=', JSON.stringify(result));
+		// console.log('procOneNews err=', err);
+		// console.log('procOneNews result=', JSON.stringify(result));
 
-		STORE_LINK_UPSERT[objRss.link] = true;
+		if (!err) {
+			console.log(`store ${objRss.link}`);
+			STORE_LINK_UPSERT[objRss.link] = true;
+		}
 
 		return callback(err, result);
 	});
@@ -198,7 +206,10 @@ const runProcess = (callback) => {
 		console.log('run process done err=', err);
 		console.log('run process done result=', JSON.stringify(result));
 
-		if (ROUND % 20 === 0) STORE_LINK_UPSERT = {}; // clear store
+		if (ROUND % 200 === 0) {
+			console.log('clear STORE_LINK_UPSERT');
+			STORE_LINK_UPSERT = {}; // clear store
+		}
 
 		if (process.env.NODE_ENV != 'production') return process.exit(0);
 

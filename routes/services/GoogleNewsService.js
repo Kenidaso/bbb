@@ -83,6 +83,7 @@ const searchFromGgSearch = (keyword, options={}, callback) => {
 		result = utils.safeParse(result);
 
 		if (NODE_ENV === 'production' && result) {
+		// if (result) {
 			console.log('get from cache key=', key);
 			return callback(null, result);
 		}

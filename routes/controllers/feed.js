@@ -54,6 +54,7 @@ FeedCtrl.upsertFeed = (req, res) => {
 
 	FeedService.upsertFeed(find, update, (err, result) => {
 		if (err) return Response.error(req, res, err, result);
+		console.log(`upsert done: ${JSON.stringify(find)}`);
 		return Response.success(req, res, result);
 	});
 }
