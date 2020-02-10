@@ -113,7 +113,7 @@ const decodeLinkGgn = function (articleLink) {
 
 	for (let i in _ignoreDecode) {
 		if (finalLink.indexOf(_ignoreDecode[i]) > -1) {
-			console.log(`[decodeLinkGgn] ignore _ignoreDecode[i] ...`);
+			console.log(`[decodeLinkGgn] ignoreDecode ${_ignoreDecode[i]} ...`);
 			return null;
 		}
 	}
@@ -258,7 +258,7 @@ const search = (searchString, callback) => {
 
 		const $ = cheerio.load(body);
 
-		_parse_gg_news($, false, (err, content) => {
+		_parse_gg_news($, true, (err, content) => {
 			return callback(err, content);
 		});
 	})
@@ -659,10 +659,16 @@ const _parse_gg_search = (body) => {
 
 		let publishDate = null;
 
+		console.log(`index= ${index} : publishDateText= ${publishDateText}`);
+
 		if (publishDateText.indexOf('giờ trước') > -1) {
 			let _tmp = publishDateText.match(/\d{1,2} giờ trước/)[0];
 			let hour = Number(_tmp.match(/\d{1,2}/)[0]);
 			publishDate = moment().add(hour * -1, 'h').utcOffset(420).format();
+		} else if (publishDateText.indexOf('phút trước') > -1) {
+			let _tmp = publishDateText.match(/\d{1,2} phút trước/)[0];
+			let minute = Number(_tmp.match(/\d{1,2}/)[0]);
+			publishDate = moment().add(minute * -1, 'm').utcOffset(420).format();
 		} else {
 			let _tmp = publishDateText.match(/\d{1,2} thg \d{1,2}, \d{4}/)[0];
 			_tmp = publishDateText.replace('thg', '').replace(',', '');
@@ -689,13 +695,20 @@ const _parse_gg_search = (body) => {
 			let titleCard = $('.card-section > a', cardSection).text();
 			let descriptionCard = $('.card-section span', cardSection).text();
 			let spans = $('.card-section span', cardSection);
-			let publishDateCardText = $(spans[2]).text();
+			// let publishDateCardText = $(spans[2]).text();
+			let publishDateCardText = $(spans).text();
 			let publishDateCard = null;
+
+			console.log('publishDateCardText=', publishDateCardText)
 
 			if (publishDateCardText.indexOf('giờ trước') > -1) {
 				let _tmp = publishDateCardText.match(/\d{1,2} giờ trước/)[0];
 				let hour = Number(_tmp.match(/\d{1,2}/)[0]);
 				publishDate = moment().add(hour * -1, 'h').utcOffset(420).format();
+			} else if (publishDateCardText.indexOf('phút trước') > -1) {
+				let _tmp = publishDateCardText.match(/\d{1,2} phút trước/)[0];
+				let minute = Number(_tmp.match(/\d{1,2}/)[0]);
+				publishDate = moment().add(minute * -1, 'm').utcOffset(420).format();
 			} else {
 				let _tmp = publishDateCardText.match(/\d{1,2} thg \d{1,2}, \d{4}/)[0];
 				_tmp = publishDateCardText.replace('thg', '').replace(',', '');
@@ -703,6 +716,8 @@ const _parse_gg_search = (body) => {
 				publishDateCard = moment(_tmp, 'DD MM YYYY')
 				publishDateCard = publishDateCard.isValid() ? publishDateCard.utcOffset(420).format() : null;
 			}
+
+			console.log(`-> ${publishDateCardText} : ${publishDateCard}`);
 
 			articles.push({
 				// isExtra: true,

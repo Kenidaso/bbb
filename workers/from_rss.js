@@ -31,6 +31,8 @@ program.parse(process.argv);
 
 let ROUND = 0;
 
+let STORE_LINK_UPSERT = {}
+
 const getAllRss = (callback) => {
 	roundGetRss++;
 	if (RSSes && roundGetRss % 10 != 0) return callback(null, RSSes);
@@ -117,6 +119,8 @@ const procEachRss = (rsses, callback) => {
 }
 
 const procOneNews = (engine, objRss, callback) => {
+	if (STORE_LINK_UPSERT[objRss.link]) return callback();
+
 	async.series({
 		save_news: (next) => {
 			let objNewFeed = {
@@ -175,6 +179,8 @@ const procOneNews = (engine, objRss, callback) => {
 		console.log('procOneNews err=', err);
 		console.log('procOneNews result=', JSON.stringify(result));
 
+		STORE_LINK_UPSERT[objRss.link] = true;
+
 		return callback(err, result);
 	});
 }
@@ -191,6 +197,8 @@ const runProcess = (callback) => {
 		console.timeEnd(`process ROUND ${ROUND}`);
 		console.log('run process done err=', err);
 		console.log('run process done result=', JSON.stringify(result));
+
+		if (ROUND % 20 === 0) STORE_LINK_UPSERT = {}; // clear store
 
 		if (process.env.NODE_ENV != 'production') return process.exit(0);
 

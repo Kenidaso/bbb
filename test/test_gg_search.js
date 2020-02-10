@@ -3,10 +3,10 @@ const ggn = require('../engines/googleNews');
 const querystring = require('querystring');
 const url = require('url');
 
-ggn.getFeedFromGgSearch('ethereum', {
+ggn.getFeedFromGgSearch('corona', {
 	getFeedFromStory: true,
 	isGetOriginLink: true,
-	maxPage: 5,
+	maxPage: 1,
 }, (err, result) => {
 	console.log('done err=', err);
 	console.log('done result=', JSON.stringify(result));

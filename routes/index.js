@@ -79,6 +79,7 @@ exports = module.exports = function (app) {
 	app.post('/feed/raw', routes.controllers.feed.getRawContent);
 	app.get('/feed/:category/:page?', routes.controllers.feed.getFeeds);
 	app.post('/ggn/search', middleware.trackSearch, routes.controllers.search.ggnSearch);
+	app.post('/ggn/search-ggs', middleware.trackSearch, routes.controllers.search.searchFromGgSearch);
 	app.post('/device/register', routes.controllers.device.register);
 
 	app.post('/feed/upsert', routes.controllers.feed.upsertFeed);

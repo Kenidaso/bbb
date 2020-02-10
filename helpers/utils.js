@@ -365,5 +365,30 @@ module.exports = {
 	clone: (obj) => {
 		if (typeof obj != 'object') return null;
 		return JSON.parse(JSON.stringify(obj));
+	},
+
+	scaleImageGg: (srcImg, ratio = 1) => {
+		if (!srcImg) return srcImg;
+
+		let heightStr = srcImg.match(/h\d{2,4}/);
+		heightStr = heightStr && heightStr[0] ? heightStr[0] : null;
+
+		let widthStr = srcImg.match(/w\d{2,4}/);
+		widthStr = widthStr && widthStr[0] ? widthStr[0] : null;
+
+		if (!heightStr || !widthStr) return srcImg;
+
+		let height = Number(heightStr.replace('h', ''));
+		let width = Number(widthStr.replace('w', ''));
+
+		if (!height || !width) return srcImg;
+
+		height *= ratio;
+		width *= ratio;
+
+		srcImg = srcImg.replace(`${heightStr}`, `h${height}`);
+		srcImg = srcImg.replace(`${widthStr}`, `w${width}`);
+
+		return srcImg;
 	}
 };

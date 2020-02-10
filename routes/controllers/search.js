@@ -18,3 +18,16 @@ SearchCtrl.ggnSearch = (req, res) => {
 		return Response.success(req, res, results);
 	});
 }
+
+SearchCtrl.searchFromGgSearch = (req, res) => {
+	let { search, options } = req.body;
+
+	GoogleNewsService.searchFromGgSearch(search, options, (err, results) => {
+		if (err) return Response.error(req, res, err, results);
+		return Response.success(req, res, results);
+	});
+}
+
+SearchCtrl.queueSearch = () => {
+
+}
