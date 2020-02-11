@@ -120,7 +120,7 @@ const procEachRss = (rsses, callback) => {
 
 const procOneNews = (engine, objRss, callback) => {
 	if (STORE_LINK_UPSERT[objRss.link]) {
-		console.log(`ignore ${objRss.link}`);
+		console.log(`[ROUND ${ROUND}] IGNORE ${objRss.link}`);
 		return callback();
 	}
 
@@ -189,7 +189,7 @@ const procOneNews = (engine, objRss, callback) => {
 		// console.log('procOneNews result=', JSON.stringify(result));
 
 		if (!err) {
-			console.log(`store ${objRss.link}`);
+			console.log(`[ROUND ${ROUND}] STORE ${objRss.link}`);
 			STORE_LINK_UPSERT[objRss.link] = true;
 		}
 
