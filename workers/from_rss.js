@@ -130,7 +130,7 @@ const procOneNews = (engine, objRss, callback) => {
 				link: objRss.link,
 				title: objRss.title,
 				description: objRss.description,
-				publishDate: objRss.pubDate,
+				publishDate: objRss.pubDate || objRss.publishDate,
 				host: objRss._objRss.host._id,
 			}
 
@@ -158,6 +158,10 @@ const procOneNews = (engine, objRss, callback) => {
 				objNewFeed['rawHtml'] = objRss.rawHtml.replace(/\r\n/g, '');
 				objNewFeed['rawHtml'] = objRss.rawHtml.replace(/\r/g, '');
 				objNewFeed['rawHtml'] = objRss.rawHtml.replace(/\n/g, '');
+			}
+
+			if (objRss.articleLink) {
+				objNewFeed['metadata.articleLink'] = objRss.articleLink;
 			}
 
 			let find = {

@@ -148,7 +148,7 @@ clipper.removeNavigationalElements = (rawHtml, host) => {
 
     let isRelTag = relTag === 'tag';
     let isPartOfList = $(this).parents('ul').length > 0;
-    let containsUrlWithTag = href.indexOf(host) > -1 && href.indexOf('tag') > -1;
+    let containsUrlWithTag = host && href.indexOf(host) > -1 && href.indexOf('tag') > -1;
 
     if (isRelTag || containsUrlWithTag) {
       if (isPartOfList) {
