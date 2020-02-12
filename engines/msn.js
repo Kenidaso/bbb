@@ -217,7 +217,7 @@ engine.getNewsFromRss = (rssUrl, callback) => {
           item['description'] = description;
 
           item['articleLink'] = item.link;
-          item['link'] = originLink;
+          if (originLink) item['link'] = originLink;
 
           return cbMap(null, item);
         })

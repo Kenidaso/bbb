@@ -74,6 +74,8 @@ exports = module.exports = function (app) {
 	app.get('/blog/post/:post', routes.views.post);
 	app.get('/gallery', routes.views.gallery);
 
+	app.get('/image-of-day', routes.controllers.image.imageOfDay);
+
 	app.get('/categories', routes.controllers.feed.getCategories);
 	app.get('/content/:slug', routes.controllers.feed.getContent);
 	app.post('/feed/raw', routes.controllers.feed.getRawContent);
