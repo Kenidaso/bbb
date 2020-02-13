@@ -47,7 +47,16 @@ let START = moment();
 
 process.on('uncaughtException', (error) => {
   console.log(`====> uncaughtException=`, error);
-  setTimeout(process.exit, 1e3, 0);
+
+  utils.sendMessageTelegram(`[rawhHtml] uncaughtException: ${error.toString()}`);
+
+  // send req restart dyno
+  let appName = process.env.APP_NAME;
+  let dynoName = 'rawhtml_all';
+
+  utils.restartDyno(appName, dynoName);
+
+  // setTimeout(process.exit, 1e3, 0);
 });
 
 const buildRegexHost = (callback) => {

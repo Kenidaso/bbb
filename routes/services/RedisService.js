@@ -1,5 +1,7 @@
 const redis = require('redis');
 
+const utils = require('../../helpers/utils');
+
 const REDIS_URI = process.env.REDIS_URI;
 
 let _client = null;
@@ -10,6 +12,34 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const prefix = `${NODE_ENV}`;
 
 const noop = () => { };
+
+let TASK_STATUS = {
+	NEW: 'NEW',
+	PENDDING: 'PENDDING',
+	PROCESSING: 'PROCESSING',
+	FAILED: 'FAILED',
+	SUCCESS: 'SUCCESS'
+}
+
+let TASK_KEY_TTL = 1000 * 60 * 60 * 24 * 2; // TTL of key is 2 days
+
+let _changeStatusKey = (key, result = {}, status, callback = noop) => {
+	_client.get(key, (err, value) => {
+		if (err) return callback(err);
+
+		value = utils.safeParse(value);
+
+		if (value) {
+			let data = Object.assign({}, value, { status });
+			data.result = result;
+
+			_client.set(key, JSON.stringify(data));
+			_client.expire(key, TASK_KEY_TTL);
+		}
+
+		return callback && callback(null, value);
+	})
+}
 
 module.exports = {
 	init: (callback = noop) => {
@@ -67,5 +97,53 @@ module.exports = {
 		if (!_client) return cb();
 		_client.quit();
 		setTimeout(cb, 500);
+	},
+
+	TASK_STATUS: TASK_STATUS,
+
+	/*
+		{
+			request: {
+				taskName: 'xxx',
+				...data request
+			},
+			result: {
+
+			},
+			status: 'NEW'
+		}
+	*/
+	createTaskKey: (key, task = {}, callback = noop) => {
+		let data = {
+			request: task,
+			result: null,
+			status: TASK_STATUS.NEW
+		}
+
+		_client.set(key, JSON.stringify(data));
+		_client.expire(key, TASK_KEY_TTL);
+
+		return callback && callback(null);
+	},
+
+	processTaskKey: (key, result = {}, callback = noop) => {
+		_changeStatusKey(key, result, TASK_STATUS.PROCESSING, callback);
+	},
+
+	successTaskKey: (key, result = {}, callback = noop) => {
+		_changeStatusKey(key, result, TASK_STATUS.SUCCESS, callback);
+	},
+
+	failTaskKey: (key, result = {}, callback = noop) => {
+		_changeStatusKey(key, result, TASK_STATUS.FAILED, callback);
+	},
+
+	getTaskKey: (key, callback) => {
+		_client.get(key, (err, value) => {
+			if (err) return callback(err);
+
+			value = utils.safeParse(value);
+			return callback(null, value);
+		})
 	}
 }

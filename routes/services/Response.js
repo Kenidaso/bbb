@@ -5,8 +5,8 @@ const messageCode = Statics.messageCode;
 
 module.exports = {
   error: (req, res, error, result) => {
-    // console.log(typeof error, 'error=', error);
-    // console.log(typeof result, 'result=', result);
+    // console.log('Response.error', typeof error, 'error=', error);
+    // console.log('Response.error', typeof result, 'result=', result);
 
     if (typeof error == 'string') { // EDEFAULT
       result = result || {};
@@ -19,7 +19,6 @@ module.exports = {
         let { errorCode, message, data, statusCode, codeDebug } = result;
         codeDebug = error.startsWith('E') ? error :  codeDebug;
 
-        message = message || result.toString() || JSON.stringify(result);
         data = data || result;
 
         return Error(req, res, errorCode, codeDebug, data, message, statusCode);
@@ -51,14 +50,14 @@ function Success (req, res, data = {}, message = 'success', statusCode = HTTP_ST
   return res.status(statusCode).json(response);
 }
 
-function Error (req, res, erroCode = -1, errorCodeDebug = 'EDEFAULT', data = {}, message = '', statusCode = HTTP_STATUS_CODE.BAD_REQUEST) {
-  if (message === '') message = messageCode[erroCode];
+function Error (req, res, errorCode = -1, errorCodeDebug = 'EDEFAULT', data = {}, message = '', statusCode = HTTP_STATUS_CODE.BAD_REQUEST) {
+  if (message === '') message = messageCode[errorCode];
 
   const response = {
-    error   : erroCode,
+    error   : errorCode,
     codeDebug: errorCodeDebug,
     data    : data,
-    message : message ? localizeResultMessage(req, res, message) : messageCode[erroCode]
+    message : message ? localizeResultMessage(req, res, message) : messageCode[errorCode]
   };
 
   return res.status(statusCode).json(response);

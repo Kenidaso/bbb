@@ -25,6 +25,9 @@ const importRoutes = keystone.importer(__dirname);
 
 const cors = require('cors');
 
+const multer  = require('multer');
+const upload = multer({ dest: 'uploads/' });
+
 const Response = require('./services/Response');
 
 // Common Middleware
@@ -104,6 +107,14 @@ exports = module.exports = function (app) {
 	app.post('/gg/stats-of-match', routes.controllers.gg.statsOfMatch);
 	app.post('/gg/news-of-match', routes.controllers.gg.newsOfMatch);
 	app.post('/gg/layout-header-of-match', routes.controllers.gg.layoutHeaderOfMatch);
+
+	app.post('/q/search', routes.controllers.search.queueSearch); // push search into queue
+	app.get('/task/status/:taskId', routes.controllers.task.status);
+
+	app.post('/tele/webhook/cky-tele-bot', routes.controllers.telegram.processUpdate);
+	app.post('/tele/send-to-group', upload.single('image'), routes.controllers.telegram.sendMessage2Group);
+
+	app.post('/heroku/restart', routes.controllers.heroku.restart);
 
 	app.post(acrud.ROUTE, acrud.controller);
 
