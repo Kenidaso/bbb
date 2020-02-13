@@ -20,7 +20,7 @@ let group_monitor_worker = '-373758728';
 let user_chickyky = '749655058';
 
 let bot = new Bot(TOKEN);
-let urlWebhook = `${APP_URL}/tele/webhook/cky-tele-bot`;
+let urlWebhook = process.env.URL_TELEGRAM_WEBHOOK;
 
 if (NODE_ENV === 'production') {
 	// nothing
