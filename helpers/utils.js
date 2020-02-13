@@ -5,10 +5,13 @@ const url = require('url');
 const fs = require('fs');
 const path = require('path');
 const { ImgPublic } = require('cky-image-public');
+const shortID = require('short-id-gen');
 
 const imgPub = new ImgPublic({
 	imgur: true
 });
+
+const noop = () => {}
 
 module.exports = {
 	errorObj: (errorCode, codeDebug = 'EUNKNOWN', data = {}, message = '', statusCode = 400) => {
@@ -390,5 +393,38 @@ module.exports = {
 		srcImg = srcImg.replace(`${widthStr}`, `w${width}`);
 
 		return srcImg;
+	},
+
+	buildTaskKey: (taskName='', id) => {
+		id = id || shortID.generate(16);
+		let _key = `${taskName && taskName.length > 0 ? taskName.toUpperCase() + '_' : ''}${id}`;
+		return _key;
+	},
+
+	sendMessageTelegram: (message, callback = noop) => {
+		request({
+			url: `${process.env.API_URL}/tele/send-to-group`,
+			method: 'POST',
+			json: true,
+			body: {
+				message
+			}
+		}, (err, response, body) => {
+			return callback && callback(err);
+		})
+	},
+
+	restartDyno: (app, dyno, callback = noop) => {
+		request({
+			url: `${process.env.API_URL}/heroku/restart`,
+			method: 'POST',
+			json: true,
+			body: {
+				app,
+				dyno
+			}
+		}, (err, response, body) => {
+			return callback && callback(err);
+		})
 	}
 };

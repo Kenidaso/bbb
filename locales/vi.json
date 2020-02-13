@@ -15,5 +15,7 @@
 	"connection 8 to 206.189.144.26:19128 timed out": "connection 8 to 206.189.144.26:19128 timed out",
 	"Feed validation failed": "Feed validation failed",
 	"EFETCHLINK": "EFETCHLINK",
-	"incorrect header check": "incorrect header check"
+	"incorrect header check": "incorrect header check",
+	"[object Object]": "[object Object]",
+	"Expected response to be successful, got 404": "Expected response to be successful, got 404"
 }
