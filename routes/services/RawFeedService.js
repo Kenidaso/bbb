@@ -28,11 +28,34 @@ RawFeed = {};
 module.exports = RawFeed;
 
 let _getFromDb = (link, callback) => {
-	Feed.model.findOne({
-		link
-	}, (err, doc) => {
-		return callback(err, doc);
-	});
+	let keyFullFeed = `fullFeed:${link}`;
+
+	// RedisService.get(keyFullFeed, (err, value) => {
+	// 	if (!err && value) {
+	// 		value = utils.safeParse(value);
+
+	// 		if (value) {
+	// 			debug('get full feed from cache key= %s', keyFullFeed);
+	// 			return callback(null, value);
+	// 		}
+	// 	}
+	// })
+
+	Feed.model
+		.findOne({
+			link
+		})
+		.select('-_id slug title link publishDate description heroImage rawHtml category topic host ')
+		.populate('category', '-_id slug title display')
+		.populate('topic', '-_id name description')
+		.populate('host', '-_id name website')
+		.exec((err, doc) => {
+			// if (!err && doc) {
+			// 	RedisService.set(keyFullFeed, doc, TTL_RAW_HTML);
+			// }
+
+			return callback(err, doc);
+		})
 }
 
 RawFeed.getHtmlContent = (link, options = {}, callback) => {
@@ -391,15 +414,17 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 			}
 		}
 
-		let _res = {
-			rawHtml
-		}
+		_getFromDb(link, (err, feed) => {
+			let _res = {
+				rawHtml
+			}
 
-		if (finalFeed) {
-			let { description, heroImage, title, publishDate, slug, link, topic, category } = finalFeed;
-			_res = Object.assign({}, _res, { description, heroImage, title, publishDate, slug, link, topic, category });
-		}
+			if (feed) {
+				let { description, heroImage, title, publishDate, slug, link, topic, category } = feed;
+				_res = Object.assign({}, _res, { description, heroImage, title, publishDate, slug, link, topic, category });
+			}
 
-		return callback(null, _res);
+			return callback(null, _res);
+		})
 	});
 }
