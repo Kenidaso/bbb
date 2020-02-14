@@ -27,6 +27,14 @@ const noop = () => {};
 RawFeed = {};
 module.exports = RawFeed;
 
+let _getFromDb = (link, callback) => {
+	Feed.model.findOne({
+		link
+	}, (err, doc) => {
+		return callback(err, doc);
+	});
+}
+
 RawFeed.getHtmlContent = (link, options = {}, callback) => {
 	let host = utils.getMainDomain(link);
 
@@ -368,7 +376,16 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 			switch (err) {
 				case 'GET_FROM_CACHE':
 				case 'GET_FROM_DB':
-					return callback(null, rawHtml);
+					_getFromDb(link, (err, feed) => {
+						if (feed) {
+							let { description, heroImage, title, publishDate, slug, link, topic, category } = feed;
+							let _res = Object.assign({}, { rawHtml }, { description, heroImage, title, publishDate, slug, link, topic, category });
+							return callback(null, _res);
+						}
+
+						return callback(null, { rawHtml });
+					})
+
 				default:
 					return callback(err, result);
 			}
