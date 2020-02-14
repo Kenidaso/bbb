@@ -5,6 +5,7 @@ const utils = require('../helpers/utils');
 process.env.PORT = utils.randInt(3000, 4000);
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const APP_NAME = process.env.APP_NAME || 'local';
+let DYNO_NAME = 'rawhtml_all';
 
 const keystone = require('keystone');
 const shortId = require('short-id-gen');
@@ -44,10 +45,6 @@ const LIMIT_FEED_IN_CATEGORY = Number(process.env.LIMIT_FEED_IN_CATEGORY) || 50;
 let regexHost = null;
 let listCategory = null;
 let START = moment();
-
-// send req restart dyno
-let APP_NAME = process.env.APP_NAME;
-let DYNO_NAME = 'rawhtml_all';
 
 process.on('uncaughtException', (error) => {
   console.log(`====> uncaughtException=`, error);
