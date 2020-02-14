@@ -374,6 +374,15 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 			}
 		}
 
-		return callback(null, finalFeed);
+		let _res = {
+			rawHtml
+		}
+
+		if (finalFeed) {
+			let { description, heroImage, title, publishDate, slug, link, topic, category } = finalFeed;
+			_res = Object.assign({}, _res, { description, heroImage, title, publishDate, slug, link, topic, category });
+		}
+
+		return callback(null, _res);
 	});
 }
