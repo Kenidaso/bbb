@@ -45,16 +45,16 @@ let regexHost = null;
 let listCategory = null;
 let START = moment();
 
+// send req restart dyno
+let APP_NAME = process.env.APP_NAME;
+let DYNO_NAME = 'rawhtml_all';
+
 process.on('uncaughtException', (error) => {
   console.log(`====> uncaughtException=`, error);
 
   utils.sendMessageTelegram(`[rawhHtml] uncaughtException: ${error.toString()}`);
 
-  // send req restart dyno
-  let appName = process.env.APP_NAME;
-  let dynoName = 'rawhtml_all';
-
-  utils.restartDyno(appName, dynoName);
+  utils.restartDyno(APP_NAME, DYNO_NAME);
 
   // setTimeout(process.exit, 1e3, 0);
 });
@@ -211,4 +211,4 @@ const stopWorker = () => {
 startWorker();
 
 // cheat
-// setTimeout(process.exit, 1e3 * 60 * 30, 0);
+setTimeout(utils.restartDyno, 1e3 * 60 * 30, APP_NAME, DYNO_NAME);
