@@ -116,6 +116,8 @@ exports = module.exports = function (app) {
 
 	app.post('/heroku/restart', routes.controllers.heroku.restart);
 
+	app.post('/fb/sharing-debugger', routes.controllers.fb.scrapedSharingDebugger);
+
 	app.post(acrud.ROUTE, acrud.controller);
 
 	// NOTE: To protect a route so that only admins can see it, use the requireUser middleware:

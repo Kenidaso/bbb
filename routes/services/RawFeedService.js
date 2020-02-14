@@ -48,6 +48,7 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 	let description = null;
 	let articleParse = null;
 	let linkBaoMoi = null;
+	let finalFeed = null;
 
 	async.waterfall([
 		// get rawHtml from cache
@@ -330,6 +331,8 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 							update.description = description;
 						}
 
+						if (NODE_ENV !== 'production') debug('[getHtmlContent] update= %o', update);
+
 						Feed.model.findOneAndUpdate({
 							_id: feed._id
 						}, {
@@ -343,6 +346,8 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 								let keyContentFeed = `rawHtml:${feed.link}`;
 								console.log('trigger delete key redis:', keyContentFeed);
 								RedisService.del(keyContentFeed);
+
+								finalFeed = newFeed;
 							}
 
 							return cb();
@@ -369,6 +374,6 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 			}
 		}
 
-		return callback(null, rawHtml);
+		return callback(null, finalFeed);
 	});
 }
