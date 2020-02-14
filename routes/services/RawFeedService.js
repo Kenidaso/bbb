@@ -12,6 +12,7 @@ const cheerio = require('cheerio');
 const baseEngine = require('../../engines/base');
 
 const RedisService = require('./RedisService');
+// const FbService = require('./FacebookService');
 
 const Host = keystone.list('Host');
 const Feed = keystone.list('Feed');
@@ -403,6 +404,9 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 						if (feed) {
 							let { description, heroImage, title, publishDate, slug, link, topic, category } = feed;
 							let _res = Object.assign({}, { rawHtml }, { description, heroImage, title, publishDate, slug, link, topic, category });
+
+
+
 							return callback(null, _res);
 						}
 

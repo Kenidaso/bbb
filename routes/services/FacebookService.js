@@ -10,7 +10,9 @@ const URL_API = 'https://graph.facebook.com';
 const FbService = {};
 module.exports = FbService;
 
-FbService.scrapedSharingDebugger = (url, callback) => {
+const noop = () => {}
+
+FbService.scrapedSharingDebugger = (url, callback = noop) => {
 	if (!url) return callback('EURLSHARINGINVALID');
 
 	request({
@@ -23,6 +25,7 @@ FbService.scrapedSharingDebugger = (url, callback) => {
 			access_token: ACCESS_TOKEN
 		}
 	}, (err, response, body) => {
-		return callback(err, body);
+		console.log(`scrapedSharingDebugger body= ${JSON.stringify(body)}`);
+		return callback && callback(err, body);
 	})
 }

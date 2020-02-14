@@ -1,6 +1,7 @@
 const Response = require('../services/Response');
 const FeedService = require('../services/FeedService');
 const RawFeedService = require('../services/RawFeedService');
+const FacebookService = require('../services/FacebookService');
 
 let FeedCtrl = {};
 module.exports = FeedCtrl;
@@ -38,10 +39,20 @@ FeedCtrl.getCategories = (req, res) => {
 }
 
 FeedCtrl.getContent = (req, res) => {
-	let { slug, options } = req.params;
+	let { slug } = req.params;
+	let options = req.query || {};
 
 	FeedService.getContent(slug, options, (err, result) => {
 		if (err) return Response.error(req, res, err, result);
+
+		if (options.shareFb) {
+			if (options.slugBoard) {
+				let link = `https://feed24h.net/${options.slugBoard}/${slug}`;
+				console.log('sharing debugger link=', link);
+				FacebookService.scrapedSharingDebugger(link);
+			}
+		}
+
 		return Response.success(req, res, result);
 	});
 }
