@@ -376,7 +376,7 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 			switch (err) {
 				case 'GET_FROM_CACHE':
 				case 'GET_FROM_DB':
-					_getFromDb(link, (err, feed) => {
+					return _getFromDb(link, (err, feed) => {
 						if (feed) {
 							let { description, heroImage, title, publishDate, slug, link, topic, category } = feed;
 							let _res = Object.assign({}, { rawHtml }, { description, heroImage, title, publishDate, slug, link, topic, category });
