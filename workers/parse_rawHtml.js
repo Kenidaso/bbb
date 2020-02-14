@@ -208,4 +208,6 @@ const stopWorker = () => {
 startWorker();
 
 // cheat
-setTimeout(utils.restartDyno, 1e3 * 60 * 30, APP_NAME, DYNO_NAME);
+if (NODE_ENV === 'production') {
+	setTimeout(utils.restartDyno, 1e3 * 60 * 30, APP_NAME, DYNO_NAME);
+}

@@ -1,6 +1,8 @@
 const NAME = 'nguoilaodong';
 const sanitizeHtml = require('sanitize-html');
 const debug = require('debug')(`Engine:${NAME}`);
+const request = require('request');
+const cheerio = require('cheerio');
 
 const fs = require('fs');
 const path = require('path');
@@ -10,6 +12,32 @@ module.exports = engine;
 
 engine.optSanitizeHtml = {
 	// Dành cho dọn rác html đặc biệt, nếu không sử dụng default của baseEngine
+}
+
+engine.fetch = (link, callback) => {
+  request({
+    url: link,
+    method: 'GET',
+  }, (err, response, body) => {
+  	if (err) return callback(err);
+  	if (!body) return callback('ENOBODY');
+
+  	let $ = cheerio.load(body);
+  	let onload = $('body').attr('onload');
+
+  	if (onload && onload.length > 0) {
+  		const i1 = onload.indexOf("'");
+  		const i2 = onload.indexOf('htm');
+  		let href = onload.substr(i1 + 1, i2 - i1 + 2);
+  		href = 'https://nld.com.vn/' + href;
+
+  		debug('href= %s', href);
+
+  		return engine.fetch(href, callback);
+  	}
+
+    return callback(err, body);
+  })
 }
 
 engine.cleanSpecial = ($, content) => {
