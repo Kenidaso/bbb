@@ -731,18 +731,38 @@ const _parse_gg_search = (body) => {
 				let _tmp = publishDateCardText.match(/\d{1,2} giờ trước/)[0];
 				let hour = Number(_tmp.match(/\d{1,2}/)[0]);
 				publishDate = moment().add(hour * -1, 'h').utcOffset(420).format();
-			} else if (publishDateCardText.indexOf('phút trước') > -1) {
+			}
+			else if (publishDateCardText.indexOf('hour') > -1) {
+				let _tmp = publishDateCardText.match(/\d{1,2} hour/)[0];
+				let hour = Number(_tmp.match(/\d{1,2}/)[0]);
+				publishDate = moment().add(hour * -1, 'h').utcOffset(420).format();
+			}
+			else if (publishDateCardText.indexOf('minute') > -1) {
+				let _tmp = publishDateCardText.match(/\d{1,2} minute/)[0];
+				let minute = Number(_tmp.match(/\d{1,2}/)[0]);
+				publishDate = moment().add(minute * -1, 'm').utcOffset(420).format();
+			}
+			else if (publishDateCardText.indexOf('phút trước') > -1) {
 				let _tmp = publishDateCardText.match(/\d{1,2} phút trước/)[0];
 				let minute = Number(_tmp.match(/\d{1,2}/)[0]);
 				publishDate = moment().add(minute * -1, 'm').utcOffset(420).format();
-			} else {
-				// let _tmp = publishDateCardText.match(/\d{1,2} thg \d{1,2}, \d{4}/)[0];
-				let _match = publishDateText.match(/\d{1,2} thg \d{1,2}, \d{2,4}/);
+			}
+			else if (publishDateCardText.indexOf('thg') > -1) {
+				let _match = publishDateCardText.match(/\d{1,2} thg \d{1,2}, \d{2,4}/);
 				let _tmp = _match ? _match[0] : '';
 				_tmp = publishDateCardText.replace('thg', '').replace(',', '');
 
-				publishDateCard = moment(_tmp, 'DD MM YYYY')
-				publishDateCard = publishDateCard.isValid() ? publishDateCard.utcOffset(420).format() : null;
+				publishDate = moment(_tmp, 'DD MM YYYY')
+				publishDate = publishDate.isValid() ? publishDate.utcOffset(420).format() : null;
+			}
+			else {
+				// 18 Feb 2020
+				let _match = publishDateCardText.match(/\d{1,2} \w{3,6}, \d{2,4}/);
+				let _tmp = _match ? _match[0] : '';
+				_tmp = publishDateCardText.replace('thg', '').replace(',', '');
+
+				publishDate = moment(_tmp, 'DD MMM YYYY')
+				publishDate = publishDate.isValid() ? publishDate.utcOffset(420).format() : null;
 			}
 
 			console.log(`-> ${publishDateCardText} : ${publishDateCard}`);
