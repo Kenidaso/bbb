@@ -691,11 +691,12 @@ const _parse_gg_search = (body) => {
 			publishDate = publishDate.isValid() ? publishDate.utcOffset(420).format() : null;
 		}
 		else {
+			// 18 Feb 2020
 			let _match = publishDateText.match(/\d{1,2} \w{3,6}, \d{2,4}/);
 			let _tmp = _match ? _match[0] : '';
 			_tmp = publishDateText.replace('thg', '').replace(',', '');
 
-			publishDate = moment(_tmp, 'DD MM YYYY')
+			publishDate = moment(_tmp, 'DD MMM YYYY')
 			publishDate = publishDate.isValid() ? publishDate.utcOffset(420).format() : null;
 		}
 
