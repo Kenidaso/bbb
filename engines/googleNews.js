@@ -293,6 +293,7 @@ const defaultGgSearch = {
 	start: 0
 }
 
+// search từ rss cung cấp bởi google news
 const getEntriesFromRss = (keyword, options = {}, callback) => {
 	if (typeof options === 'function') {
 		callback = options;
@@ -679,11 +680,14 @@ const _parse_gg_search = (body) => {
 
 		console.log(`-> ${publishDateText} : ${publishDate}`);
 
+		// let image = $('img', child).attr('src');
+
 		let article = {
 			title,
 			link,
 			description,
-			publishDate
+			publishDate,
+			// image
 		}
 
 		articles.push(article);
@@ -720,7 +724,7 @@ const _parse_gg_search = (body) => {
 			console.log(`-> ${publishDateCardText} : ${publishDateCard}`);
 
 			articles.push({
-				// isExtra: true,
+				isExtra: true,
 				title: titleCard,
 				link: linkCard,
 				description: descriptionCard,
@@ -741,6 +745,7 @@ const _parse_gg_search = (body) => {
 	return { articles, linkStories, next};
 }
 
+// search từ tab News của google search
 const getFeedFromGgSearch = (keyword, options, callback) => {
 	if (typeof options === 'function') {
 		callback = options;
@@ -748,8 +753,14 @@ const getFeedFromGgSearch = (keyword, options, callback) => {
 	}
 
 	options['maxPage'] = options['maxPage'] || 1;
-
+	options['maxPage'] = Math.max(options['maxPage'], 0);
 	options['maxPage'] = Math.min(options['maxPage'], 10);
+
+	if (options['maxFeed']) {
+		options['maxFeed'] = Number(options['maxFeed']);
+		options['maxFeed'] = Math.max(options['maxFeed'], 0);
+		options['maxFeed'] = Math.min(options['maxFeed'], 100);
+	}
 
 	let finalResult = {
 		articles: [],
@@ -767,7 +778,12 @@ const getFeedFromGgSearch = (keyword, options, callback) => {
 
 		if (page > 0 && !qsNext) {
 			console.log('result search is max ...')
-			return cb();
+			return async.nextTick(cb);
+		}
+
+		if (options['maxFeed'] && finalResult.articles.length >= options['maxFeed']) {
+			console.log('stop get feed, maxFeed=', options['maxFeed'], 'articles.length=', finalResult.articles.length);
+			return async.nextTick(cb);
 		}
 
 		let qs = Object.assign({}, defaultGgSearch, options.qs);

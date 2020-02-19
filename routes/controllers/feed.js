@@ -53,6 +53,10 @@ FeedCtrl.getContent = (req, res) => {
 			}
 		}
 
+		if (options.scrapeurl) {
+			FacebookService.scrapedSharingDebugger(options.scrapeurl);
+		}
+
 		return Response.success(req, res, result);
 	});
 }

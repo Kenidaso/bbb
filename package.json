@@ -66,6 +66,7 @@
     "lint": "eslint .",
     "ggn": "NODE_ENV=production node workers/from_topic_gg_news_v2",
     "rawhtml": "DEBUG=*routes*,*Service*,*Model*,FATAL,*Engine*,*WebClipper* node workers/parse_rawHtml",
+    "task_queue": "node workers/task_queue",
     "start": "npm run docs && DEBUG=*routes*,*Service*,*Model*,FATAL,*Engine*,*WebClipper*,*Google* PORT=3222 nodemon keystone.js",
     "docs": "apidoc -i routes/controllers -o public/docs",
     "test-clipper": "DEBUG=*WebClipper* mocha test-web-clipper.mocha.js",

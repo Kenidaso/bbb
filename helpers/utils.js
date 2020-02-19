@@ -199,6 +199,7 @@ module.exports = {
 			'alobacsi.com',
 			'antv.gov.vn',
 			'netnews.vn',
+			'hanoimoi.com.vn',
 			// 'vietnamfinance.vn'
 		]
 

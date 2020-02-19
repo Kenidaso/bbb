@@ -22,6 +22,8 @@ console.log('worker workerConfig=', JSON.stringify(workerConfig));
 
 const utils = require('../helpers/utils');
 
+const TASK = Statics.task;
+
 const debug = require('debug');
 let log = debug('TASK_WORKER');
 let fatal = debug('FATAL');
@@ -30,13 +32,10 @@ let logE = log.extend('error');
 let logQ = log.extend('queue');
 let logQE = logQ.extend('error');
 
-// const pupCtrl = require('../controllers/pup');
-
-// const TASK_MAP = pupCtrl.TASK_MAP;
-
 const redisService = require('../routes/services/RedisService');
 const queueService = require('../routes/services/QueueService');
-// const pupService = require('../services/PupService');
+const searchService = require('../routes/services/SearchService');
+const taskService = require('../routes/services/TaskService');
 
 redisService.init();
 
@@ -45,13 +44,12 @@ let client = redisService.getClient();
 const WORKER_NAME = workerConfig.name;
 const MAX_DRAIN = process.env.MAX_DRAIN || 3;
 let COUNT_DRAIN = 0;
-const WORKER_TTL = process.env.WORKER_TTL ? Number(process.env.WORKER_TTL) : 30; // 30 min: Worker time to life in minite
+const WORKER_TTL = Number(process.env.WORKER_TTL) || 45; // 45 min: Worker time to life in minite
+const QUEUE_CAPACITY = Number(process.env.QUEUE_CAPACITY) || 3
+
 const START_AT = moment();
 
-// const rsmq = new RedisSMQ({
-// 	client,
-// 	ns: workerConfig.ns
-// });
+const noop = () => {};
 
 let _fakeProcessMessage = (message, callback) => {
 	let task = utils.safeParse(message.message);
@@ -86,6 +84,10 @@ let _fakeProcessMessage = (message, callback) => {
 				});
 			});
 		},
+		(next) => {
+			let timeout = utils.randInt(2, 7);
+			setTimeout(next, timeout * 1e3, null);
+		}
 	], callback);
 }
 
@@ -112,19 +114,28 @@ let _processMessage = (message, callback) => {
 		},
 		// processing ...
 		(next) => {
-			switch (task.taskName) {
-				case TASK_MAP.getCookies:
-					return pupService.getCookies(task, next);
-				case TASK_MAP.loginCgv:
-					return pupService.loginCgv(task, next);
-				case TASK_MAP.savePlanSeatCgv:
-					return pupService.saveHtmlPlanSeat_cgv(task, next);
+			/*switch (task.taskName) {
+				case TASK.SEARCH:
+					searchService.mixSearch(task.keyword, task.options, (err, result) => {
+						if (err) return next(err);
+						return next(null, { result, err: null });
+					})
+					break;
 				default:
 					return next('ENOSUPPORTTASK', task);
-			}
+			}*/
+
+			let execute = taskService[task.taskName];
+
+			if (!execute) return next('ENOSUPPORTTASK', task);
+
+			execute(task, (err, result) => {
+				if (err) return next(err);
+				return next(null, { result, err: null });
+			})
 		},
 		(taskResult, next) => {
-			redisService.successTaskKey(key, { data: taskResult.result, error: taskResult.err }, () => {
+			redisService.successTaskKey(key, { data: taskResult.result }, () => {
 				redisService.getTaskKey(key, (err, value) => {
 					log('success value= %o', value);
 
@@ -132,13 +143,20 @@ let _processMessage = (message, callback) => {
 				});
 			});
 		},
-	], callback);
+	], (err, result) => {
+		if (err) {
+			redisService.failTaskKey(key, { error: err }, noop);
+		}
+
+		return callback();
+	});
 }
 
 let jmQueue = async.queue( (message, cbQueue) => {
 	logQ('message= %o', message);
 
-	_fakeProcessMessage(message, (err, result) => {
+	// _fakeProcessMessage(message, (err, result) => {
+	_processMessage(message, (err, result) => {
 		if (err) {
 			logQE('process message err= %o', err);
 			return cbQueue(err);
@@ -160,51 +178,98 @@ let jmQueue = async.queue( (message, cbQueue) => {
 			return cbQueue('EMESSAGENOTFOUND', message);
 		});
 	})
-}, process.env.QUEUE_CAPACITY || 1);
+}, QUEUE_CAPACITY);
 
-jmQueue.error((err, task) => {
+jmQueue.error = (err, task) => {
   logQE('task experienced an error: %o', err);
   logQE('task= %o', task);
-});
+}
 
-jmQueue.drain(() => {
+jmQueue.drain = function () {
 	logQ('jmQueue drain: all items have been processed');
 	let diff = moment().diff(START_AT, 'm');
 
 	if (jmQueue.idle() && diff >= WORKER_TTL) {
 		_shutdown();
 	}
-});
+}
+
+jmQueue.saturated = () => {
+	logQ('jmQueue saturated ...');
+	STOP_RECEIVE_MESSAGE = true;
+	CALL_MAIN = false;
+}
+
+jmQueue.unsaturated = () => {
+	logQ('jmQueue unsaturated ...');
+	STOP_RECEIVE_MESSAGE = false;
+	if (CALL_MAIN) main();
+}
+
+// jmQueue.empty = () => {
+// 	logQ('jmQueue empty ...');
+// }
 
 let _shutdown = () => {
 	log('shutdown ...');
 	setTimeout(process.exit, 100, 0);
 }
 
+let concurrency = jmQueue.concurrency;
+let STOP_RECEIVE_MESSAGE = false;
+let CALL_MAIN = false;
+
 let main = () => {
 	let diff = moment().diff(START_AT, 'm');
 
 	if (diff >= WORKER_TTL) {
 		log('diff= %s, wait to shutdown ...', diff);
-		return _shutdown();
+
+		CALL_MAIN = false;
+		if (jmQueue.running() === 0) {
+			return _shutdown();
+		}
+
+		return;
+	}
+
+	if (jmQueue.running() >= concurrency) {
+		log("Running(%s) is max Concurrency(%s), wait at least 1 worker free ...", jmQueue.running(), concurrency);
+
+		CALL_MAIN = true;
+		return;
 	}
 
 	queueService.receiveMessage((err, message) => {
 		if (err) {
 			logE('receiveMessage err= %s', err);
-			return;
+			CALL_MAIN = false;
+			return setTimeout(main, 1000);
 		}
 
 		if (!message || !message.id) {
 			log("No messages ...");
+			CALL_MAIN = false;
 			return setTimeout(main, 1000);
+			// return;
 		}
 
-		log("Message received: %o", message);
+		log("Message received: %s", message.id);
 
-		jmQueue.push(message, () => {
-			return setTimeout(main, 1000);
+		jmQueue.push(message, (errQ, result) => {
+			if (errQ) {
+				logE(`process message= %s errQ= %s`, JSON.stringify(message.message), errQ);
+			}
+
+			return;
 		});
+
+		if (jmQueue.running() < concurrency) {
+			CALL_MAIN = false;
+			main();
+		} else {
+			CALL_MAIN = true;
+		}
 	})
 }
 

@@ -1,9 +1,24 @@
 const fs = require('fs');
-const ggn = require('../engines/googleNews');
 const querystring = require('querystring');
 const url = require('url');
 
-ggn.getFeedFromGgSearch('corona', {
+const ggn = require('../engines/googleNews');
+
+const searchService = require('../routes/services/SearchService');
+
+/*ggn.getFeedFromGgSearch('corona', {
+	// getFeedFromStory: true,
+	isGetOriginLink: true,
+	maxPage: 5,
+	maxFeed: 20,
+}, (err, result) => {
+	console.log('done err=', err);
+	console.log('done result=', JSON.stringify(result));
+
+	// fs.writeFileSync('../data_sample/ggn_getFeedFromGgSearch.html', result);
+})*/
+
+/*ggn.getEntriesFromRss('corona', {
 	getFeedFromStory: true,
 	isGetOriginLink: true,
 	maxPage: 1,
@@ -12,6 +27,20 @@ ggn.getFeedFromGgSearch('corona', {
 	console.log('done result=', JSON.stringify(result));
 
 	// fs.writeFileSync('../data_sample/ggn_getFeedFromGgSearch.html', result);
+})*/
+
+searchService.mixSearch('corona', {
+	// getFeedFromStory: true,
+	isGetOriginLink: true,
+	maxPage: 5,
+	maxFeed: 20,
+	page: 2,
+	limit: 5,
+}, (err, result) => {
+	console.log('done err=', err);
+	console.log('done result=', JSON.stringify(result));
+
+	process.exit(0);
 })
 
 // let articleLink = 'https://news.google.com/articles/CBMiNWh0dHBzOi8vdnRjLnZuL2JpdGNvaW4tZGFvLWNoaWV1LWJ1dC1waGEtZDUxMjc2Mi5odG1s0gE5aHR0cHM6Ly9hbXAudnRjLnZuL2JpdGNvaW4tZGFvLWNoaWV1LWJ1dC1waGEtZDUxMjc2Mi5odG1s?hl=vi&gl=VN&ceid=VN%3Avi';
