@@ -662,6 +662,8 @@ const _parse_gg_search = (body) => {
 
 		console.log(`index= ${index} : publishDateText= ${publishDateText}`);
 
+		publishDateText = publishDateText.substr(publishDateText.lastIndexOf('-') + 1);
+
 		if (publishDateText.indexOf('giờ trước') > -1) {
 			let _tmp = publishDateText.match(/\d{1,2} giờ trước/)[0];
 			let hour = Number(_tmp.match(/\d{1,2}/)[0]);
@@ -726,6 +728,8 @@ const _parse_gg_search = (body) => {
 			let publishDateCard = null;
 
 			console.log('publishDateCardText=', publishDateCardText)
+
+			publishDateCardText = publishDateCardText.substr(publishDateCardText.lastIndexOf('-') + 1);
 
 			if (publishDateCardText.indexOf('giờ trước') > -1) {
 				let _tmp = publishDateCardText.match(/\d{1,2} giờ trước/)[0];
