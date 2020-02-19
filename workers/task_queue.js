@@ -39,7 +39,7 @@ const queueService = require('../routes/services/QueueService');
 const searchService = require('../routes/services/SearchService');
 const taskService = require('../routes/services/TaskService');
 
-let client = redisService.getClient();
+// let client = redisService.getClient();
 
 const WORKER_NAME = workerConfig.name;
 const MAX_DRAIN = process.env.MAX_DRAIN || 3;
