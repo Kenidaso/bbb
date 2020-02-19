@@ -23,6 +23,10 @@ const request = require('request').defaults({
 	}
 });
 
+const proxies = [
+  'http://atadi:v1etjetl@b0ngh0@l@1@fptapp.atadi.xyz:1201'
+];
+
 const LIMIT = 2;
 
 // https://news.google.com/search?q=vu%2039%20nguoi%20chet%20trong%20container&hl=vi&gl=VN&ceid=VN%3Avi
@@ -867,7 +871,8 @@ const getFeedFromGgSearch = (keyword, options, callback) => {
 		request({
 			url: `https://www.google.com/search`,
 			method: 'GET',
-			qs
+			qs,
+			proxy: proxies[0]
 		}, (err, response, body) => {
 			if (err) return cb();
 
