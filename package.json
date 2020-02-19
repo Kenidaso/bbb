@@ -55,10 +55,6 @@
     "cjs": true,
     "mode": "auto"
   },
-  "devDependencies": {
-    "eslint": "3.15.0",
-    "nodemon": "^1.19.1"
-  },
   "scripts": {
     "lint": "eslint .",
     "ggn": "NODE_ENV=production node workers/from_topic_gg_news_v2",
