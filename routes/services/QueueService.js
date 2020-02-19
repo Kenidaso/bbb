@@ -13,8 +13,20 @@ const utils = require('../../helpers/utils');
 const redisService = require('./RedisService');
 let client = redisService.getClient();
 
+// redis://user:9nSpQH7B3aRjcTClWjOJqVOINX0AoDRH@157.230.253.180:6379
+
+const REDIS_URI = process.env.REDIS_URI;
+
+let split = REDIS_URI.replace('redis://', '').split('@');
+
+let [user, password] = split[0].split(':');
+let [host, port] = split[1].split(':');
+
 const rsmq = new RedisSMQ({
-	client,
+	// client,
+	host,
+	port,
+	password,
 	ns: workerConfig.ns
 });
 
