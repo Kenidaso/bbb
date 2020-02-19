@@ -671,7 +671,8 @@ const _parse_gg_search = (body) => {
 			let minute = Number(_tmp.match(/\d{1,2}/)[0]);
 			publishDate = moment().add(minute * -1, 'm').utcOffset(420).format();
 		} else {
-			let _tmp = publishDateText.match(/\d{1,2} thg \d{1,2}, \d{4}/)[0];
+			let _match = publishDateText.match(/\d{1,2} thg \d{1,2}, \d{2,4}/);
+			let _tmp = _match ? _match[0] : '';
 			_tmp = publishDateText.replace('thg', '').replace(',', '');
 
 			publishDate = moment(_tmp, 'DD MM YYYY')
@@ -714,7 +715,9 @@ const _parse_gg_search = (body) => {
 				let minute = Number(_tmp.match(/\d{1,2}/)[0]);
 				publishDate = moment().add(minute * -1, 'm').utcOffset(420).format();
 			} else {
-				let _tmp = publishDateCardText.match(/\d{1,2} thg \d{1,2}, \d{4}/)[0];
+				// let _tmp = publishDateCardText.match(/\d{1,2} thg \d{1,2}, \d{4}/)[0];
+				let _match = publishDateText.match(/\d{1,2} thg \d{1,2}, \d{2,4}/);
+				let _tmp = _match ? _match[0] : '';
 				_tmp = publishDateCardText.replace('thg', '').replace(',', '');
 
 				publishDateCard = moment(_tmp, 'DD MM YYYY')
