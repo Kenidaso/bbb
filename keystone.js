@@ -149,6 +149,8 @@ async.parallel({
 		return;
 	}
 
+	let queueService = require('./routes/services/QueueService');
+
 	console.log('keystone start done.');
 	keystone.emit('ready');
 })
