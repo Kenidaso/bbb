@@ -745,50 +745,50 @@ const _parse_gg_search = (body) => {
 			if (publishDateCardText.indexOf('giờ trước') > -1) {
 				let _tmp = publishDateCardText.match(/\d{1,2} giờ trước/)[0];
 				let hour = Number(_tmp.match(/\d{1,2}/)[0]);
-				publishDate = moment().add(hour * -1, 'h').utcOffset(420).format();
+				publishDateCard = moment().add(hour * -1, 'h').utcOffset(420).format();
 
-				console.log(`publishDateCardText: giờ trước, _tmp= ${_tmp}, hour= ${hour} publishDate= ${publishDate}`);
+				console.log(`publishDateCardText: giờ trước, _tmp= ${_tmp}, hour= ${hour} publishDateCard= ${publishDateCard}`);
 			}
 			else if (publishDateCardText.indexOf('hour') > -1) {
 				// let _tmp = publishDateCardText.match(/\d{1,2} hour/)[0];
 				let hour = Number(publishDateCardText.match(/\d{1,2}/)[0]);
-				publishDate = moment().add(hour * -1, 'h').utcOffset(420).format();
+				publishDateCard = moment().add(hour * -1, 'h').utcOffset(420).format();
 
-				console.log(`publishDateCardText: hour, hour= ${hour} publishDate= ${publishDate}`);
+				console.log(`publishDateCardText: hour, hour= ${hour} publishDateCard= ${publishDateCard}`);
 			}
 			else if (publishDateCardText.indexOf('minute') > -1) {
 				// let _tmp = publishDateCardText.match(/\d{1,2} minute/)[0];
 				let minute = Number(publishDateCardText.match(/\d{1,2}/)[0]);
-				publishDate = moment().add(minute * -1, 'm').utcOffset(420).format();
+				publishDateCard = moment().add(minute * -1, 'm').utcOffset(420).format();
 
-				console.log(`publishDateCardText: minute, minute= ${minute} publishDate= ${publishDate}`);
+				console.log(`publishDateCardText: minute, minute= ${minute} publishDateCard= ${publishDateCard}`);
 			}
 			else if (publishDateCardText.indexOf('phút trước') > -1) {
 				let _tmp = publishDateCardText.match(/\d{1,2} phút trước/)[0];
 				let minute = Number(_tmp.match(/\d{1,2}/)[0]);
-				publishDate = moment().add(minute * -1, 'm').utcOffset(420).format();
+				publishDateCard = moment().add(minute * -1, 'm').utcOffset(420).format();
 
-				console.log(`publishDateCardText: phút trước, minute= ${minute} publishDate= ${publishDate}`);
+				console.log(`publishDateCardText: phút trước, minute= ${minute} publishDateCard= ${publishDateCard}`);
 			}
 			else if (publishDateCardText.indexOf('thg') > -1) {
 				let _match = publishDateCardText.match(/\d{1,2} thg \d{1,2}, \d{2,4}/);
 				let _tmp = _match ? _match[0] : '';
 				_tmp = publishDateCardText.replace('thg', '').replace(',', '');
 
-				publishDate = moment(_tmp, 'DD MM YYYY')
-				publishDate = publishDate.isValid() ? publishDate.utcOffset(420).format() : null;
+				publishDateCard = moment(_tmp, 'DD MM YYYY')
+				publishDateCard = publishDateCard.isValid() ? publishDateCard.utcOffset(420).format() : null;
 
-				console.log(`publishDateCardText: thg, _tmp= ${_tmp} publishDate= ${publishDate}`);
+				console.log(`publishDateCardText: thg, _tmp= ${_tmp} publishDateCard= ${publishDateCard}`);
 			}
 			else {
 				// 18 Feb 2020 In-Depth-BBC Tiếng Việt-16 Feb 2020
 				let _match = publishDateCardText.match(/\d{1,2} \w{3,6} \d{2,4}/);
 				let _tmp = _match ? _match[0] : '';
 
-				publishDate = moment(_tmp, 'DD MMM YYYY')
-				publishDate = publishDate.isValid() ? publishDate.utcOffset(420).format() : null;
+				publishDateCard = moment(_tmp, 'DD MMM YYYY')
+				publishDateCard = publishDateCard.isValid() ? publishDateCard.utcOffset(420).format() : null;
 
-				console.log(`publishDateCardText: else, _tmp= ${_tmp} publishDate= ${publishDate}`);
+				console.log(`publishDateCardText: else, _tmp= ${_tmp} publishDateCard= ${publishDateCard}`);
 			}
 
 			console.log(`-> ${publishDateCardText} : ${publishDateCard}`);
