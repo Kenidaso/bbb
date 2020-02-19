@@ -33,11 +33,11 @@ let logQ = log.extend('queue');
 let logQE = logQ.extend('error');
 
 const redisService = require('../routes/services/RedisService');
+redisService.init();
+
 const queueService = require('../routes/services/QueueService');
 const searchService = require('../routes/services/SearchService');
 const taskService = require('../routes/services/TaskService');
-
-redisService.init();
 
 let client = redisService.getClient();
 
