@@ -108,7 +108,8 @@ exports = module.exports = function (app) {
 	app.post('/gg/news-of-match', routes.controllers.gg.newsOfMatch);
 	app.post('/gg/layout-header-of-match', routes.controllers.gg.layoutHeaderOfMatch);
 
-	app.post('/q/search', routes.controllers.search.queueSearch); // push search into queue
+	app.post('/q/search', middleware.trackSearch, routes.controllers.search.queueSearch); // push search into queue
+	app.post('/q/push-task', middleware.trackSearchInPushTask, routes.controllers.queue.pushTask); // push task
 	app.get('/task/status/:taskId', routes.controllers.task.status);
 
 	app.post('/tele/webhook/cky-tele-bot', routes.controllers.telegram.processUpdate);

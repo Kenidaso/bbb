@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const { ImgPublic } = require('cky-image-public');
 const shortID = require('short-id-gen');
+const unidecode = require('unidecode');
 
 const imgPub = new ImgPublic({
 	imgur: true
@@ -427,5 +428,14 @@ module.exports = {
 		}, (err, response, body) => {
 			return callback && callback(err);
 		})
+	},
+
+	normalizeSearch: (search = '') => {
+		if (!search) return search;
+
+		search = search.toLowerCase().trim();
+		search = unidecode(search);
+
+		return search;
 	}
 };

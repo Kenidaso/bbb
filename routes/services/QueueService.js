@@ -5,13 +5,16 @@ const Statics = requireDir('../../statics');
 
 const configQueue = Statics.queue;
 const workerConfig = configQueue.task_worker;
+const TASK = Statics.task;
 
 console.log('QueueService workerConfig=', JSON.stringify(workerConfig));
 
 const utils = require('../../helpers/utils');
 
-const redisService = require('./RedisService');
-let client = redisService.getClient();
+const RedisService = require('./RedisService');
+const TaskService = require('./TaskService');
+
+let client = RedisService.getClient();
 
 // redis://user:9nSpQH7B3aRjcTClWjOJqVOINX0AoDRH@157.230.253.180:6379
 
@@ -73,7 +76,7 @@ queueService.push = (data, callback) => {
 			data
 		}
 
-		if (data.key) redisService.createTaskKey(data.key, data);
+		if (data.key) RedisService.createTaskKey(data.key, data);
 
 		return callback(null, data);
 	});
@@ -88,6 +91,43 @@ queueService.deleteMessage = (id, callback) => {
 		qname: workerConfig.name,
 		id
 	}, callback);
+}
+
+queueService.pushTask = (taskData, callback) => {
+	let { name, params, options } = taskData;
+
+	if (!name) return callback('EMISSTASKNAME');
+	if (!params) return callback('EMISSTASKPARAMS');
+
+	if (typeof params != 'object') return callback('EINVALIDTYPEOFPARAMS');
+	if (Array.isArray(params)) return callback('EINVALIDTYPEOFPARAMS');
+	if (Object.keys(params).length === 0) return callback('ENOFIELDINTASKPARAMS');
+
+	if (params.key) return callback('EFIELDKEYINPARAMSNOTALLOWED');
+	if (params.taskName) return callback('EFIELDTASKNAMEINPARAMSNOTALLOWED');
+	if (params.options) return callback('EFIELDOPTIONSINPARAMSNOTALLOWED');
+
+	name = name.toUpperCase().trim();
+	options = options || {};
+
+	if (!TASK[name]) return callback('ENOTCONFIGNAME');
+
+	let taskName = TASK[name];
+	let excecute = TaskService[taskName];
+
+	if (!excecute) return callback('ENOTASKEXECUTE');
+
+	let key = utils.buildTaskKey();
+
+	let data = {
+	  taskName,
+	  options,
+	  key,
+	}
+
+	data = Object.assign({}, data, params);
+
+	queueService.push(data, callback);
 }
 
 module.exports = queueService;

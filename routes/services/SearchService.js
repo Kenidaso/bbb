@@ -15,6 +15,8 @@ const Statics = requireDir('../../statics');
 const TASK = Statics.task;
 const TTL_MIXSEARCH = 1 * 60 * 30; // 30 mins
 
+const noop = () => {}
+
 const SearchService = {};
 module.exports = SearchService;
 

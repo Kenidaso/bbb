@@ -12,10 +12,14 @@ const keystone = require('keystone');
 const unidecode = require('unidecode');
 
 const Response = require('./services/Response');
+const SearchService = require('./services/SearchService');
+
 const UserSearch = keystone.list('UserSearch');
 
 const i18n = keystone.get('i18n');
 const t = i18n.__;
+
+const utils = require('../helpers/utils');
 
 const noop = () => {}
 
@@ -71,11 +75,47 @@ exports.requireUser = function (req, res, next) {
 };
 
 exports.trackSearch = (req, res, next) => {
-	let search = req.body.search;
-	if (!search) return Response.error(req, res, 'EMISSSEARCHKEYWORD');
+	let search = req.body.search || req.body.keyword;
+	// if (!search) return Response.error(req, res, 'EMISSSEARCHKEYWORD');
+	if (!search) return next();
 
-	search = search.toLowerCase().trim();
-	req.body.search = search;
+	search = utils.normalizeSearch(search);
+	if (!search || search.length == 0) return next();
+
+	if (req.body.search) req.body.search = search;
+	if (req.body.keyword) req.body.keyword = search;
+
+	UserSearch.model.findOne({ searchContent: search }, (err, result) => {
+		if (err) {
+			console.log('track search err=', err);
+			// return next('EFINDKEYWORD', err);
+			return noop();
+		}
+
+		if (result) return result.incCount(noop);
+
+		let newSearch = new UserSearch.model({ searchContent: search });
+		newSearch.save(noop);
+	});
+
+	return next()
+}
+
+exports.trackSearchInPushTask = (req, res, next) => {
+	if (!req.body.name) return next();
+	if (req.body.name && req.body.name.toLowerCase() !== 'search') return next();
+
+	if (!req.body.params || !req.body.params.keyword) return next();
+
+	let search = req.body.params.keyword;
+
+	if (!search || search.length == 0) return next();
+
+	search = utils.normalizeSearch(search);
+
+	if (!search || search.length == 0) return next();
+
+	req.body.params.keyword = search;
 
 	UserSearch.model.findOne({ searchContent: search }, (err, result) => {
 		if (err) {
