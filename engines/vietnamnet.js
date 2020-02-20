@@ -61,7 +61,12 @@ engine.getNewsFromRss = (rssUrl, callback) => {
           }
 
           item[key] = value;
-          item['rawHtml'] = item['content:encoded'];
+
+          if (item['content:encoded']) {
+            let raw = item['content:encoded'];
+
+            item['rawHtml'] = `<div class='host-vietnamnet _wrap'>${raw}</div>`;
+          }
 
           if (item['media:content']) {
           	let media = item['media:content'];
