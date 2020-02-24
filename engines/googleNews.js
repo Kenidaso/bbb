@@ -492,7 +492,9 @@ const _parse_gg_news_story = ($, isGetOriginLink = false, callback) => {
 				objArticle.channel = articlePaperName;
 			}
 
-			objSection.articles.push(objArticle);
+			if (objArticle.publishDate) {
+				objSection.articles.push(objArticle);
+			}
 		})
 
 		if (sectionTitle.toLowerCase() === 'from twitter') {

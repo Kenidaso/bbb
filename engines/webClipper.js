@@ -804,6 +804,8 @@ clipper.extract = (html, link) => {
   let ldJson = clipper.getLdJSON(rawHtml);
   let publishDate = clipper.getPublishDate(rawHtml);
 
+  debug('publishDate= %s', publishDate)
+
   let article = clipper.readability(link, html);
   // let articleContent = clipper.getArticleContent(html, link);
 
