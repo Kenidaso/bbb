@@ -141,6 +141,8 @@ const getAllTopic = (callback) => {
 
 const save_1_article = (article, callback) => {
 	if (!article.title) return callback();
+	if (!article.publishDate) return callback();
+	if (!moment(article.publishDate).isValid()) return callback();
 
 	if (!article.linkArticle && !article.originLink) return callback();
 

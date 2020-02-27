@@ -223,6 +223,21 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 				});
 			}
 
+			if (flow === 'READABILITY') {
+				return baseEngine.useReadability(link, (err, article) => {
+					if (err) return next(err, article);
+					if (!article) return next('EARTICLENOTFOUND');
+
+					articleParse = article;
+					rawHtml = article.content;
+
+					if (article.image) heroImage = article.image;
+					if (article.description || article.excerpt) description = article.description || article.excerpt;
+
+					return next(null);
+				});
+			}
+
 			if (link.indexOf('youtube.com') > -1) {
 				let parseUrl = url.parse(link);
 				let parseQs = querystring.parse(parseUrl.query);

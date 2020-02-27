@@ -54,6 +54,11 @@ const Readability = require('@web-clipper/readability');
 const clipper = require('./webClipper');
 const utils = require('../helpers/utils');
 
+const mozillaReadability = require('./MozillaReadability');
+
+const MozillaReadability = mozillaReadability.Readability;
+const JSDOMParser = mozillaReadability.JSDOMParser;
+
 const defaultSanitizeHtml = () => {
   return {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat([ 'img', 'h1', 'h2', 'header', 'article', 'section', 'footer', 'figure', 'video', 'amp-img', 'source' ]),
@@ -554,7 +559,34 @@ base.getNewsFromRss = (rssUrl, callback) => {
   }, task, callback);
 }
 
+base.useReadability = (link, callback) => {
+  base.fetch(link, (err, html) => {
+    if (err) {
+      debug('fetch link %s err= %s result= %s', link, err, html);
+      return callback('EFETCHLINK', err);
+    }
 
+    if (!html) {
+      debug('can not get html from link %s', link);
+      return callback('EFETCHHTMLNOTFOUND');
+    }
+
+    const doc = new JSDOM(html, {
+      url: link
+    });
+
+    let reader = new MozillaReadability(doc.window.document);
+    let article = reader.parse();
+
+    doc.window.close();
+
+    // let doc = new JSDOMParser().parse(html);
+    // let parser = new MozillaReadability(doc);
+    // let article = parser.parse()
+
+    return callback(null, article);
+  })
+}
 
 
 

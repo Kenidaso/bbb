@@ -596,7 +596,9 @@ const _parse_gg_news_topic = ($, isGetOriginLink = false, callback) => {
 				paper
 			}
 
-			objCard.articles.push(objArticle);
+			if (publishDate) {
+				objCard.articles.push(objArticle);
+			}
 		})
 
 		let srcImg = $($('img', card)[0]).attr('src');

@@ -1,6 +1,10 @@
 // NODE_ENV=production LIMIT_RSS=5 LIMIT_NEWS=5 node workers/from_rss
 
-require('dotenv').config();
+const path = require('path');
+
+require('dotenv').config({
+	path: path.join(__dirname, '../.env')
+});
 
 const utils = require('../helpers/utils');
 
@@ -10,7 +14,6 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const shortId = require('short-id-gen');
 const async = require('async');
 const fs = require('fs');
-const path = require('path');
 const moment = require('moment');
 
 const baseEngine = require('../engines/base');
