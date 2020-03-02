@@ -792,61 +792,66 @@ clipper.addHeroImage = (rawHtml, heroImage) => {
 clipper.extract = (html, link) => {
   debug('--> go to extract of web clipper ...');
 
-  let rawHtml = clipper.prepareForParse(html);
+  try {
+    let rawHtml = clipper.prepareForParse(html);
 
-  let title = clipper.getTitle(rawHtml);
-  let description = clipper.getDescription(rawHtml).trim();
-  // let author = clipper.getAuthor(rawHtml);
-  let heroImage = clipper.getHeroImage(rawHtml);
-  let ldJson = clipper.getLdJSON(rawHtml);
-  let publishDate = clipper.getPublishDate(rawHtml);
+    let title = clipper.getTitle(rawHtml);
+    let description = clipper.getDescription(rawHtml).trim();
+    // let author = clipper.getAuthor(rawHtml);
+    let heroImage = clipper.getHeroImage(rawHtml);
+    let ldJson = clipper.getLdJSON(rawHtml);
+    let publishDate = clipper.getPublishDate(rawHtml);
 
-  debug('publishDate= %s', publishDate)
+    debug('publishDate= %s', publishDate)
 
-  let article = clipper.readability(link, html);
-  // let articleContent = clipper.getArticleContent(html, link);
+    let article = clipper.readability(link, html);
+    // let articleContent = clipper.getArticleContent(html, link);
 
-  if (!article) return null;
+    if (!article) return null;
 
-  let content = article.content;
+    let content = article.content;
 
-  if (content && content.length > 0) {
-    content = clipper.cleanAfterParsing(content, link);
-  }
-
-  let images = [];
-
-  if (heroImage && heroImage.length > 0) images.push(heroImage);
-
-  if (ldJson) {
-    if (ldJson.description && !description) description = ldJson.description;
-    if (ldJson.image && ldJson.image.url) images.push(ldJson.image.url);
-    if ((!publishDate || !moment(publishDate).isValid()) && ldJson.datePublished) {
-      publishDate = ldJson.datePublished;
+    if (content && content.length > 0) {
+      content = clipper.cleanAfterParsing(content, link);
     }
-    if (!heroImage && ldJson.image && ldJson.image.url) heroImage = ldJson.image.url;
+
+    let images = [];
+
+    if (heroImage && heroImage.length > 0) images.push(heroImage);
+
+    if (ldJson) {
+      if (ldJson.description && !description) description = ldJson.description;
+      if (ldJson.image && ldJson.image.url) images.push(ldJson.image.url);
+      if ((!publishDate || !moment(publishDate).isValid()) && ldJson.datePublished) {
+        publishDate = ldJson.datePublished;
+      }
+      if (!heroImage && ldJson.image && ldJson.image.url) heroImage = ldJson.image.url;
+    }
+
+    // try add hero image if not exists
+    content = clipper.addHeroImage(content, heroImage);
+
+    // wrap content with div
+    content = clipper.wrapWithSpecialClasses(content);
+
+    let resultExtract = {
+      title,
+      description,
+      // author,
+      heroImage,
+      ldJson,
+      publishDate,
+      content,
+      images
+    }
+
+    resultExtract = Object.assign({}, article, resultExtract);
+
+    return resultExtract;
+  } catch (ex) {
+    fatal('extract exception: %o', ex);
+    return {};
   }
-
-  // try add hero image if not exists
-  content = clipper.addHeroImage(content, heroImage);
-
-  // wrap content with div
-  content = clipper.wrapWithSpecialClasses(content);
-
-  let resultExtract = {
-    title,
-    description,
-    // author,
-    heroImage,
-    ldJson,
-    publishDate,
-    content,
-    images
-  }
-
-  resultExtract = Object.assign({}, article, resultExtract);
-
-  return resultExtract;
 }
 
 
