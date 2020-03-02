@@ -94,7 +94,8 @@ let _ignoreGzip = [
 
 let _useProxy = [
   'rfi.fr',
-  'rfa.org'
+  'rfa.org',
+  'cafeland.vn'
 ]
 
 let _ignoreFollowRedirect = [
