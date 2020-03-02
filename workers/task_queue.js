@@ -273,4 +273,4 @@ let main = () => {
 	})
 }
 
-main();
+setTimeout(main, 3e3);
