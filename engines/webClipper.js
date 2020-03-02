@@ -374,9 +374,9 @@ function getTitleFromMetaTags (rawHtml) {
   debug('go getTitleFromMetaTags ...');
 
   let $ = cheerio.load(rawHtml);
-  let title;
+  let title = null;
   let siteName = getSiteName(rawHtml);
-  let author = clipper.getAuthor(rawHtml);
+  // let author = clipper.getAuthor(rawHtml);
 
   for (let i = 0; i < titleMetatags.length; i++) {
     let metatag = titleMetatags[i];
@@ -410,7 +410,7 @@ function getTitleFromWindowTitle (rawHtml) {
   let $ = cheerio.load(rawHtml);
   let title = $('title').text();
   let siteName = getSiteName(rawHtml);
-  let author = clipper.getAuthor(rawHtml);
+  // let author = clipper.getAuthor(rawHtml);
 
   /*if (siteName && title) {
     title = removeSiteNameFromTitle(title, siteName);
@@ -799,7 +799,7 @@ clipper.extract = (html, link) => {
 
   let title = clipper.getTitle(rawHtml);
   let description = clipper.getDescription(rawHtml).trim();
-  let author = clipper.getAuthor(rawHtml);
+  // let author = clipper.getAuthor(rawHtml);
   let heroImage = clipper.getHeroImage(rawHtml);
   let ldJson = clipper.getLdJSON(rawHtml);
   let publishDate = clipper.getPublishDate(rawHtml);
@@ -839,7 +839,7 @@ clipper.extract = (html, link) => {
   let resultExtract = {
     title,
     description,
-    author,
+    // author,
     heroImage,
     ldJson,
     publishDate,
