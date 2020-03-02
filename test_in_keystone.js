@@ -1,5 +1,6 @@
 // node test_in_keystone upsertsafe
 // node test_in_keystone upsertsafe_v2
+// node test_in_keystone rawcontent
 
 require('dotenv').config();
 
@@ -36,6 +37,8 @@ const Article = keystone.list('Article');
 const Feed = keystone.list('Feed');
 const NewsTopic = keystone.list('NewsTopic');
 
+const RawFeedService = require('./routes/services/RawFeedService');
+
 const noop = () => {};
 
 let _done = (err, result) => {
@@ -48,7 +51,6 @@ let _done = (err, result) => {
 	});
 }
 
-
 const utils = require('./helpers/utils');
 
 keystone.start( x => {
@@ -60,6 +62,7 @@ keystone.start( x => {
 	switch (task) {
 		case 'upsertsafe': return test_upsertSafe(_done);
 		case 'upsertsafe_v2': return test_upsertSafe_v2(_done);
+		case 'rawcontent': return getRawContent(_done);
 		default:
 			console.log('Task not exists');
 			return _done();
@@ -154,3 +157,11 @@ const test_upsertSafe_v2 = (callback) => {
 	], callback);
 }
 
+const getRawContent = (callback) => {
+	let link = 'https://cafeland.vn/tin-tuc/corona-khien-cac-du-an-lon-cua-trung-quoc-bi-anh-huong-85622.html';
+	let options = {
+		ignoreCache: true
+	};
+
+	RawFeedService.getHtmlContent(link, options, callback);
+}
