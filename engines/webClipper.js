@@ -255,19 +255,25 @@ clipper.getAuthor = (html) => {
  */
 function getSummaryFromMetatags (rawHtml) {
   debug('go getSummaryFromMetatags ...');
-  const $ = cheerio.load(rawHtml);
 
-  for (let i = 0; i < metatags.length; i++) {
-    let metatag = metatags[i];
-    let metaName = $('meta[name="' + metatag + '"]').attr('content');
-    let metaProperty = $('meta[property="' + metatag + '"]').attr('content');
+  try {
+    const $ = cheerio.load(rawHtml);
 
-    if (metaName || metaProperty) {
-      return metaName || metaProperty;
+    for (let i = 0; i < metatags.length; i++) {
+      let metatag = metatags[i];
+      let metaName = $('meta[name="' + metatag + '"]').attr('content');
+      let metaProperty = $('meta[property="' + metatag + '"]').attr('content');
+
+      if (metaName || metaProperty) {
+        return metaName || metaProperty;
+      }
     }
-  }
 
-  return null;
+    return null;
+  } catch (ex) {
+    fatal('getSummaryFromMetatags ex= %o', ex)
+    return null;
+  }
 }
 
 /**
@@ -373,29 +379,24 @@ function getSiteName(rawHtml) {
 function getTitleFromMetaTags (rawHtml) {
   debug('go getTitleFromMetaTags ...');
 
-  let $ = cheerio.load(rawHtml);
-  let title = null;
-  // let siteName = getSiteName(rawHtml);
-  // let author = clipper.getAuthor(rawHtml);
+  try {
+    let $ = cheerio.load(rawHtml);
+    let title = null;
 
-  for (let i = 0; i < titleMetatags.length; i++) {
-    let metatag = titleMetatags[i];
-    title = $('meta[property="' + metatag + '"]').attr('content');
+    for (let i = 0; i < titleMetatags.length; i++) {
+      let metatag = titleMetatags[i];
+      title = $('meta[property="' + metatag + '"]').attr('content');
 
-    if (title) {
-      break;
+      if (title) {
+        break;
+      }
     }
+
+    return title;
+  } catch (ex) {
+    fatal('getTitleFromMetaTags ex= %o', ex);
+    return null;
   }
-
-  /*if (siteName && title) {
-    title = removeSiteNameFromTitle(title, siteName);
-  }
-
-  if (author && title) {
-    title = removeSiteNameFromTitle(title, author);
-  }*/
-
-  return title;
 }
 
 /**
@@ -753,8 +754,8 @@ clipper.decodeEntities = (rawHtml) => {
 
 clipper.getLdJSON = (rawHtml) => {
   debug('go getLdJSON ...');
-  const $ = cheerio.load(rawHtml);
   try {
+    const $ = cheerio.load(rawHtml);
     let ldJson = $('[type="application/ld+json"]').html();
     if (!ldJson) return null;
     ldJson = ldJson.toString('utf8');
@@ -794,6 +795,11 @@ clipper.extract = (html, link) => {
 
   try {
     let rawHtml = clipper.prepareForParse(html);
+
+     if (!rawHtml || rawHtml.length == 0) {
+       fatal('rawHtml null after use prepareForParse');
+       return {};
+     }
 
     let title = clipper.getTitle(rawHtml);
     let description = clipper.getDescription(rawHtml).trim();
