@@ -138,6 +138,11 @@ keystone.on = function (eventname, callback) {
 	keystone.keystoneEmitter.on(eventname, callback);
 };
 
+process.on('uncaughtException', (error) => {
+  console.log(`====> uncaughtException=`, error);
+  utils.sendMessageTelegram(`[news-backend] uncaughtException: ${error.toString()}`);
+});
+
 async.parallel({
 	start_keystone: (next) => {
 		keystone.start(next)

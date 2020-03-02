@@ -18,6 +18,8 @@ const myArgs = process.argv.slice(2);
 const task = myArgs[0].toLowerCase();
 
 let ggNewsService = require('./routes/services/GoogleNewsService');
+let RawFeedService = require('./routes/services/RawFeedService');
+
 let GGNews = require('./engines/googleNews');
 let vnexpress = require('./engines/vnexpress');
 
@@ -112,6 +114,16 @@ let getVnexpressRss = (callback) => {
 	vnexpress.getNewsFromRss(linkRss, callback);
 }
 
+const getRawContent = (callback) => {
+	let link = 'https://cafeland.vn/tin-tuc/corona-khien-cac-du-an-lon-cua-trung-quoc-bi-anh-huong-85622.html';
+	let options = {
+		ignoreCache: true
+	};
+
+	RawFeedService.getHtmlContent(link, options, callback);
+}
+
+
 console.clear();
 
 console.log('begin ...');
@@ -123,6 +135,7 @@ switch (task) {
 	case 'reqmongo': return reqMongo(_done);
 	case 'vnexpress_rss': return getVnexpressRss(_done);
 	case 'requpsertfeed': return reqUpsertFeed(_done);
+	case 'rawcontent': return getRawContent(_done);
 	default:
 		console.log('Task not exists');
 		return _done();
