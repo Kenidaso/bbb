@@ -449,7 +449,7 @@ const runProcess = (callback) => {
 	console.log('process ...');
 
 	async.waterfall([
-		removeOldFeed,
+		// removeOldFeed,
 		getAllTopic,
 		procTopics,
 	], (err, result) => {
