@@ -98,7 +98,7 @@ Feed.getContent = (slugFeed, ignoreCache = false, callback) => {
 
 			RedisService.set(keyLinkFeed, feed.link, TTL_LINK_FEED);
 
-			if (feed.rawHtml && feed.rawHtml.length > 0) return callback(null, feed.rawHtml);
+			// if (feed.rawHtml && feed.rawHtml.length > 0) return callback(null, feed.rawHtml);
 
 			return RawFeedService.getHtmlContent(feed.link, ignoreCache, callback);
 		})
