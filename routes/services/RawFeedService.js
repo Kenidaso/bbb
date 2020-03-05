@@ -420,8 +420,6 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 							let { description, heroImage, title, publishDate, slug, link, topic, category } = feed;
 							let _res = Object.assign({}, { rawHtml }, { description, heroImage, title, publishDate, slug, link, topic, category });
 
-
-
 							return callback(null, _res);
 						}
 
@@ -429,7 +427,7 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 					})
 
 				default:
-					return callback(err, result);
+					return callback(err, { rawHtml });
 			}
 		}
 
