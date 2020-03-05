@@ -425,9 +425,9 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 
 						return callback(null, { rawHtml });
 					})
-
+					break;
 				default:
-					return callback(err, { rawHtml });
+					return callback(null, { rawHtml });
 			}
 		}
 
