@@ -24,8 +24,8 @@ const UPSERT_MAP_LIMIT = 10;
 const keyLockShuffleHotNews = `lockshufflehotnews`;
 
 let engines_hotnews = [
-  ENGINES.VNEXPRESS,
   ENGINES.ZINGNEWS,
+  ENGINES.VNEXPRESS,
   ENGINES.EVA,
   ENGINES.CAFEF,
   ENGINES.KENH14,
@@ -228,6 +228,8 @@ SearchService.makeHotnews = (callback) => {
 
     engine.hotnews((err, news) => {
       if (err || !news) return cb();
+
+      news = _.uniqBy(news, 'link');
 
       async.mapLimit(news, UPSERT_MAP_LIMIT, _mapOneFeed, (err2, results) => {
         results = results.filter((f) => {

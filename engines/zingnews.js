@@ -46,13 +46,15 @@ engine.homepage = (callback) => {
 	engine.fetch(URL_HOMEPAGE, (err, html) => {
 		let feeds = [];
 
+		// fs.writeFileSync('zingnews_homepage.html', html);
+
 		let $ = cheerio.load(html);
 		let articles = $('article');
 		_.forEach(articles, (article) => {
 			let link = $('a', article).attr('href');
 			link = URL_HOMEPAGE + link;
 
-			let srcImg = $('img', article).attr('src');
+			let srcImg = $('img', article).attr('data-src');
 			let title = $('.article-title a', article).text();
 			title = utils.normalizeText(title);
 
@@ -78,14 +80,11 @@ engine.homepage = (callback) => {
 			let commentCount = $('.comment-count', article).text();
 			commentCount = Number(commentCount) || 0;
 
-			feeds.push({
+			let objFeed = {
 				link,
-				heroImage: {
-					url: srcImg
-				},
 				title,
-				description,
-				publishDate,
+				// description,
+				// publishDate,
 				metadata: {
 					category,
 					likeCount,
@@ -94,7 +93,18 @@ engine.homepage = (callback) => {
 					viralCount,
 					commentCount
 				}
-			});
+			}
+
+			if (srcImg && utils.validURL(srcImg)) {
+				objFeed.heroImage = {
+					url: srcImg
+				}
+			}
+
+			if (description) objFeed.description = description;
+			if (publishDate) objFeed.publishDate = publishDate;
+
+			feeds.push(objFeed);
 		})
 
 		return callback(err, feeds);
