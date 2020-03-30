@@ -114,7 +114,7 @@ base.fetch = (link, callback) => {
   // link = link.replace(/\/u.{4}/g, '');
   // link = link.replace('/u00f0', '');
 
-  console.log('link=', link);
+  debug('link=', link);
 
   let options = {
     url: link,
@@ -177,7 +177,7 @@ base.fetch = (link, callback) => {
       return callback('EFETCHLINK', err);
     }
 
-    console.log('statusCode=', response.statusCode);
+    debug('statusCode=', response.statusCode);
 
     if (!body) return callback('EFETCHNOBODY');
 
@@ -518,14 +518,12 @@ base.validateRssResult = (result) => {
 
 base.getNewsFromRss = (rssUrl, callback) => {
   let task = (cb) => {
-    console.log(`[base] fetching rss ... ${rssUrl}`);
+    debug(`[base] fetching rss ... ${rssUrl}`);
 
     fetchRss({
       link: rssUrl
     }, (err, result) => {
       if (err) return cb(err);
-
-      // console.log('result rss=', JSON.stringify(result));
 
       let isValid = base.validateRssResult(result);
 
@@ -544,7 +542,7 @@ base.getNewsFromRss = (rssUrl, callback) => {
             }
           }
 
-          item[key] = value;
+          item[key] = value.trim ? value.trim() : value;
         }
 
         return item;

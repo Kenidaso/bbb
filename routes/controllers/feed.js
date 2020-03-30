@@ -1,6 +1,7 @@
 const Response = require('../services/Response');
 const FeedService = require('../services/FeedService');
 const RawFeedService = require('../services/RawFeedService');
+const SearchService = require('../services/SearchService');
 const FacebookService = require('../services/FacebookService');
 
 let FeedCtrl = {};
@@ -70,6 +71,13 @@ FeedCtrl.upsertFeed = (req, res) => {
 	FeedService.upsertFeed(find, update, (err, result) => {
 		if (err) return Response.error(req, res, err, result);
 		console.log(`upsert done: ${JSON.stringify(find)}`);
+		return Response.success(req, res, result);
+	});
+}
+
+FeedCtrl.getHotNews = (req, res) => {
+	SearchService.hotnews((err, result) => {
+		if (err) return Response.error(req, res, err, result);
 		return Response.success(req, res, result);
 	});
 }

@@ -105,3 +105,7 @@ TaskService[TASK.SEARCH] = (taskParams, callback) => {
     })
   })
 }
+
+TaskService[TASK.HOTNEWS] = (taskParams, callback) => {
+  searchService.makeHotnews(callback);
+}

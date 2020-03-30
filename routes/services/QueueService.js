@@ -97,15 +97,18 @@ queueService.pushTask = (taskData, callback) => {
 	let { name, params, options } = taskData;
 
 	if (!name) return callback('EMISSTASKNAME');
-	if (!params) return callback('EMISSTASKPARAMS');
+	// if (!params) return callback('EMISSTASKPARAMS');
 
-	if (typeof params != 'object') return callback('EINVALIDTYPEOFPARAMS');
-	if (Array.isArray(params)) return callback('EINVALIDTYPEOFPARAMS');
-	if (Object.keys(params).length === 0) return callback('ENOFIELDINTASKPARAMS');
+	if (params) {
+		if (typeof params != 'object') return callback('EINVALIDTYPEOFPARAMS');
+		if (Array.isArray(params)) return callback('EINVALIDTYPEOFPARAMS');
+		if (Object.keys(params).length === 0) return callback('ENOFIELDINTASKPARAMS');
 
-	if (params.key) return callback('EFIELDKEYINPARAMSNOTALLOWED');
-	if (params.taskName) return callback('EFIELDTASKNAMEINPARAMSNOTALLOWED');
-	if (params.options) return callback('EFIELDOPTIONSINPARAMSNOTALLOWED');
+		// not allow some key in params
+		if (params.key) return callback('EFIELDKEYINPARAMSNOTALLOWED');
+		if (params.taskName) return callback('EFIELDTASKNAMEINPARAMSNOTALLOWED');
+		if (params.options) return callback('EFIELDOPTIONSINPARAMSNOTALLOWED');
+	}
 
 	name = name.toUpperCase().trim();
 	options = options || {};

@@ -1,3 +1,7 @@
+require('dotenv').config({
+	path: require('path').join(__dirname, '../.env')
+})
+
 const fs = require('fs');
 const querystring = require('querystring');
 const url = require('url');
@@ -6,7 +10,10 @@ const ggn = require('../engines/googleNews');
 
 const searchService = require('../routes/services/SearchService');
 
-/*ggn.getFeedFromGgSearch('corona', {
+let searchText = "Lê Thanh Hải";
+// searchText = "le thanh hai";
+
+/*ggn.getFeedFromGgSearch(searchText, {
 	// getFeedFromStory: true,
 	isGetOriginLink: true,
 	maxPage: 5,
@@ -15,10 +22,11 @@ const searchService = require('../routes/services/SearchService');
 	console.log('done err=', err);
 	console.log('done result=', JSON.stringify(result));
 
+	process.exit(0);
 	// fs.writeFileSync('../data_sample/ggn_getFeedFromGgSearch.html', result);
 })*/
 
-/*ggn.getEntriesFromRss('corona', {
+/*ggn.getEntriesFromRss(searchText, {
 	getFeedFromStory: true,
 	isGetOriginLink: true,
 	maxPage: 1,
@@ -26,22 +34,23 @@ const searchService = require('../routes/services/SearchService');
 	console.log('done err=', err);
 	console.log('done result=', JSON.stringify(result));
 
+	process.exit(0);
 	// fs.writeFileSync('../data_sample/ggn_getFeedFromGgSearch.html', result);
 })*/
 
-searchService.mixSearch('corona', {
+/*searchService.mixSearch(searchText, {
 	// getFeedFromStory: true,
 	isGetOriginLink: true,
 	maxPage: 5,
 	maxFeed: 20,
-	page: 2,
-	limit: 5,
+	// page: 1,
+	limit: 20,
 }, (err, result) => {
 	console.log('done err=', err);
 	console.log('done result=', JSON.stringify(result));
 
 	process.exit(0);
-})
+})*/
 
 // let articleLink = 'https://news.google.com/articles/CBMiNWh0dHBzOi8vdnRjLnZuL2JpdGNvaW4tZGFvLWNoaWV1LWJ1dC1waGEtZDUxMjc2Mi5odG1s0gE5aHR0cHM6Ly9hbXAudnRjLnZuL2JpdGNvaW4tZGFvLWNoaWV1LWJ1dC1waGEtZDUxMjc2Mi5odG1s?hl=vi&gl=VN&ceid=VN%3Avi';
 

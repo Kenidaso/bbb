@@ -7,6 +7,7 @@ const async = require('async');
 const moment = require('moment');
 const fs = require('fs');
 const path = require('path');
+const debug = require('debug')(`Engine:${NAME}`);
 
 const base = require('./base');
 const fetchRss = require('./fetchRss');
@@ -45,7 +46,7 @@ const _parseContent = ($, objRss) => {
     }
 
   }).get();
-  // console.log('contentOrder=', JSON.stringify(contentOrder));
+  // debug('contentOrder=', JSON.stringify(contentOrder));
 
   let heroImage = null;
   let images = [];
@@ -106,7 +107,7 @@ const getContent = (objRss = {}, callback) => {
 
 const getNewsFromRss = (rssUrl, callback) => {
   let task = (cb) => {
-    console.log(`[${NAME}] fetching rss ... ${rssUrl}`);
+    debug(`[${NAME}] fetching rss ... ${rssUrl}`);
 
     fetchRss({
       link: rssUrl
@@ -174,8 +175,34 @@ const cleanSpecial = ($, content) => {
   }
 }
 
+const homepage = (callback) => {
+  let linkRss = 'https://vnexpress.net/rss/tin-moi-nhat.rss';
+  getNewsFromRss(linkRss, (err, feeds) => {
+    if (err) return callback(err);
+
+    feeds = feeds.map((f) => {
+      f.pubishDate = moment(f.pubDate).format();
+
+      delete f.pubDate;
+
+      return f;
+    })
+
+    return callback(null, feeds);
+  });
+}
+
+const hotnews = (callback) => {
+  homepage((err, news) => {
+    // news = news.slice(0, 30);
+    return callback(null, news);
+  });
+}
+
 module.exports = {
   getContent,
   getNewsFromRss,
   cleanSpecial,
+  homepage,
+  hotnews
 }

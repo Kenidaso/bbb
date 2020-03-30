@@ -3,7 +3,7 @@ const async = require('async');
 const _ = require('lodash');
 const moment = require('moment');
 
-const engine = require('../../engines/googleNews');
+const engineGgn = require('../../engines/googleNews');
 
 const queueService = require('./QueueService');
 const redisService = require('./RedisService');
@@ -11,9 +11,25 @@ const redisService = require('./RedisService');
 const utils = require('../../helpers/utils');
 
 const Statics = requireDir('../../statics');
+const ENGINES = Statics.map_engines;
 
 const TASK = Statics.task;
+
 const TTL_MIXSEARCH = 1 * 60 * 30; // 30 mins
+const TTL_HOTNEWS = 1 * 60 * 30; // 3 mins
+const TTL_LOCK_SHUFFLE_HOTNEWS = 1 * 60 * 5; // 3 mins
+
+const UPSERT_MAP_LIMIT = 10;
+
+const keyLockShuffleHotNews = `lockshufflehotnews`;
+
+let engines_hotnews = [
+  ENGINES.VNEXPRESS,
+  ENGINES.ZINGNEWS,
+  ENGINES.EVA,
+  ENGINES.CAFEF,
+  ENGINES.KENH14,
+]
 
 const noop = () => {}
 
@@ -70,7 +86,7 @@ SearchService.mixSearch = (keyword, options = {}, callback) => {
           ]
         */
 
-        engine.getEntriesFromRss(keyword, options, (err, result) => {
+        engineGgn.getEntriesFromRss(keyword, options, (err, result) => {
           if (err || !result || result.length == 0) return next(null, []);
 
           result = result.map((r) => {
@@ -106,7 +122,7 @@ SearchService.mixSearch = (keyword, options = {}, callback) => {
           }
         */
 
-        engine.getFeedFromGgSearch(keyword, options, (err, result) => {
+        engineGgn.getFeedFromGgSearch(keyword, options, (err, result) => {
           if (err || !result || !result.articles || result.articles.length == 0) return next(null, []);
 
           result = result.articles;
@@ -156,5 +172,112 @@ SearchService.mixSearch = (keyword, options = {}, callback) => {
 
       return callback(null, feeds);
     })
+  })
+}
+
+let _mapOneFeed = (feed, cbMap) => {
+  let { link, title, description, publishDate, heroImage } = feed;
+
+  let find = {
+    link
+  }
+
+  let update = {
+    $set: {
+      link,
+      title,
+      description,
+      publishDate
+    }
+  }
+
+  if (heroImage) update['$set']['heroImage'] = heroImage
+
+  utils.reqUpsertFeed(find, update, (errUpsert, resUpsert) => {
+    if (errUpsert) return cbMap(null, null);
+
+    resUpsert = utils.safeParse(resUpsert);
+    if (!resUpsert || !resUpsert.data) return cbMap(null, null);
+
+    let data = resUpsert.data;
+
+    let res = {
+      slug: data.slug,
+      link: data.link,
+      title: data.title,
+      publishDate: data.publishDate,
+    }
+
+    if (data.description) res.description = data.description;
+    if (data.heroImage && data.heroImage.url) res.heroImage = data.heroImage;
+    if (data.rawHtml) res.rawHtml = data.rawHtml;
+
+    return cbMap(errUpsert, res);
+  })
+}
+
+let _comparePublishDate = (f) => {
+  if (!f.publishDate) return -1;
+  return new Date(f.publishDate).getTime();
+}
+
+SearchService.makeHotnews = (callback) => {
+  async.each(engines_hotnews, (engineName, cb) => {
+    let keyHotNews = `hotnews:${engineName}`;
+    let engine = require(`../../engines/${engineName}`);
+
+    engine.hotnews((err, news) => {
+      if (err || !news) return cb();
+
+      async.mapLimit(news, UPSERT_MAP_LIMIT, _mapOneFeed, (err2, results) => {
+        results = results.filter((f) => {
+          return f && f.heroImage && f.heroImage.url;
+        })
+
+        results = _.orderBy(results, [_comparePublishDate], ['desc']);
+        results = results.slice(0, 30);
+
+        return redisService.set(keyHotNews, results, TTL_HOTNEWS, (err3) => {
+          if (err3) console.log('makeHotnews err3=', err3);
+          return cb();
+        });
+      })
+    })
+  }, (err) => {
+    let now = moment();
+    return callback(null, now.utcOffset(420).format());
+  })
+}
+
+SearchService.hotnews = (callback) => {
+  let hotnews = [];
+
+  // return SearchService.makeHotnews(callback);
+
+  async.each(engines_hotnews, (engineName, cb) => {
+    let keyHotNews = `hotnews:${engineName}`;
+
+    redisService.get(keyHotNews, (err, value) => {
+      value = utils.safeParse(value) || [];
+
+      hotnews = [...hotnews, ...value];
+      return cb();
+    });
+  }, (err, result) => {
+    hotnews = _.shuffle(hotnews);
+    return callback(err, hotnews);
+
+    /*redisService.get(keyLockShuffleHotNews, (err, value) => {
+      if (!value) {
+        console.log('--> let shuffle hot news!');
+        hotnews = _.shuffle(hotnews);
+
+        return redisService.set(keyLockShuffleHotNews, 1, TTL_LOCK_SHUFFLE_HOTNEWS, () => {
+          return callback(err, hotnews);
+        });
+      }
+
+      return callback(err, hotnews);
+    })*/
   })
 }

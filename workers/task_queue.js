@@ -31,6 +31,7 @@ let fatal = debug('FATAL');
 let logE = log.extend('error');
 let logQ = log.extend('queue');
 let logQE = logQ.extend('error');
+let logAutoPushTask = log.extend('AutoPushTask');
 
 const redisService = require('../routes/services/RedisService');
 redisService.init();
@@ -274,3 +275,33 @@ let main = () => {
 }
 
 setTimeout(main, 3e3);
+
+// auto push task
+let AUTO_PUSH_TASKS = [
+	{
+		name: TASK.HOTNEWS,
+		interval: 1e3 * 60 * 3
+		// interval: 1e3 * 10
+	}
+]
+
+setTimeout(() => {
+	logAutoPushTask('begin auto push task ...');
+
+	async.each(AUTO_PUSH_TASKS, (t, cb) => {
+		queueService.pushTask(t, (err, result) => {
+			logAutoPushTask(`task name: ${t.name} done, err= ${err}`);
+			logAutoPushTask(`task name: ${t.name} done, result= ${JSON.stringify(result)}`);
+			return cb();
+		})
+
+		// auto push
+		setInterval(() => {
+			queueService.pushTask(t, (err, result) => {
+				logAutoPushTask(`task name: ${t.name} done, err= ${err}`);
+				logAutoPushTask(`task name: ${t.name} done, result= ${JSON.stringify(result)}`);
+			})
+		}, t.interval);
+	}, noop)
+}, 5e3)
+

@@ -17,5 +17,11 @@
 	"EFETCHLINK": "EFETCHLINK",
 	"incorrect header check": "incorrect header check",
 	"[object Object]": "[object Object]",
-	"Expected response to be successful, got 404": "Expected response to be successful, got 404"
+	"Expected response to be successful, got 404": "Expected response to be successful, got 404",
+	"E11000 duplicate key error collection: feed24h.feeds index: slug_1 dup key: { slug: \"lisa-bat-cuoi-khi-duoc-h-i-ve-toc-mai\" }": "E11000 duplicate key error collection: feed24h.feeds index: slug_1 dup key: { slug: \"lisa-bat-cuoi-khi-duoc-h-i-ve-toc-mai\" }",
+	"connection 3 to 206.189.144.26:19128 timed out": "connection 3 to 206.189.144.26:19128 timed out",
+	"connection 0 to 206.189.144.26:19128 timed out": "connection 0 to 206.189.144.26:19128 timed out",
+	"connection 2 to 206.189.144.26:19128 timed out": "connection 2 to 206.189.144.26:19128 timed out",
+	"connection 4 to 206.189.144.26:19128 timed out": "connection 4 to 206.189.144.26:19128 timed out",
+	"E11000 duplicate key error collection: feed24h.feeds index: slug_1 dup key: { slug: \"cau-chuyen-bi-dat-cua-cuu-ngoi-sao-ngoai-hang-anh-vua-dinh-loi-nguyen-lai-bi-choi-ngai\" }": "E11000 duplicate key error collection: feed24h.feeds index: slug_1 dup key: { slug: \"cau-chuyen-bi-dat-cua-cuu-ngoi-sao-ngoai-hang-anh-vua-dinh-loi-nguyen-lai-bi-choi-ngai\" }"
 }

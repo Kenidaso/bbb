@@ -1,11 +1,14 @@
-// node test [task]
-// node test ggnews
-// node test ggnews_rss
-// node test ggnews_topic
-// node test ggnews_story
-// node test reqmongo
-// node test vnexpress_rss
-// node test requpsertfeed
+/*
+node test [task]
+node test ggnews
+node test ggnews_rss
+node test ggnews_topic
+node test ggnews_story
+node test reqmongo
+node test vnexpress_rss
+node test requpsertfeed
+node test hotnews
+*/
 
 require('dotenv').config();
 
@@ -18,7 +21,9 @@ const myArgs = process.argv.slice(2);
 const task = myArgs[0].toLowerCase();
 
 let ggNewsService = require('./routes/services/GoogleNewsService');
-let RawFeedService = require('./routes/services/RawFeedService');
+// let RawFeedService = require('./routes/services/RawFeedService');
+let SearchService = require('./routes/services/SearchService');
+let RedisService = require('./routes/services/RedisService');
 
 let GGNews = require('./engines/googleNews');
 let vnexpress = require('./engines/vnexpress');
@@ -123,20 +128,28 @@ const getRawContent = (callback) => {
 	RawFeedService.getHtmlContent(link, options, callback);
 }
 
+const hotnews = (callback) => {
+	SearchService.hotnews(callback);
+}
 
 console.clear();
 
-console.log('begin ...');
-switch (task) {
-	case 'ggnews': return ggNews(_done);
-	case 'ggnews_rss': return ggNews_RSS(_done);
-	case 'ggnews_topic': return ggNews_Topic(_done);
-	case 'ggnews_story': return ggNews_Story(_done);
-	case 'reqmongo': return reqMongo(_done);
-	case 'vnexpress_rss': return getVnexpressRss(_done);
-	case 'requpsertfeed': return reqUpsertFeed(_done);
-	case 'rawcontent': return getRawContent(_done);
-	default:
-		console.log('Task not exists');
-		return _done();
-}
+RedisService.init();
+
+setTimeout(() => {
+	console.log('begin ...');
+	switch (task) {
+		case 'ggnews': return ggNews(_done);
+		case 'ggnews_rss': return ggNews_RSS(_done);
+		case 'ggnews_topic': return ggNews_Topic(_done);
+		case 'ggnews_story': return ggNews_Story(_done);
+		case 'reqmongo': return reqMongo(_done);
+		case 'vnexpress_rss': return getVnexpressRss(_done);
+		case 'requpsertfeed': return reqUpsertFeed(_done);
+		case 'rawcontent': return getRawContent(_done);
+		case 'hotnews': return hotnews(_done);
+		default:
+			console.log('Task not exists');
+			return _done();
+	}
+}, 5e3)

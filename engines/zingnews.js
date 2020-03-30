@@ -1,9 +1,15 @@
 const NAME = 'zingnews';
 const sanitizeHtml = require('sanitize-html');
 const debug = require('debug')(`Engine:${NAME}`);
-
+const cheerio = require('cheerio');
 const fs = require('fs');
 const path = require('path');
+const _ = require('lodash');
+const moment = require('moment');
+
+const URL_HOMEPAGE = 'https://news.zing.vn';
+
+const utils = require('../helpers/utils');
 
 const request = require('request').defaults({
 	headers: {
@@ -34,6 +40,72 @@ engine.fetch = (link, callback) => {
   }, (err, response, body) => {
     return callback(err, body);
   })
+}
+
+engine.homepage = (callback) => {
+	engine.fetch(URL_HOMEPAGE, (err, html) => {
+		let feeds = [];
+
+		let $ = cheerio.load(html);
+		let articles = $('article');
+		_.forEach(articles, (article) => {
+			let link = $('a', article).attr('href');
+			link = URL_HOMEPAGE + link;
+
+			let srcImg = $('img', article).attr('src');
+			let title = $('.article-title a', article).text();
+			title = utils.normalizeText(title);
+
+			let description = $('.article-summary', article).text();
+			let category = $('.category', article).text();
+			let date = $('.date', article).text();
+			let time = $('.time', article).text();
+
+			let publishDate = moment(`${date} ${time}`, 'DD/MM/YYYY HH:mm').format();
+
+			let likeCount = $('.like-count', article).text();
+			likeCount = Number(likeCount) || 0;
+
+			let dislikeCount = $('.dislike-count', article).text();
+			dislikeCount = Number(dislikeCount) || 0;
+
+			let ratingCount = $('.rating-count', article).text();
+			ratingCount = Number(ratingCount) || 0;
+
+			let viralCount = $('.viral-count', article).text();
+			viralCount = Number(viralCount) || 0;
+
+			let commentCount = $('.comment-count', article).text();
+			commentCount = Number(commentCount) || 0;
+
+			feeds.push({
+				link,
+				heroImage: {
+					url: srcImg
+				},
+				title,
+				description,
+				publishDate,
+				metadata: {
+					category,
+					likeCount,
+					dislikeCount,
+					ratingCount,
+					viralCount,
+					commentCount
+				}
+			});
+		})
+
+		return callback(err, feeds);
+	})
+}
+
+engine.hotnews = (callback) => {
+	engine.homepage((err, news) => {
+	  // news = news.slice(0, 30);
+	  return callback(null, news);
+	});
 }
 
 engine.cleanSpecial = ($, content) => {

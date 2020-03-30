@@ -1,6 +1,9 @@
-// node test_in_keystone upsertsafe
-// node test_in_keystone upsertsafe_v2
-// node test_in_keystone rawcontent
+/*
+node test_in_keystone upsertsafe
+node test_in_keystone upsertsafe_v2
+node test_in_keystone rawcontent
+node test_in_keystone hotnews
+*/
 
 require('dotenv').config();
 
@@ -38,6 +41,7 @@ const Feed = keystone.list('Feed');
 const NewsTopic = keystone.list('NewsTopic');
 
 const RawFeedService = require('./routes/services/RawFeedService');
+const FeedService = require('./routes/services/FeedService');
 
 const noop = () => {};
 
@@ -63,6 +67,7 @@ keystone.start( x => {
 		case 'upsertsafe': return test_upsertSafe(_done);
 		case 'upsertsafe_v2': return test_upsertSafe_v2(_done);
 		case 'rawcontent': return getRawContent(_done);
+		case 'hotnews': return hotnews(_done);
 		default:
 			console.log('Task not exists');
 			return _done();
@@ -164,4 +169,8 @@ const getRawContent = (callback) => {
 	};
 
 	RawFeedService.getHtmlContent(link, options, callback);
+}
+
+const hotnews = (callback) => {
+	FeedService.hotnews(callback);
 }
