@@ -261,12 +261,10 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
     if (err) return callback(err, html);
 
     let fnReformat = base.reformat;
+    if (engine.reformat) fnReformat = engine.reformat;
 
-    if (engine.reformat) {
-      fnReformat = engine.reformat;
-      debug('go reformat ...');
-      html = fnReformat(html);
-    }
+    debug('go reformat ...');
+    html = fnReformat(html);
 
     let $ = cheerio.load(html);
 
