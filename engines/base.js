@@ -189,6 +189,27 @@ base.fetch = (link, callback) => {
   })
 }
 
+base.reformat = (html) => {
+  let $ = cheerio.load(html);
+
+  debug('tag img: convert data-original -> src ');
+  $('img').each(function () {
+    let dataOriginal = $(this).attr('data-original');
+    if (dataOriginal) {
+      $(this).attr('src', dataOriginal);
+      $(this).removeAttr('data-original');
+    }
+
+    let dataSrc = $(this).attr('data-src');
+    if (dataSrc) {
+      $(this).attr('src', dataSrc);
+      $(this).removeAttr('data-src');
+    }
+  });
+
+  return $.html();
+}
+
 base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
   if (NODE_ENV !== 'production') debug('hostInfo= %o', hostInfo);
 
@@ -239,6 +260,14 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
   fetchEngine(link, (err, html) => {
     if (err) return callback(err, html);
 
+    let fnReformat = base.reformat;
+
+    if (engine.reformat) {
+      fnReformat = engine.reformat;
+      debug('go reformat ...');
+      html = fnReformat(html);
+    }
+
     let $ = cheerio.load(html);
 
     debug('host %s : mainContentSelector= %s', hostInfo.website, config.mainContentSelector);
@@ -268,11 +297,6 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
     }
 
     if (!content || content.length == 0) {
-      if (engine.reformat) {
-        debug('go reformat ...');
-        html = engine.reformat(html);
-      }
-
       let extractor = clipper.extract(html, link);
 
       // if (NODE_ENV != 'production') debug('extractor= %o', extractor);
