@@ -167,3 +167,22 @@ engine.hotnews = (callback) => {
     return callback(null, news);
   });
 }
+
+engine.reformat = (html) => {
+	if (process.env.NODE_ENV !== 'production') {
+		fs.writeFileSync(path.join(__dirname, `../data_sample/parse_${NAME}.html`), html);
+	}
+
+	let $ = cheerio.load(html);
+
+	debug('tag img: convert data-original -> src ');
+	$('img').each(function () {
+		let dataOriginal = $(this).attr('data-original');
+		if (dataOriginal) {
+			$(this).attr('src', dataOriginal);
+			$(this).removeAttr('data-original');
+		}
+	});
+
+	return $.html();
+}

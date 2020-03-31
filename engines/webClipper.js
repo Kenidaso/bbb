@@ -828,8 +828,11 @@ clipper.extract = (html, link) => {
     if (ldJson) {
       if (ldJson.description && !description) description = ldJson.description;
       if (ldJson.image && ldJson.image.url) images.push(ldJson.image.url);
-      if ((!publishDate || !moment(publishDate).isValid()) && ldJson.datePublished) {
-        publishDate = ldJson.datePublished;
+      if ((!publishDate || !moment(publishDate).isValid())) {
+        if (ldJson.datePublished) {
+          publishDate = ldJson.datePublished;
+          debug('use ldJson publishDate= %s', publishDate)
+        }
       }
       if (!heroImage && ldJson.image && ldJson.image.url) heroImage = ldJson.image.url;
     }

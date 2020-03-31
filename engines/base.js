@@ -268,7 +268,14 @@ base.getRawContent = (link, hostInfo = {}, engine = {}, callback) => {
     }
 
     if (!content || content.length == 0) {
+      if (engine.reformat) {
+        debug('go reformat ...');
+        html = engine.reformat(html);
+      }
+
       let extractor = clipper.extract(html, link);
+
+      // if (NODE_ENV != 'production') debug('extractor= %o', extractor);
 
       if (extractor && extractor.content) {
         if (NODE_ENV !== 'production') debug('content= %s', extractor.content);

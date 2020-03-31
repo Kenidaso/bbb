@@ -78,6 +78,7 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 	let rawHtml = null;
 	let heroImage = null;
 	let description = null;
+	let publishDate = null;
 	let articleParse = null;
 	let linkBaoMoi = null;
 	let finalFeed = null;
@@ -302,6 +303,7 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 				heroImage = result.heroImage;
 
 				if (result.description) description = result.description;
+				if (result.publishDate) publishDate = result.publishDate;
 
 				return next(null);
 			});
@@ -376,6 +378,10 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 
 						if (!feed.description && description) {
 							update.description = description;
+						}
+
+						if (!feed.publishDate && publishDate) {
+							update.publishDate = publishDate;
 						}
 
 						if (NODE_ENV !== 'production') debug('[getHtmlContent] update= %o', update);
