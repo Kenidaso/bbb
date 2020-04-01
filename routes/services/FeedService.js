@@ -19,6 +19,8 @@ if (NODE_ENV === 'development') TTL = 60 * 60;
 
 let TTL_LINK_FEED = 60 * 60 * 24 * 7; // 7 day
 
+const noop = () => {}
+
 Feed = {};
 module.exports = Feed;
 
@@ -33,7 +35,7 @@ Feed.getFeeds = (params, callback) => {
 		result = utils.safeParse(result);
 
 		if (result && NODE_ENV === 'production') {
-			console.log('get from cache key=', key);
+			debug('get from cache key=', key);
 			return callback(null, result);
 		}
 
@@ -116,7 +118,7 @@ Feed.getCategories = (callback) => {
 Feed.upsertFeed = (find, update, callback) => {
 	FeedModel.findOne(find, (err, result) => {
 		if (err) {
-			console.log('upsertSafe err=', err);
+			debug('upsertSafe err=', err);
 			return callback(err);
 		}
 
@@ -158,5 +160,19 @@ Feed.upsertFeed = (find, update, callback) => {
 			if (err) return callback(err);
 			return callback(err, newObj);
 		});
+	});
+}
+
+Feed.incView = (slug, callback) => {
+	callback();
+
+	FeedModel.findOne({ slug }, (err, result) => {
+		if (err) {
+			debug('inc view search err=', err);
+			return noop();
+		}
+
+		if (!result) return noop();
+		result.incView(noop);
 	});
 }

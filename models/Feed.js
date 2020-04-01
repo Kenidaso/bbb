@@ -101,10 +101,15 @@ Feed.schema.pre('save', function (next) {
 	return next();
 });
 
-Feed.schema.index( {
+Feed.schema.methods.incView = function (callback) {
+	this.view += 1;
+	this.save(callback)
+}
+
+/*Feed.schema.index( {
 	topic: 1
 }, function (err, result) {
    console.log(`Feed index topic done: ${result}`);
-});
+});*/
 
 Feed.register();

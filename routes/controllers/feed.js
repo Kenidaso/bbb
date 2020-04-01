@@ -81,3 +81,11 @@ FeedCtrl.getHotNews = (req, res) => {
 		return Response.success(req, res, result);
 	});
 }
+
+FeedCtrl.incView = (req, res) => {
+	let slug = req.params.slug;
+	FeedService.incView(slug, (err, result) => {
+		if (err) return Response.error(req, res, err, result);
+		return Response.success(req, res, result);
+	});
+}

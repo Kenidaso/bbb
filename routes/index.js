@@ -81,6 +81,7 @@ exports = module.exports = function (app) {
 
 	app.get('/categories', routes.controllers.feed.getCategories);
 	app.get('/content/:slug', routes.controllers.feed.getContent);
+	app.get('/view/:slug', routes.controllers.feed.incView);
 	app.post('/feed/raw', routes.controllers.feed.getRawContent);
 	app.get('/feed/hotnews', routes.controllers.feed.getHotNews);
 	app.get('/feed/:category/:page?', routes.controllers.feed.getFeeds);
