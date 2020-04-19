@@ -60,7 +60,7 @@ bot.onText(/^\/redis_set/, (msg, match) => {
   let key = split[1];
   let value = split[2];
 
-  RedisService.set(key, value, () => {
+  RedisService.set(key, value, 60 * 60 * 2, () => {
     return bot.sendMessage(chatId, `set redis success`, { reply_to_message_id: msg.message_id });
   });
 });
