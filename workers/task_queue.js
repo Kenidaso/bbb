@@ -45,7 +45,7 @@ const taskService = require('../routes/services/TaskService');
 const WORKER_NAME = workerConfig.name;
 const MAX_DRAIN = process.env.MAX_DRAIN || 3;
 let COUNT_DRAIN = 0;
-const WORKER_TTL = Number(process.env.WORKER_TTL) || 120; // 45 min: Worker time to life in minite
+const WORKER_TTL = Number(process.env.WORKER_TTL) || 45; // 45 min: Worker time to life in minite
 const QUEUE_CAPACITY = Number(process.env.QUEUE_CAPACITY) || 3
 
 const START_AT = moment();
@@ -304,4 +304,10 @@ setTimeout(() => {
 		}, t.interval);
 	}, noop)
 }, 5e3)
+
+// auto restart
+setTimeout(() => {
+	console.log('Auto stop ...');
+	process.exit(0);
+}, (WORKER_TTL + 3) * 1000 * 60);
 
