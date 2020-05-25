@@ -1,0 +1,59 @@
+{
+  "user": {
+    "uid": "VvKRTv3Ky9VmmJFrAxNO3JL19HG2",
+    "displayName": "Quyen Le",
+    "photoURL": "https://lh3.googleusercontent.com/a-/AOh14GjSwavn-HK2EthazvH2XSJj-gu56zd4KgmMjwqB0A",
+    "email": "chickyky@gmail.com",
+    "emailVerified": true,
+    "phoneNumber": null,
+    "isAnonymous": false,
+    "tenantId": null,
+    "providerData": [
+      {
+        "uid": "110703536814197843684",
+        "displayName": "Quyen Le",
+        "photoURL": "https://lh3.googleusercontent.com/a-/AOh14GjSwavn-HK2EthazvH2XSJj-gu56zd4KgmMjwqB0A",
+        "email": "chickyky@gmail.com",
+        "phoneNumber": null,
+        "providerId": "google.com"
+      }
+    ],
+    "apiKey": "AIzaSyBvTGZKN9R9MS5a0Zk5axmDw-B3lrxELzQ",
+    "appName": "[DEFAULT]",
+    "authDomain": "cky-feed24h.firebaseapp.com",
+    "stsTokenManager": {
+      "apiKey": "AIzaSyBvTGZKN9R9MS5a0Zk5axmDw-B3lrxELzQ",
+      "refreshToken": "AE0u-NcJa-e8F8eljzeeO9RgOUqtp3yPssGMqrkgZPssuP3wphtqf6DC1dfirUpiNHMWxZiMpM3jVfsMbnRkTHomG-4MAP0AyhHLCpUahkY9aqHugpkoOgN8rkkJs5EGJtMgpNk9BQ3dm-3j1hqCasO1G3Zul6OPlE9isDG4Go0uACIxZtgurNChyy9MvL9xH3_IMI2o6SutE_MpZojuA2iHo6Djy8FO2kGPasJRxYArqxoIw2H_uivQR78HV92l5Ai5YXN1AqTQnaUkfk2tevKp-z2oyZzwowclUynjRfaO02pRFQoFzHBP_T0iLi6fikWrc6LM4bxfRiEc-juZNtYBTK3JBFEvWFF4D4pmJu5VyyAwjc0UsmgdO9F4jZI4CiajZpEZRL1A8bsBWZbX6X-5oMeB-byQwg",
+      "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImZjMmM4YmIyNmE3OGM0M2JkODYzNzA1YjNkNzkyMWI0ZTY0MjVkNTQiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiUXV5ZW4gTGUiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EtL0FPaDE0R2pTd2F2bi1ISzJFdGhhenZIMlhTSmotZ3U1NnpkNEtnbU1qd3FCMEEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vY2t5LWZlZWQyNGgiLCJhdWQiOiJja3ktZmVlZDI0aCIsImF1dGhfdGltZSI6MTU4OTYwMjcxMCwidXNlcl9pZCI6IlZ2S1JUdjNLeTlWbW1KRnJBeE5PM0pMMTlIRzIiLCJzdWIiOiJWdktSVHYzS3k5Vm1tSkZyQXhOTzNKTDE5SEcyIiwiaWF0IjoxNTg5NjAyNzEwLCJleHAiOjE1ODk2MDYzMTAsImVtYWlsIjoiY2hpY2t5a3lAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZ29vZ2xlLmNvbSI6WyIxMTA3MDM1MzY4MTQxOTc4NDM2ODQiXSwiZW1haWwiOlsiY2hpY2t5a3lAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoiZ29vZ2xlLmNvbSJ9fQ.na-C8sV63RDMDdT13XGkIu3nmdeTMqgIjwV6ubk0b_xCc68zywa6O_ah_nrKJpPxdFV4b4vLpesM8Y6eiBB1TcOF839q5M8N6SovGn0-NkGGR2c09Sj8VIvhS6nZUCMM2f6ezrChXGV-fedQgdPNwk5xyLUvkP3Shz5O38Z-YiuR_ZBm9bqrhu61F5Gvpa_c7hLMHpRFOPzBu_zmTG4xqRa6TTty4GubwwfvVJnMqFXO4QhpRk03teEjFDtrvqN1mn0mnw93J1l9edvfWXGncQi5isMef3eraCAOqVd_9RXoRIaC-zacbsZMbPPpHlAppXnPk0TvRcoDDvgAR5HkNg",
+      "expirationTime": 1589606310000
+    },
+    "redirectEventId": null,
+    "lastLoginAt": "1589602710461",
+    "createdAt": "1589078415121",
+    "multiFactor": {
+      "enrolledFactors": []
+    }
+  },
+  "credential": {
+    "providerId": "google.com",
+    "signInMethod": "google.com",
+    "oauthIdToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImMxNzcxODE0YmE2YTcwNjkzZmI5NDEyZGEzYzZlOTBjMmJmNWI5MjciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiMTAwMjI4Njk5NjUzMS0yNzUwdGlpN2s1MDhkcG9sZ2R1MjAybHY4ZW05Ymk3NC5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImF1ZCI6IjEwMDIyODY5OTY1MzEtMjc1MHRpaTdrNTA4ZHBvbGdkdTIwMmx2OGVtOWJpNzQuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTA3MDM1MzY4MTQxOTc4NDM2ODQiLCJlbWFpbCI6ImNoaWNreWt5QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoiRkxyMU1GR2Jqa0tLLUs0N3ozcXRvdyIsImlhdCI6MTU4OTYwMjcxMCwiZXhwIjoxNTg5NjA2MzEwfQ.eoRurXbwM8hdIkwZKKUuPSkuY4oio_GFTaAQE3tvRKtA98waVy9Jl-w4_X1HmdXe8IZmzV9h_wqfsuVcJhkoSAj1i0Y3Lj3NSBHDY9gaPoWzSjj4sGjGGPDtVFDIBxygGM87V8yJRmXm-f4e0XfynxeCkN_edco1pJhb7TPUgpWRKfQhFjBWJe2QXSAAsOklIza4avVq1nTrzV6WjK5VIzi-DF8miysYFHUbq-vK-jGJN_zLtKVsrU55mllI3zheWLZFF-QUQGK6der4qWWGBcH3ip6JApi4uV_eTyVGa7KGO2iaiMY9HM-HVLhJzg96yvIv2PcEQMmQ-oOfOFNN4A",
+    "oauthAccessToken": "ya29.a0AfH6SMA3Qbc6EoWUZdn1OinEnEvBbaRWb8mjqeaCD23Q3J-RGnPm-LUVFHzpnsk01Z9uMkmX91NqstoK3WfJ4arruek36rwNlSH2Gb-8REc96lmS0XGeHIKMekVIYlqo9k-2HQ9KFtoKiTuH2q9HEdN9yD9xXsT-7Y7C"
+  },
+  "additionalUserInfo": {
+    "providerId": "google.com",
+    "isNewUser": false,
+    "profile": {
+      "name": "Quyen Le",
+      "granted_scopes": "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid",
+      "id": "110703536814197843684",
+      "verified_email": true,
+      "given_name": "Quyen",
+      "locale": "en",
+      "family_name": "Le",
+      "email": "chickyky@gmail.com",
+      "picture": "https://lh3.googleusercontent.com/a-/AOh14GjSwavn-HK2EthazvH2XSJj-gu56zd4KgmMjwqB0A"
+    }
+  },
+  "operationType": "signIn"
+}

@@ -7,6 +7,8 @@ const keystone = require('keystone');
 const requireDir = require('require-dir');
 const i18n = require("i18n");
 const async = require('async');
+const Sentry = require('@sentry/node');
+
 const acrud = require('./helpers/acrud');
 
 const utils = require('./helpers/utils');
@@ -26,7 +28,7 @@ i18n.configure({
 	defaultLocale: 'vi',
 
 	// sets a custom cookie name to parse locale settings from - defaults to NULL
-	cookie: 'language',
+	cookie: 'lang',
 
 	// query parameter to switch locale (ie. /home?lang=ch) - defaults to NULL
 	queryParameter: 'lang',
@@ -34,6 +36,10 @@ i18n.configure({
 	// sync locale information accros all files - defaults to false
 	syncFiles: false,
 });
+
+if (process.env.NODE_ENV === 'production') {
+	Sentry.init({ dsn: 'https://7281f0a1561440aebecba820081aacb2@o309267.ingest.sentry.io/5243553' });
+}
 
 // Initialise Keystone with your project's configuration.
 // See http://keystonejs.com/guide/config for available options
@@ -62,6 +68,7 @@ keystone.init({
 
 keystone.set('i18n', i18n);
 keystone.set('acrud', acrud);
+keystone.set('Sentry', Sentry);
 
 // Load your project's Models
 keystone.import('models');
@@ -92,8 +99,10 @@ keystone.set('nav', {
 	'ks-users': 'ks-users',
 
 	'System': [
+		'Counting',
 		'Device',
-		'User'
+		'User',
+		'RegisterProvider'
 	],
 
 	'News': [
@@ -143,6 +152,7 @@ keystone.on = function (eventname, callback) {
 process.on('uncaughtException', (error) => {
   console.log(`====> uncaughtException=`, error);
   utils.sendMessageTelegram(`[news-backend] uncaughtException: ${error.toString()}`);
+  Sentry.captureException(error);
 });
 
 async.parallel({

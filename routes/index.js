@@ -19,6 +19,7 @@
  */
 
 const keystone = require('keystone');
+const jwt = require('express-jwt');
 
 const middleware = require('./middleware');
 const importRoutes = keystone.importer(__dirname);
@@ -29,6 +30,7 @@ const multer  = require('multer');
 const upload = multer({ dest: 'uploads/' });
 
 const Response = require('./services/Response');
+const JwtService = require('./services/JwtService');
 
 // Common Middleware
 keystone.pre('routes', middleware.initLocals);
@@ -36,93 +38,117 @@ keystone.pre('render', middleware.flashMessages);
 
 // Import Route Controllers
 const routes = {
-	views: importRoutes('./views'),
-	controllers: importRoutes('./controllers'),
+  views: importRoutes('./views'),
+  controllers: importRoutes('./controllers'),
 };
 
 const i18n = keystone.get('i18n');
 const acrud = keystone.get('acrud');
+const Sentry = keystone.get('Sentry');
 
 // Setup Route Bindings
 exports = module.exports = function (app) {
+  // The request handler must be the first middleware on the app
+  app.use(Sentry.Handlers.requestHandler());
 
-	app.use(i18n.init);
+  app.use(function (req, res, next) {
+    app.disable('x-powered-by');
 
-	app.use(function (req, res, next) {
-	  app.disable('x-powered-by');
-	  next();
-	});
+    req.query = req.query || {};
+    if (!req.query.lang && req.headers['accept-language']) {
+      req.query.lang = req.headers['accept-language'];
+    }
 
-	app.use(cors());
+    next();
+  });
 
-	app.get('/ping', (req, res) => {
-	  return Response.success(req, res, {
-	    message: 'pong',
-	    query: req.query,
-	    params: req.params,
-	    path: req.path,
-	    ip: req.ip,
-	    ips: req.ips,
-	    hostname: req.hostname,
-	    headers: req.headers,
-	    i18n: {
-	      getLocales: res.locals.i18n.getLocales()
-	    }
-	  });
-	});
+  app.use(i18n.init);
 
-	// Views
-	app.get('/', routes.views.index);
-	app.get('/blog/:category?', routes.views.blog);
-	app.get('/blog/post/:post', routes.views.post);
-	app.get('/gallery', routes.views.gallery);
+  app.use(cors());
 
-	app.get('/image-of-day', routes.controllers.image.imageOfDay);
+  app.get('/ping', (req, res) => {
+    return Response.success(req, res, {
+      message: 'pong',
+      query: req.query,
+      params: req.params,
+      path: req.path,
+      ip: req.ip,
+      ips: req.ips,
+      hostname: req.hostname,
+      headers: req.headers,
+      i18n: {
+        getLocales: res.locals.i18n.getLocales()
+      }
+    });
+  });
 
-	app.get('/categories', routes.controllers.feed.getCategories);
-	app.get('/content/:slug', routes.controllers.feed.getContent);
-	app.get('/view/:slug', routes.controllers.feed.incView);
-	app.post('/feed/raw', routes.controllers.feed.getRawContent);
-	app.get('/feed/hotnews', routes.controllers.feed.getHotNews);
-	app.get('/feed/:category/:page?', routes.controllers.feed.getFeeds);
-	app.post('/ggn/search', middleware.trackSearch, routes.controllers.search.ggnSearch);
-	app.post('/ggn/search-ggs', middleware.trackSearch, routes.controllers.search.searchFromGgSearch);
-	app.post('/device/register', routes.controllers.device.register);
+  // Views
+  app.get('/', routes.views.index);
+  app.get('/blog/:category?', routes.views.blog);
+  app.get('/blog/post/:post', routes.views.post);
+  app.get('/gallery', routes.views.gallery);
 
-	app.post('/feed/upsert', routes.controllers.feed.upsertFeed);
+  app.get('/image-of-day', routes.controllers.image.imageOfDay);
 
-	app.post('/autocomplete', routes.controllers.gg.autocompleteMerge); // autocomplete by google search
-	app.post('/gg/autocomplete', routes.controllers.gg.autocomplete); // autocomplete by google search
-	app.post('/ggt/yis', routes.controllers.trends.yearInSearch); // Year in Search, top search in year
-	app.post('/ggt/autocomplete', routes.controllers.trends.autocomplete); // autocomplete with region
-	app.post('/ggt/daily', routes.controllers.trends.dailytrends);
-	app.post('/ggt/realtime', routes.controllers.trends.realtimetrends);
+  app.get('/categories', routes.controllers.feed.getCategories);
+  app.get('/content/:slug', routes.controllers.feed.getContent);
+  app.get('/view/:slug', routes.controllers.feed.incView);
+  app.post('/feed/raw', routes.controllers.feed.getRawContent);
+  app.get('/feed/hotnews', routes.controllers.feed.getHotNews);
+  app.get('/feed/:category/:page?', routes.controllers.feed.getFeeds);
+  app.post('/ggn/search', middleware.trackSearch, routes.controllers.search.ggnSearch);
+  app.post('/ggn/search-ggs', middleware.trackSearch, routes.controllers.search.searchFromGgSearch);
+  app.post('/device/register', routes.controllers.device.register);
 
-	app.post('/gg/standing-of-league', routes.controllers.gg.standingOfLeague);
-	app.post('/gg/stat-of-league', routes.controllers.gg.statOfLeague);
-	app.post('/gg/news-of-league', routes.controllers.gg.newsOfLeague);
-	app.post('/gg/player-of-league', routes.controllers.gg.playerOfLeague);
-	app.post('/gg/match-of-league', routes.controllers.gg.matchOfLeague);
-	app.post('/gg/player-stat', routes.controllers.gg.statOfPlayer);
-	app.post('/gg/timeline-of-match', routes.controllers.gg.timelineOfMatch);
-	app.post('/gg/lineups-of-match', routes.controllers.gg.lineupsOfMatch);
-	app.post('/gg/stats-of-match', routes.controllers.gg.statsOfMatch);
-	app.post('/gg/news-of-match', routes.controllers.gg.newsOfMatch);
-	app.post('/gg/layout-header-of-match', routes.controllers.gg.layoutHeaderOfMatch);
+  app.post('/feed/upsert', routes.controllers.feed.upsertFeed);
 
-	app.post('/q/search', middleware.trackSearch, routes.controllers.search.queueSearch); // push search into queue
-	app.post('/q/push-task', middleware.trackSearchInPushTask, routes.controllers.queue.pushTask); // push task
-	app.get('/task/status/:taskId', routes.controllers.task.status);
+  app.post('/autocomplete', routes.controllers.gg.autocompleteMerge); // autocomplete by google search
+  app.post('/gg/autocomplete', routes.controllers.gg.autocomplete); // autocomplete by google search
+  app.post('/ggt/yis', routes.controllers.trends.yearInSearch); // Year in Search, top search in year
+  app.post('/ggt/autocomplete', routes.controllers.trends.autocomplete); // autocomplete with region
+  app.post('/ggt/daily', routes.controllers.trends.dailytrends);
+  app.post('/ggt/realtime', routes.controllers.trends.realtimetrends);
 
-	app.post('/tele/webhook/cky-tele-bot', routes.controllers.telegram.processUpdate);
-	app.post('/tele/send-to-group', upload.single('image'), routes.controllers.telegram.sendMessage2Group);
+  app.post('/gg/standing-of-league', routes.controllers.gg.standingOfLeague);
+  app.post('/gg/stat-of-league', routes.controllers.gg.statOfLeague);
+  app.post('/gg/news-of-league', routes.controllers.gg.newsOfLeague);
+  app.post('/gg/player-of-league', routes.controllers.gg.playerOfLeague);
+  app.post('/gg/match-of-league', routes.controllers.gg.matchOfLeague);
+  app.post('/gg/player-stat', routes.controllers.gg.statOfPlayer);
+  app.post('/gg/timeline-of-match', routes.controllers.gg.timelineOfMatch);
+  app.post('/gg/lineups-of-match', routes.controllers.gg.lineupsOfMatch);
+  app.post('/gg/stats-of-match', routes.controllers.gg.statsOfMatch);
+  app.post('/gg/news-of-match', routes.controllers.gg.newsOfMatch);
+  app.post('/gg/layout-header-of-match', routes.controllers.gg.layoutHeaderOfMatch);
 
-	app.post('/heroku/restart', routes.controllers.heroku.restart);
+  app.post('/q/search', middleware.trackSearch, routes.controllers.search.queueSearch); // push search into queue
+  app.post('/q/push-task', middleware.trackSearchInPushTask, routes.controllers.queue.pushTask); // push task
+  app.get('/task/status/:taskId', routes.controllers.task.status);
 
-	app.post('/fb/sharing-debugger', routes.controllers.fb.scrapedSharingDebugger);
+  app.post('/user/register-guest', routes.controllers.user.registerGuest);
+  // app.get('/user/verify-token', jwt({ secret: JwtService.JWT_SECRET }));
+  app.get('/user/verify-token', middleware.verifyToken, (req, res, next) => {
+    return res.json(req.user);
+  });
 
-	app.post(acrud.ROUTE, acrud.controller);
+  // firebase
+  app.post('/firebase/verify-access-token', routes.controllers.firebase.verifyAccessToken);
+  app.get('/firebase/generate-access-token', routes.controllers.firebase.generateAccessToken);
+  app.post('/firebase/refresh-access-token', routes.controllers.firebase.refreshAccessToken);
 
-	// NOTE: To protect a route so that only admins can see it, use the requireUser middleware:
-	// app.get('/protected', middleware.requireUser, routes.views.protected);
+  app.post('/tele/webhook/cky-tele-bot', routes.controllers.telegram.processUpdate);
+  app.post('/tele/send-to-group', upload.single('image'), routes.controllers.telegram.sendMessage2Group);
+
+  app.post('/heroku/restart', routes.controllers.heroku.restart);
+
+  app.post('/fb/sharing-debugger', routes.controllers.fb.scrapedSharingDebugger);
+
+  app.post(acrud.ROUTE, acrud.controller);
+
+  // The error handler must be before any other error middleware
+  app.use(Sentry.Handlers.errorHandler());
+
+  app.use(middleware.handleError);
+  // NOTE: To protect a route so that only admins can see it, use the requireUser middleware:
+  // app.get('/protected', middleware.requireUser, routes.views.protected);
 };

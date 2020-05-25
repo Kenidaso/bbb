@@ -4,7 +4,7 @@
 	"success": "Thành công",
 	"Timeout - no response": "Timeout - no response",
 	"Method not found": "Method not found",
-	"Not define error message": "Not define error message",
+	"Not define error message": " Mã lỗi này chưa được khai báo!",
 	"Fetching failed: https://news.google.com/rss/search?pz=1&cf=all&q=&hl=vi&gl=VN&ceid=VN:vi": "Fetching failed: https://news.google.com/rss/search?pz=1&cf=all&q=&hl=vi&gl=VN&ceid=VN:vi",
 	"Link is invalid": "Link không hợp lệ",
 	"connection 3 to ds259245.mlab.com:59245 timed out": "connection 3 to ds259245.mlab.com:59245 timed out",
@@ -23,5 +23,18 @@
 	"connection 0 to 206.189.144.26:19128 timed out": "connection 0 to 206.189.144.26:19128 timed out",
 	"connection 2 to 206.189.144.26:19128 timed out": "connection 2 to 206.189.144.26:19128 timed out",
 	"connection 4 to 206.189.144.26:19128 timed out": "connection 4 to 206.189.144.26:19128 timed out",
-	"E11000 duplicate key error collection: feed24h.feeds index: slug_1 dup key: { slug: \"cau-chuyen-bi-dat-cua-cuu-ngoi-sao-ngoai-hang-anh-vua-dinh-loi-nguyen-lai-bi-choi-ngai\" }": "E11000 duplicate key error collection: feed24h.feeds index: slug_1 dup key: { slug: \"cau-chuyen-bi-dat-cua-cuu-ngoi-sao-ngoai-hang-anh-vua-dinh-loi-nguyen-lai-bi-choi-ngai\" }"
+	"E11000 duplicate key error collection: feed24h.feeds index: slug_1 dup key: { slug: \"cau-chuyen-bi-dat-cua-cuu-ngoi-sao-ngoai-hang-anh-vua-dinh-loi-nguyen-lai-bi-choi-ngai\" }": "E11000 duplicate key error collection: feed24h.feeds index: slug_1 dup key: { slug: \"cau-chuyen-bi-dat-cua-cuu-ngoi-sao-ngoai-hang-anh-vua-dinh-loi-nguyen-lai-bi-choi-ngai\" }",
+	"Missing Parameter": "Missing Parameter",
+	"test": "test",
+	"ahihihi": "ahihihi",
+	"Format is Authorization: Bearer [token]": "Định dạng xác thực là `Authorization: Bearer [token]`",
+	"Định dạng xác thực là `Authorization: Bearer [token]`": "Định dạng xác thực là `Authorization: Bearer [token]`",
+	"as is not defined": "as is not defined",
+	"Missing parameter fingerprint": "Missing parameter fingerprint",
+	"Firebase ID token has expired. Get a fresh ID token from your client app and try again (auth/id-token-expired). See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.": "Firebase ID token has expired. Get a fresh ID token from your client app and try again (auth/id-token-expired). See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.",
+	"Firebase ID token has incorrect \"aud\" (audience) claim. Expected \"cky-feed24h\" but got \"1002286996531-2750tii7k508dpolgdu202lv8em9bi74.apps.googleusercontent.com\". Make sure the ID token comes from the same Firebase project as the service account used to authenticate this SDK. See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.": "Firebase ID token has incorrect \"aud\" (audience) claim. Expected \"cky-feed24h\" but got \"1002286996531-2750tii7k508dpolgdu202lv8em9bi74.apps.googleusercontent.com\". Make sure the ID token comes from the same Firebase project as the service account used to authenticate this SDK. See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.",
+	"Decoding Firebase ID token failed. Make sure you passed the entire string JWT which represents an ID token. See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.": "Decoding Firebase ID token failed. Make sure you passed the entire string JWT which represents an ID token. See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.",
+	"refresh_token is not defined": "refresh_token is not defined",
+	"INVALID_REFRESH_TOKEN": "INVALID_REFRESH_TOKEN",
+	"Devide not registered": "Devide not registered"
 }

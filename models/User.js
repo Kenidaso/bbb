@@ -1,6 +1,9 @@
 const keystone = require('keystone');
 const Types = keystone.Field.Types;
 const shortId = require('short-id-gen');
+const faker = require('faker/locale/vi');
+
+const Counting = keystone.list('Counting');
 
 /**
  * User Model
@@ -28,43 +31,13 @@ User.add(
 			default: 'GUEST',
 			index: true
 		},
+
+		userId: { type: String, required: false, index: true, sparse: true },
 		password: { type: Types.Password, initial: true, required: false },
 
-		email: { type: Types.Email, required: false, index: true, sparse: true },
 		phone: { type: String, initial: false, required: false },
-	},
 
-	'Facebook', {
-		fb_id: { type: String, initial: false, required: false , index: true, sparse: true },
-		fb_token: { type: String, initial: false, required: false },
-	},
-
-	'Google', {
-		gg_id: { type: String, initial: false, required: false , index: true, sparse: true },
-		gg_token: { type: String, initial: false, required: false },
-	},
-
-	'Twitter', {
-		twitter_id: { type: String, initial: false, required: false , index: true, sparse: true },
-		twitter_token: { type: String, initial: false, required: false },
-	},
-
-	'Skype', {
-		skype_id: { type: String, initial: false, required: false , index: true, sparse: true },
-		skype_token: { type: String, initial: false, required: false },
-	},
-
-	'Apple', {
-		apple_id: { type: String, initial: false, required: false , index: true, sparse: true },
-		apple_token: { type: String, initial: false, required: false },
-	},
-
-	'Zalo', {
-		zalo: { type: String, initial: false, required: false , index: true, sparse: true },
-	},
-
-	'Momo', {
-		momo: { type: String, initial: false, required: false , index: true, sparse: true },
+		providerRegistered: { type: Types.Relationship, ref: 'RegisterProvider', index: true, many: true }
 	},
 
 	'System', {
@@ -79,20 +52,28 @@ let partialFilter = {
 	$ne: ""
 }
 
-User.schema.index({
+/*User.schema.index({
 	email: 1
 }, {
 	partialFilterExpression: {
 		email: partialFilter
 	}
-})
+})*/
 
-User.schema.index({ fb_id: 1 }, { partialFilterExpression: { fb_id: partialFilter }});
-User.schema.index({ gg_id: 1 }, { partialFilterExpression: { gg_id: partialFilter }});
-User.schema.index({ twitter_id: 1 }, { partialFilterExpression: { twitter_id: partialFilter }});
-User.schema.index({ skype_id: 1 }, { partialFilterExpression: { skype_id: partialFilter }});
-User.schema.index({ apple_id: 1 }, { partialFilterExpression: { apple_id: partialFilter }});
-User.schema.index({ zalo: 1 }, { partialFilterExpression: { zalo: partialFilter }});
-User.schema.index({ momo: 1 }, { partialFilterExpression: { momo: partialFilter }});
+User.schema.static('createGuestProfile', function (deviceId, callback) {
+	Counting.model.sequence('guest', (err, sequence) => {
+		if (err) return callback(err);
+
+		const guest = new User.model({
+			name: {
+				last: 'Guest',
+				first: sequence,
+			},
+			device: deviceId
+		});
+
+		guest.save(callback);
+	})
+})
 
 User.register();

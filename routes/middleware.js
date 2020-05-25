@@ -10,14 +10,20 @@
 const _ = require('lodash');
 const keystone = require('keystone');
 const unidecode = require('unidecode');
+const jwt = require('express-jwt');
 
 const Response = require('./services/Response');
 const SearchService = require('./services/SearchService');
+const JwtService = require('./services/JwtService');
 
 const UserSearch = keystone.list('UserSearch');
 
 const i18n = keystone.get('i18n');
 const t = i18n.__;
+
+const { Statics } = keystone;
+
+const ERROR_CODE = Statics.errorCode;
 
 const utils = require('../helpers/utils');
 
@@ -60,7 +66,6 @@ exports.flashMessages = function (req, res, next) {
 	res.locals.messages = _.some(flashMessages, function (msgs) { return msgs.length; }) ? flashMessages : false;
 	next();
 };
-
 
 /**
 	Prevents people from accessing protected pages when they're not signed in
@@ -131,4 +136,18 @@ exports.trackSearchInPushTask = (req, res, next) => {
 	});
 
 	return next()
+}
+
+exports.verifyToken = jwt({ secret: JwtService.JWT_SECRET })
+
+exports.handleError = function (err, req, res, next) {
+  if (err) {
+    if (err.name === 'UnauthorizedError') {
+    	return Response.error(req, res, ERROR_CODE.EINVALIDTOKEN, err);
+    }
+
+  	return Response.error(req, res, err, err);
+  }
+
+  return next(err);
 }
