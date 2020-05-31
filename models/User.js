@@ -52,13 +52,18 @@ let partialFilter = {
 	$ne: ""
 }
 
-/*User.schema.index({
-	email: 1
-}, {
-	partialFilterExpression: {
-		email: partialFilter
-	}
-})*/
+// User.schema.index({
+// 	email: 1
+// }, {
+// 	partialFilterExpression: {
+// 		email: partialFilter
+// 	}
+// })
+
+User.schema.index({
+	device: 1,
+	status: 1
+})
 
 User.schema.static('createGuestProfile', function (deviceId, callback) {
 	Counting.model.sequence('guest', (err, sequence) => {

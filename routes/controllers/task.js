@@ -1,4 +1,3 @@
-const Response = require('../services/Response');
 const RedisService = require('../services/RedisService');
 
 let TaskCtrl = {};
@@ -8,7 +7,7 @@ TaskCtrl.status = (req, res) => {
 	let taskId = req.params.taskId;
 
 	RedisService.getTaskKey(taskId, (err, result) => {
-		if (err) return Response.error(req, res, err, result);
-		return Response.success(req, res, result);
+		if (err) return res.error(req, res, err, result);
+		return res.success(req, res, result);
 	})
 }

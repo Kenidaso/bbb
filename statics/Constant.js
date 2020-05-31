@@ -1,4 +1,4 @@
-{
+const CONST = {
   "HTTP_STATUS_CODE": {
     "SUCCESS": 200,
     "CREATED": 201,
@@ -13,5 +13,11 @@
     "PRECONDITION_FAILED": 412,
     "INTERNAL_SERVER_ERROR": 500,
     "NOT_IMPLEMENTED": 501
+  },
+
+  PROFILE_STATUS: {
+    GUEST: 'GUEST'
   }
 }
+
+module.exports = CONST;

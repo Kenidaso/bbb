@@ -422,7 +422,7 @@ const statOfLeague = (opt, callback) => {
 
 	// lr_sma_tb ct:VN,hl:vi,tz:Asia/Saigon,dtoint:2020-01-12T14:00:00Z,dtointmid:/g/11fj6snmjm,emid:/g/11fj6snmjm,et:lg,gndr:UNKNOWN_GENDER,lmid:/m/02_tc,rtab:3,sp:2,_fmt:prog,_id:tab-1-3,_jsfs:Ffpdje
 
-	let urlGet = `https://www.google.com/async/lr_sma_tb?async=ct:${opt.ct},hl:${opt.hl},tz:${opt.tz},dtoint:${date},dtointmid:${emid},emid:${emid},et:lg,gndr:UNKNOWN_GENDER,lmid:/m/02_tc,rtab:19,sp:2,_fmt:prog,_id:tab-1-19,_jsfs:Ffpdje`;
+	let urlGet = `https://www.google.com/async/lr_sma_tb?async=ct:${opt.ct},hl:${opt.hl},tz:${opt.tz},dtoint:${date},dtointmid:${emid},emid:${emid},et:lg,gndr:UNKNOWN_GENDER,lmid:/m/02_tc,rtab:3,sp:2,_fmt:prog,_id:tab-1-19,_jsfs:Ffpdje`;
 
 	console.log('statOfLeague url=', urlGet);
 

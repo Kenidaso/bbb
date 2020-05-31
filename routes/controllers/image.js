@@ -1,4 +1,3 @@
-const Response = require('../services/Response');
 const ImageService = require('../services/ImageService');
 
 let Ctrl = {};
@@ -90,8 +89,13 @@ Ctrl.upload = (req, res) => {
 }
 
 Ctrl.imageOfDay = (req, res) => {
-  ImageService.imageOfDay((err, result) => {
-    if (err) return Response.error(req, res, err, result);
-    return Response.success(req, res, result);
+  // ImageService.imageOfDay((err, result) => {
+  //   if (err) return res.error(req, res, err, result);
+  //   return res.success(req, res, result);
+  // });
+
+  ImageService.imageOfDay.call(req, (err, result) => {
+    if (err) return res.error(req, res, err, result);
+    return res.success(req, res, result);
   });
 }

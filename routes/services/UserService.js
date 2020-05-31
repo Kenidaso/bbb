@@ -8,11 +8,19 @@ const Response = require('../services/Response');
 const JwtService = require('../services/JwtService');
 
 const { Statics } = keystone;
-const ERROR_CODE = Statics.errorCode;
+const {
+  errorCode : ERROR_CODE,
+  Constant: CONST
+} = Statics;
+const { PROFILE_STATUS } = CONST;
 
 const User = keystone.list('User');
 const Device = keystone.list('Device');
 const DeviceModel = Device.model;
+
+const NAME_SPACE = keystone.get('getFileName')(__filename);
+
+const debug = keystone.get('debug')(NAME_SPACE);
 
 const {
   EEMAILWASREGISTERED,
@@ -44,8 +52,9 @@ const registerByProvider = (params, callback) => {
   })
 }
 
-const registerGuest = (params, callback) => {
+const registerGuest = function (params, callback) {
   let { fingerprint } = params;
+  let log = keystone.get('useLogContext')(this, debug, NAME_SPACE);
 
   if (!fingerprint) return callback(EMISSINGFINGERPRINT);
 
@@ -62,18 +71,38 @@ const registerGuest = (params, callback) => {
       });
     },
 
-    // create user guest
+    // find guest by device or create new guest
     (device, next) => {
-      User.model.createGuestProfile(device._id, (err, guest) => {
-        let profile = {
-          // _id: guest._id,
-          slug: guest.slug,
-          name: guest.name,
-          device,
-          status: guest.status,
+      User.model.findOne({
+        device: device._id,
+        status: PROFILE_STATUS.GUEST
+      }, (err, guestProfile) => {
+        if (err) return next(err);
+
+        if (guestProfile) {
+          log('find guest profile by device OK. profile=', guestProfile);
+
+          let result = {
+            slug: guestProfile.slug,
+            name: guestProfile.name,
+            device,
+            status: guestProfile.status,
+          }
+
+          return next(null, { device, profile: result });
         }
 
-        return next(err, { device, profile });
+        User.model.createGuestProfile(device._id, (err, guest) => {
+          let profile = {
+            // _id: guest._id,
+            slug: guest.slug,
+            name: guest.name,
+            device,
+            status: guest.status,
+          }
+
+          return next(err, { device, profile });
+        })
       })
     },
 
@@ -86,5 +115,6 @@ const registerGuest = (params, callback) => {
 }
 
 module.exports = {
+  log: debug,
   registerGuest
 }

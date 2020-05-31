@@ -1,4 +1,3 @@
-const Response = require('../services/Response');
 const FeedService = require('../services/FeedService');
 const RawFeedService = require('../services/RawFeedService');
 const SearchService = require('../services/SearchService');
@@ -18,8 +17,8 @@ FeedCtrl.getFeeds = (req, res) => {
 	limit = Math.min(limit, 100);
 
 	FeedService.getFeeds({ category, page, limit }, (err, feeds) => {
-		if (err) return Response.error(req, res, err, feeds);
-		return Response.success(req, res, feeds);
+		if (err) return res.error(req, res, err, feeds);
+		return res.success(req, res, feeds);
 	});
 }
 
@@ -27,15 +26,15 @@ FeedCtrl.getRawContent = (req, res) => {
 	let { link, options } = req.body;
 
 	RawFeedService.getHtmlContent(link, options, (err, html) => {
-		if (err) return Response.error(req, res, err, html);
-		return Response.success(req, res, html);
+		if (err) return res.error(req, res, err, html);
+		return res.success(req, res, html);
 	});
 }
 
 FeedCtrl.getCategories = (req, res) => {
 	FeedService.getCategories((err, result) => {
-		if (err) return Response.error(req, res, err, result);
-		return Response.success(req, res, result);
+		if (err) return res.error(req, res, err, result);
+		return res.success(req, res, result);
 	});
 }
 
@@ -44,7 +43,7 @@ FeedCtrl.getContent = (req, res) => {
 	let options = req.query || {};
 
 	FeedService.getContent(slug, options, (err, result) => {
-		if (err) return Response.error(req, res, err, result);
+		if (err) return res.error(req, res, err, result);
 
 		if (options.shareFb) {
 			if (options.slugBoard) {
@@ -58,34 +57,34 @@ FeedCtrl.getContent = (req, res) => {
 			FacebookService.scrapedSharingDebugger(options.scrapeurl);
 		}
 
-		return Response.success(req, res, result);
+		return res.success(req, res, result);
 	});
 }
 
 FeedCtrl.upsertFeed = (req, res) => {
 	let { find, update } = req.body;
 
-	if (!find) return Response.error(req, res, 'EINVALIDFIND');
-	if (!update) return Response.error(req, res, 'EINVALIDUPDATE');
+	if (!find) return res.error(req, res, 'EINVALIDFIND');
+	if (!update) return res.error(req, res, 'EINVALIDUPDATE');
 
 	FeedService.upsertFeed(find, update, (err, result) => {
-		if (err) return Response.error(req, res, err, result);
+		if (err) return res.error(req, res, err, result);
 		console.log(`upsert done: ${JSON.stringify(find)}`);
-		return Response.success(req, res, result);
+		return res.success(req, res, result);
 	});
 }
 
 FeedCtrl.getHotNews = (req, res) => {
 	SearchService.hotnews((err, result) => {
-		if (err) return Response.error(req, res, err, result);
-		return Response.success(req, res, result);
+		if (err) return res.error(req, res, err, result);
+		return res.success(req, res, result);
 	});
 }
 
 FeedCtrl.incView = (req, res) => {
 	let slug = req.params.slug;
 	FeedService.incView(slug, (err, result) => {
-		if (err) return Response.error(req, res, err, result);
-		return Response.success(req, res, result);
+		if (err) return res.error(req, res, err, result);
+		return res.success(req, res, result);
 	});
 }

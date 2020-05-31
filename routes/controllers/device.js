@@ -1,4 +1,3 @@
-const Response = require('../services/Response');
 const Device = require('../services/DeviceService');
 
 let DeviceCtrl = {};
@@ -11,7 +10,7 @@ DeviceCtrl.register = (req, res) => {
 	}
 
 	Device.register(params, (err, device) => {
-		if (err) return Response.error(req, res, err, device);
-		return Response.success(req, res, device);
+		if (err) return res.error(req, res, err, device);
+		return res.success(req, res, device);
 	});
 }

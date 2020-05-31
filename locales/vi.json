@@ -36,5 +36,12 @@
 	"Decoding Firebase ID token failed. Make sure you passed the entire string JWT which represents an ID token. See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.": "Decoding Firebase ID token failed. Make sure you passed the entire string JWT which represents an ID token. See https://firebase.google.com/docs/auth/admin/verify-id-tokens for details on how to retrieve an ID token.",
 	"refresh_token is not defined": "refresh_token is not defined",
 	"INVALID_REFRESH_TOKEN": "INVALID_REFRESH_TOKEN",
-	"Devide not registered": "Devide not registered"
+	"Devide not registered": "Devide not registered",
+	"method is not defined": "method is not defined",
+	"Firebase ID token has \"kid\" claim which does not correspond to a known public key. Most likely the ID token is expired, so get a fresh token from your client app and try again.": "Firebase ID token has \"kid\" claim which does not correspond to a known public key. Most likely the ID token is expired, so get a fresh token from your client app and try again.",
+	"Cannot read property 'bind' of undefined": "Cannot read property 'bind' of undefined",
+	"CreateListFromArrayLike called on non-object": "CreateListFromArrayLike called on non-object",
+	"Maximum call stack size exceeded": "Maximum call stack size exceeded",
+	"Assignment to constant variable.": "Assignment to constant variable.",
+	"patern is not defined": "patern is not defined"
 }

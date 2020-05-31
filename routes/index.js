@@ -20,6 +20,11 @@
 
 const keystone = require('keystone');
 const jwt = require('express-jwt');
+const addRequestId = require('express-request-id')();
+const morgan = require('morgan');
+const helmet = require('helmet');
+const compression = require('compression');
+const debug = require('debug');
 
 const middleware = require('./middleware');
 const importRoutes = keystone.importer(__dirname);
@@ -29,7 +34,7 @@ const cors = require('cors');
 const multer  = require('multer');
 const upload = multer({ dest: 'uploads/' });
 
-const Response = require('./services/Response');
+// const Response = require('./services/Response');
 const JwtService = require('./services/JwtService');
 
 // Common Middleware
@@ -37,21 +42,58 @@ keystone.pre('routes', middleware.initLocals);
 keystone.pre('render', middleware.flashMessages);
 
 // Import Route Controllers
+const controllers = importRoutes('./controllers');
+const views = importRoutes('./views');
+
+const services = importRoutes('./services');
+
+let warningMsg = '';
+for (let name in services) {
+  if (!services[name].log) {
+    warningMsg += `Service \`${name}\` don't expose \`log\` function\n`;
+  }
+}
+
+if (warningMsg.length) {
+  let dash = '----------------------------------------';
+  console.log(dash);
+  console.log(`WARNING: LOG FUNCTION IN SERVICE`);
+  console.log(dash);
+  console.log(warningMsg);
+}
+
 const routes = {
-  views: importRoutes('./views'),
-  controllers: importRoutes('./controllers'),
+  views,
+  controllers,
 };
 
 const i18n = keystone.get('i18n');
 const acrud = keystone.get('acrud');
 const Sentry = keystone.get('Sentry');
 
+morgan.token('id', function getId (req) {
+  return req.id
+})
+
+function shouldCompress (req, res) {
+  if (req.headers['x-no-compression']) {
+    // don't compress responses with this request header
+    return false
+  }
+
+  // fallback to standard filter function
+  return compression.filter(req, res)
+}
+
 // Setup Route Bindings
 exports = module.exports = function (app) {
   // The request handler must be the first middleware on the app
   app.use(Sentry.Handlers.requestHandler());
+  app.use(addRequestId);
 
   app.use(function (req, res, next) {
+    req.startAt = new Date();
+
     app.disable('x-powered-by');
 
     req.query = req.query || {};
@@ -59,15 +101,61 @@ exports = module.exports = function (app) {
       req.query.lang = req.headers['accept-language'];
     }
 
+    req.logId = (nameSpace) => {
+      let log = debug(nameSpace);
+      let isExtend = false;
+
+      return (...args) => {
+        args = args.map( s => {
+          if (typeof s === 'object') {
+            try {
+              // mongoose object
+              if (s.toObject) {
+                return JSON.stringify(s.toObject());
+              }
+
+              return JSON.stringify(s);
+            } catch {
+              return s;
+            }
+          }
+
+          return s;
+        })
+
+        let paterns = args.map( arg => typeof arg === 'string' ? '%s' : '%o')
+        paterns = paterns.join(' ');
+
+        if (!isExtend && req.id) {
+          log = log.extend(req.id);
+          isExtend = true;
+        }
+
+        log.apply(null, [paterns, ...args]);
+      }
+    }
+
     next();
   });
+
+  app.use(middleware.addFnFormatResponse);
+  app.use(middleware.printDetailRequest);
+
+  app.use(helmet());
+
+  // app.use(morgan('combined'));
+  app.use(morgan('[:id] :remote-addr - :remote-user [:date[clf]] ":method :url" :status ":referrer" ":user-agent" - :response-time ms'));
 
   app.use(i18n.init);
 
   app.use(cors());
 
+  // compress responses
+  app.use(compression({ filter: shouldCompress }));
+
   app.get('/ping', (req, res) => {
-    return Response.success(req, res, {
+    return res.success(req, res, {
+      id: req.id,
       message: 'pong',
       query: req.query,
       params: req.params,
@@ -78,7 +166,7 @@ exports = module.exports = function (app) {
       headers: req.headers,
       i18n: {
         getLocales: res.locals.i18n.getLocales()
-      }
+      },
     });
   });
 

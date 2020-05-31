@@ -1,4 +1,3 @@
-const Response = require('../services/Response');
 const HerokuService = require('../services/HerokuService');
 
 const herokuCtrl = {};
@@ -6,11 +5,11 @@ const herokuCtrl = {};
 herokuCtrl.restart = (req, res) => {
 	let { app, dyno } = req.body;
 
-	if (!app || !dyno) return Response.error(req, res, 'EINVALIDBODY');
+	if (!app || !dyno) return res.error(req, res, 'EINVALIDBODY');
 
 	HerokuService.restart(app, dyno, (err, result) => {
-		if (err) return Response.error(req, res, err, result);
-		return Response.success(req, res, result);
+		if (err) return res.error(req, res, err, result);
+		return res.success(req, res, result);
 	})
 }
 

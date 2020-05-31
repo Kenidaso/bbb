@@ -8,6 +8,9 @@ const requireDir = require('require-dir');
 const i18n = require("i18n");
 const async = require('async');
 const Sentry = require('@sentry/node');
+const debug = require('debug');
+const path = require('path');
+const colors = require('colors');
 
 const acrud = require('./helpers/acrud');
 
@@ -64,11 +67,47 @@ keystone.init({
 
 	'auth': true,
 	'user model': 'KsUser',
+	'logger': false,
 });
 
 keystone.set('i18n', i18n);
 keystone.set('acrud', acrud);
 keystone.set('Sentry', Sentry);
+keystone.set('debug', debug);
+
+keystone.set('useLogContext', function (reqContext, logVariable, namespace) {
+	if (reqContext && reqContext.logId) {
+		return reqContext.logId(namespace);
+	}
+
+	return (...args) => {
+	  args = args.map( s => {
+	    if (typeof s === 'object') {
+	      try {
+	        // mongoose object
+          if (s.toObject) {
+            return JSON.stringify(s.toObject());
+          }
+
+	        return JSON.stringify(s);
+	      } catch {
+	        return s;
+	      }
+	    }
+
+	    return s;
+	  })
+
+	  let paterns = args.map( arg => typeof arg === 'string' ? '%s' : '%o')
+	  paterns = paterns.join(' ');
+
+	  logVariable.apply(null, [paterns, ...args]);
+	}
+})
+
+keystone.set('getFileName', (filename) => {
+	return  path.basename(filename).split('.')[0];
+})
 
 // Load your project's Models
 keystone.import('models');
@@ -124,7 +163,6 @@ keystone.set('nav', {
 
 // Start Keystone to connect to your database and initialise the web server
 
-
 if (!process.env.MAILGUN_API_KEY || !process.env.MAILGUN_DOMAIN) {
 	console.log('----------------------------------------'
 		+ '\nWARNING: MISSING MAILGUN CREDENTIALS'
@@ -136,7 +174,6 @@ if (!process.env.MAILGUN_API_KEY || !process.env.MAILGUN_DOMAIN) {
 }
 
 let redisService = require('./routes/services/RedisService');
-// redisService.init();
 
 let events = require('events');
 keystone.keystoneEmitter = new events.EventEmitter();

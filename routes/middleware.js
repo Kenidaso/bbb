@@ -52,7 +52,6 @@ exports.initLocals = function (req, res, next) {
 	next();
 };
 
-
 /**
 	Fetches and clears the flashMessages before a view is rendered
 */
@@ -78,6 +77,16 @@ exports.requireUser = function (req, res, next) {
 		next();
 	}
 };
+
+/**
+	Add function format error and success request
+*/
+exports.addFnFormatResponse = (req, res, next) => {
+	res.error = Response.error;
+	res.success = Response.success;
+
+	return next();
+}
 
 exports.trackSearch = (req, res, next) => {
 	let search = req.body.search || req.body.keyword;
@@ -150,4 +159,24 @@ exports.handleError = function (err, req, res, next) {
   }
 
   return next(err);
+}
+
+exports.verifyAccessTokenProvider = (req, res, next) => {
+
+}
+
+exports.printDetailRequest = (req, res, next) => {
+	const _prefix = `[${req.id.red.bgYellow}] [${new Date().toISOString().blue.bgWhite}]`;
+	const { originalUrl, method, headers, body, query } = req;
+	const  detail = {
+		originalUrl,
+		method,
+		headers,
+		body,
+		query,
+	}
+
+	console.log(`\n${_prefix.bold} DETAIL_REQUEST ${JSON.stringify(detail)}`);
+
+	return next();
 }

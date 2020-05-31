@@ -6,8 +6,14 @@ const { ImgPublic } = require('cky-image-public');
 
 const utils = require('../../helpers/utils');
 
+const NAME_SPACE = keystone.get('getFileName')(__filename);
+
+const debug = keystone.get('debug')(NAME_SPACE);
+
 let ImageService = {};
 module.exports = ImageService;
+
+ImageService.log = debug;
 
 ImageService.upload_cloudinary = (url_image, callback) => {
 	cloudinary.v2.uploader.upload(url_image, callback);
@@ -48,8 +54,10 @@ let _genUrlFromBase = (urlBase) => {
 	return images;
 }
 
-ImageService.imageOfDay = (callback) => {
+ImageService.imageOfDay = function (callback) {
 	let urlBingImage = `https://www.bing.com/HPImageArchive.aspx?format=js&n=8`;
+
+	let log = keystone.get('useLogContext')(this, debug, NAME_SPACE);
 
 	request({
 	  url: urlBingImage,
@@ -64,7 +72,7 @@ ImageService.imageOfDay = (callback) => {
 	  let image = _.sample(result.images);
 	  if (!image) return callback();
 
-	  console.log('image=', image);
+	  log('image=', image);
 
 	  /*
 			{
@@ -89,7 +97,7 @@ ImageService.imageOfDay = (callback) => {
 	  let note = image.copyright;
 	  let images = _genUrlFromBase(image.urlbase);
 
-	  console.log('images=', images);
+	  log('images=', images);
 
 	  return callback(null, Object.assign({}, images, { note }));
 	})
