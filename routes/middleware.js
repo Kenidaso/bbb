@@ -176,7 +176,7 @@ exports.printDetailRequest = (req, res, next) => {
 		query,
 	}
 
-	console.log(`\n${_prefix.bold} DETAIL_REQUEST ${JSON.stringify(detail)}`);
+	console.log(`\n${_prefix.bold} DETAIL_REQUEST ${JSON.stringify(detail).italic}`);
 
 	return next();
 }

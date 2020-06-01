@@ -75,6 +75,10 @@ morgan.token('id', function getId (req) {
   return req.id
 })
 
+morgan.token('ISODate', function getId (req) {
+  return new Date().toISOString();
+})
+
 function shouldCompress (req, res) {
   if (req.headers['x-no-compression']) {
     // don't compress responses with this request header
@@ -144,7 +148,22 @@ exports = module.exports = function (app) {
   app.use(helmet());
 
   // app.use(morgan('combined'));
-  app.use(morgan('[:id] :remote-addr - :remote-user [:date[clf]] ":method :url" :status ":referrer" ":user-agent" - :response-time ms'));
+  // app.use(morgan('[:id] :remote-addr - :remote-user [:date[iso]] ":method :url" :status ":referrer" ":user-agent" - :response-time ms'));
+
+  app.use(morgan(function (tokens, req, res) {
+    let id = tokens.id(req, res);
+    let remoteAddr = tokens['remote-addr'](req, res);
+    let remoteUser = tokens['remote-user'](req, res) || '';
+    let isoDate = tokens['ISODate'](req, res);
+    let method = tokens.method(req, res);
+    let url = tokens.url(req, res);
+    let status = tokens.status(req, res);
+    let referrer = tokens.referrer(req, res) || '-';
+    let userAgent = tokens['user-agent'](req, res);
+    let responseTime = tokens['response-time'](req, res);
+
+    return `[${id.red.bgYellow}] ${remoteAddr} - ${remoteUser} [${isoDate.blue.bgWhite}] "${method.red.bgGreen} ${url.bgGreen}" ${status} "${referrer}" "${userAgent}" - ${responseTime} ms`;
+  }))
 
   app.use(i18n.init);
 
