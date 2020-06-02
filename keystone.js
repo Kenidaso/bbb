@@ -41,7 +41,10 @@ i18n.configure({
 });
 
 if (process.env.NODE_ENV === 'production') {
-	Sentry.init({ dsn: 'https://7281f0a1561440aebecba820081aacb2@o309267.ingest.sentry.io/5243553' });
+	Sentry.init({
+		release: 'api-feed24h@1.0.0',
+		dsn: 'https://7281f0a1561440aebecba820081aacb2@o309267.ingest.sentry.io/5243553'
+	});
 }
 
 // Initialise Keystone with your project's configuration.

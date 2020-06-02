@@ -159,7 +159,7 @@ exports = module.exports = function (app) {
     let url = tokens.url(req, res);
     let status = tokens.status(req, res);
     let referrer = tokens.referrer(req, res) || '-';
-    let userAgent = tokens['user-agent'](req, res);
+    let userAgent = tokens['user-agent'](req, res) || '-';
     let responseTime = tokens['response-time'](req, res);
 
     return `[${id.red.bgYellow}] ${remoteAddr} - ${remoteUser} [${isoDate.blue.bgWhite}] "${method.red.bgGreen} ${url.bgGreen}" ${status} "${referrer}" "${userAgent}" - ${responseTime} ms`;
@@ -196,6 +196,10 @@ exports = module.exports = function (app) {
   app.get('/gallery', routes.views.gallery);
 
   app.get('/image-of-day', routes.controllers.image.imageOfDay);
+
+  app.get('/test/sentry', (req, res) => {
+    throw new Error('Test Sentry ...');
+  })
 
   app.get('/categories', routes.controllers.feed.getCategories);
   app.get('/content/:slug', routes.controllers.feed.getContent);

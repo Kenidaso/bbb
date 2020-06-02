@@ -29,25 +29,34 @@ const {
   EDEVICENOTREGISTERED
 } = ERROR_CODE;
 
-const registerByProvider = (params, callback) => {
+const registerByProvider = function (params, callback) {
+  let log = keystone.get('useLogContext')(this, debug, NAME_SPACE);
+
   async.waterfall([
-    // check register provider
+    // verify accesstoken
     (next) => {
       return next();
     },
 
     // get device id
     (next) => {
-      return next();
+      DeviceModel.findOne({
+        fingerprint
+      }, 'fingerprint fingerprintInt', (err, device) => {
+        if (err) return next(EFINDDEVICE, err);
+        if (!device) return next(EDEVICENOTREGISTERED);
+
+        return next(null, device);
+      });
     },
 
-    // create user guest
+    // create user registerd
     (next) => {
       return next();
     }
   ], (err, result) => {
     // error number
-    return callback(EEMAILWASREGISTERED);
+    return callback();
     // return callback(err, { err, result });
   })
 }

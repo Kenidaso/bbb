@@ -226,7 +226,13 @@ SearchService.makeHotnews = (callback) => {
     let keyHotNews = `hotnews:${engineName}`;
     let engine = require(`../../engines/${engineName}`);
 
-    engine.hotnews((err, news) => {
+    if (!engine || !engine.hotnews) return cb();
+
+    let wrapped = async.timeout(engine.hotnews, 30e3);
+
+    wrapped((err, news) => {
+      console.log(`[SearchService.makeHotnews] engine ${engineName} done, err= ${err}`);
+
       if (err || !news) return cb();
 
       news = _.uniqBy(news, 'link');

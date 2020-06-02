@@ -43,5 +43,6 @@
 	"CreateListFromArrayLike called on non-object": "CreateListFromArrayLike called on non-object",
 	"Maximum call stack size exceeded": "Maximum call stack size exceeded",
 	"Assignment to constant variable.": "Assignment to constant variable.",
-	"patern is not defined": "patern is not defined"
+	"patern is not defined": "patern is not defined",
+	"Test Sentry ...": "Test Sentry ..."
 }
