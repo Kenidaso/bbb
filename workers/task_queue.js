@@ -220,6 +220,15 @@ let concurrency = jmQueue.concurrency;
 let STOP_RECEIVE_MESSAGE = false;
 let CALL_MAIN = false;
 
+let checkRunning = () => {
+	if (CALL_MAIN && jmQueue.running() < concurrency) {
+		CALL_MAIN = false;
+		main();
+	} else {
+		CALL_MAIN = true;
+	}
+}
+
 let main = () => {
 	let diff = moment().diff(START_AT, 'm');
 
@@ -262,15 +271,18 @@ let main = () => {
 				logE(`process message= %s errQ= %s`, JSON.stringify(message.message), errQ);
 			}
 
+			log('jmQueue.running= %s', jmQueue.running());
+			checkRunning();
 			return;
 		});
 
-		if (jmQueue.running() < concurrency) {
-			CALL_MAIN = false;
-			main();
-		} else {
-			CALL_MAIN = true;
-		}
+		checkRunning();
+		// if (jmQueue.running() < concurrency) {
+		// 	CALL_MAIN = false;
+		// 	main();
+		// } else {
+		// 	CALL_MAIN = true;
+		// }
 	})
 }
 
@@ -280,30 +292,30 @@ setTimeout(main, 3e3);
 let AUTO_PUSH_TASKS = [
 	{
 		name: TASK.HOTNEWS,
-		interval: 1e3 * 60 * 3
+		interval: 1e3 * 60 * 5
 		// interval: 1e3 * 10
 	}
 ]
 
-// setTimeout(() => {
-// 	logAutoPushTask('begin auto push task ...');
+setTimeout(() => {
+	logAutoPushTask('begin auto push task ...');
 
-// 	async.each(AUTO_PUSH_TASKS, (t, cb) => {
-// 		queueService.pushTask(t, (err, result) => {
-// 			logAutoPushTask(`task name: ${t.name} done, err= ${err}`);
-// 			logAutoPushTask(`task name: ${t.name} done, result= ${JSON.stringify(result)}`);
-// 			return cb();
-// 		})
+	async.each(AUTO_PUSH_TASKS, (t, cb) => {
+		queueService.pushTask(t, (err, result) => {
+			logAutoPushTask(`task name: ${t.name} done, err= ${err}`);
+			logAutoPushTask(`task name: ${t.name} done, result= ${JSON.stringify(result)}`);
+			return cb();
+		})
 
-// 		// auto push
-// 		setInterval(() => {
-// 			queueService.pushTask(t, (err, result) => {
-// 				logAutoPushTask(`task name: ${t.name} done, err= ${err}`);
-// 				logAutoPushTask(`task name: ${t.name} done, result= ${JSON.stringify(result)}`);
-// 			})
-// 		}, t.interval);
-// 	}, noop)
-// }, 5e3)
+		// auto push
+		setInterval(() => {
+			queueService.pushTask(t, (err, result) => {
+				logAutoPushTask(`task name: ${t.name} done, err= ${err}`);
+				logAutoPushTask(`task name: ${t.name} done, result= ${JSON.stringify(result)}`);
+			})
+		}, t.interval);
+	}, noop)
+}, 5e3)
 
 // auto restart
 setTimeout(() => {
