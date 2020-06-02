@@ -285,25 +285,25 @@ let AUTO_PUSH_TASKS = [
 	}
 ]
 
-setTimeout(() => {
-	logAutoPushTask('begin auto push task ...');
+// setTimeout(() => {
+// 	logAutoPushTask('begin auto push task ...');
 
-	async.each(AUTO_PUSH_TASKS, (t, cb) => {
-		queueService.pushTask(t, (err, result) => {
-			logAutoPushTask(`task name: ${t.name} done, err= ${err}`);
-			logAutoPushTask(`task name: ${t.name} done, result= ${JSON.stringify(result)}`);
-			return cb();
-		})
+// 	async.each(AUTO_PUSH_TASKS, (t, cb) => {
+// 		queueService.pushTask(t, (err, result) => {
+// 			logAutoPushTask(`task name: ${t.name} done, err= ${err}`);
+// 			logAutoPushTask(`task name: ${t.name} done, result= ${JSON.stringify(result)}`);
+// 			return cb();
+// 		})
 
-		// auto push
-		setInterval(() => {
-			queueService.pushTask(t, (err, result) => {
-				logAutoPushTask(`task name: ${t.name} done, err= ${err}`);
-				logAutoPushTask(`task name: ${t.name} done, result= ${JSON.stringify(result)}`);
-			})
-		}, t.interval);
-	}, noop)
-}, 5e3)
+// 		// auto push
+// 		setInterval(() => {
+// 			queueService.pushTask(t, (err, result) => {
+// 				logAutoPushTask(`task name: ${t.name} done, err= ${err}`);
+// 				logAutoPushTask(`task name: ${t.name} done, result= ${JSON.stringify(result)}`);
+// 			})
+// 		}, t.interval);
+// 	}, noop)
+// }, 5e3)
 
 // auto restart
 setTimeout(() => {
