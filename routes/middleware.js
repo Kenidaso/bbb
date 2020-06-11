@@ -166,7 +166,7 @@ exports.verifyAccessTokenProvider = (req, res, next) => {
 }
 
 exports.printDetailRequest = (req, res, next) => {
-	const _prefix = `[${req.id.red.bgYellow}] [${new Date().toISOString().blue.bgWhite}]`;
+	const _prefix = `[${req.id.red.bgYellow.bold}] [${new Date().toISOString().blue.bgWhite.bold}]`;
 	const { originalUrl, method, headers, body, query } = req;
 	const  detail = {
 		originalUrl,
@@ -176,7 +176,7 @@ exports.printDetailRequest = (req, res, next) => {
 		query,
 	}
 
-	console.log(`\n${_prefix.bold} DETAIL_REQUEST ${JSON.stringify(detail).italic}`);
+	console.log(`\n${_prefix} DETAIL_REQUEST ${JSON.stringify(detail).italic}`);
 
 	return next();
 }

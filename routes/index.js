@@ -25,6 +25,10 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const compression = require('compression');
 const debug = require('debug');
+const rateLimit = require("express-rate-limit");
+const csrf = require('csurf');
+const cookieParser = require('cookie-parser');
+const protect = require('@risingstack/protect');
 
 const middleware = require('./middleware');
 const importRoutes = keystone.importer(__dirname);
@@ -89,6 +93,22 @@ function shouldCompress (req, res) {
   return compression.filter(req, res)
 }
 
+// Enable if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
+// see https://expressjs.com/en/guide/behind-proxies.html
+// app.set('trust proxy', 1);
+
+const limiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 5 // limit each IP to 100 requests per windowMs
+});
+
+const csrfProtection = csrf(/*{ cookie: true }*/);
+
+const corsOptions = {
+  origin: 'https://feed24h.net',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
+
 // Setup Route Bindings
 exports = module.exports = function (app) {
   // The request handler must be the first middleware on the app
@@ -145,7 +165,12 @@ exports = module.exports = function (app) {
   app.use(middleware.addFnFormatResponse);
   app.use(middleware.printDetailRequest);
 
-  app.use(helmet());
+  // limit request
+  /*app.use((req, res, next) => {
+    console.log(`--> ${req.url}`);
+
+    return limiter(req, res, next);
+  });*/
 
   // app.use(morgan('combined'));
   // app.use(morgan('[:id] :remote-addr - :remote-user [:date[iso]] ":method :url" :status ":referrer" ":user-agent" - :response-time ms'));
@@ -162,12 +187,28 @@ exports = module.exports = function (app) {
     let userAgent = tokens['user-agent'](req, res) || '-';
     let responseTime = tokens['response-time'](req, res);
 
-    return `[${id.red.bgYellow}] ${remoteAddr} - ${remoteUser} [${isoDate.blue.bgWhite}] "${method.red.bgGreen} ${url.bgGreen}" ${status} "${referrer}" "${userAgent}" - ${responseTime} ms`;
+    return `[${id.red.bgYellow.bold}] ${remoteAddr} - ${remoteUser} [${isoDate.blue.bgWhite}] "${method.red.bgGreen} ${url.bgGreen}" ${status} "${referrer}" "${userAgent}" - ${responseTime} ms`;
   }))
 
-  app.use(i18n.init);
+  app.use(cors(corsOptions));
+  app.use(helmet());
 
-  app.use(cors());
+  app.use(protect.express.sqlInjection({
+    body: true,
+    loggerFunction: console.error
+  }))
+
+  app.use(protect.express.xss({
+    body: true,
+    loggerFunction: console.error
+  }))
+
+  // parse cookies
+  // we need this because "cookie" is true in csrfProtection
+  app.use(cookieParser());
+  // app.use(csrfProtection);
+
+  app.use(i18n.init);
 
   // compress responses
   app.use(compression({ filter: shouldCompress }));
@@ -209,7 +250,7 @@ exports = module.exports = function (app) {
   app.get('/feed/:category/:page?', routes.controllers.feed.getFeeds);
   app.post('/ggn/search', middleware.trackSearch, routes.controllers.search.ggnSearch);
   app.post('/ggn/search-ggs', middleware.trackSearch, routes.controllers.search.searchFromGgSearch);
-  app.post('/device/register', routes.controllers.device.register);
+  app.post('/device/register', limiter, routes.controllers.device.register);
 
   app.post('/feed/upsert', routes.controllers.feed.upsertFeed);
 
@@ -233,10 +274,10 @@ exports = module.exports = function (app) {
   app.post('/gg/layout-header-of-match', routes.controllers.gg.layoutHeaderOfMatch);
 
   app.post('/q/search', middleware.trackSearch, routes.controllers.search.queueSearch); // push search into queue
-  app.post('/q/push-task', middleware.trackSearchInPushTask, routes.controllers.queue.pushTask); // push task
+  app.post('/q/push-task', limiter, middleware.trackSearchInPushTask, routes.controllers.queue.pushTask); // push task
   app.get('/task/status/:taskId', routes.controllers.task.status);
 
-  app.post('/user/register-guest', routes.controllers.user.registerGuest);
+  app.post('/user/register-guest', limiter, routes.controllers.user.registerGuest);
   // app.get('/user/verify-token', jwt({ secret: JwtService.JWT_SECRET }));
   app.get('/user/verify-token', middleware.verifyToken, (req, res, next) => {
     return res.json(req.user);
