@@ -1,7 +1,7 @@
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const request = require('request').defaults({
 	headers: {
-		'host': 'chickyky-by-pass',
+		'origin': 'chickyky-by-pass',
 	}
 });
 const sizeOf = require('image-size');
