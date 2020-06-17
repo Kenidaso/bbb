@@ -115,6 +115,9 @@ const whitelist = [
 
   'herokuapp.com',
 
+  'chickyky-by-pass',
+
+  'localhost',
   'http://localhost',
   '127.0.0.1'
 ]

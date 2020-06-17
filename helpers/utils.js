@@ -1,5 +1,9 @@
 const NODE_ENV = process.env.NODE_ENV || 'development';
-const request = require('request');
+const request = require('request').defaults({
+	headers: {
+		'host': 'chickyky-by-pass',
+	}
+});
 const sizeOf = require('image-size');
 const url = require('url');
 const fs = require('fs');
@@ -352,6 +356,7 @@ module.exports = {
 			url: upsertUrl,
 			method: 'POST',
 			headers: {
+				'host': 'chickyky-by-pass',
 				'Content-Type': 'application/json',
 				// 'Authorization': process.env.ACRUD_APIKEY
 			},
@@ -408,6 +413,9 @@ module.exports = {
 			url: `${process.env.API_URL}/tele/send-to-group`,
 			method: 'POST',
 			json: true,
+			headers: {
+				'host': 'chickyky-by-pass',
+			},
 			body: {
 				message
 			}
@@ -420,6 +428,9 @@ module.exports = {
 		request({
 			url: `${process.env.API_URL}/heroku/restart`,
 			method: 'POST',
+			headers: {
+				'host': 'chickyky-by-pass',
+			},
 			json: true,
 			body: {
 				app,
