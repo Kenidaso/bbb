@@ -219,10 +219,10 @@ exports = module.exports = function (app) {
   app.use(cors(corsOptions));
   app.use(helmet());
 
-  app.use(protect.express.sqlInjection({
+  /*app.use(protect.express.sqlInjection({
     body: true,
     loggerFunction: console.error
-  }))
+  }))*/
 
   app.use(protect.express.xss({
     body: true,
