@@ -113,12 +113,16 @@ const whitelist = [
   'http://feed24h.net',
   'http://www.feed24h.net',
 
+  'herokuapp.com',
+
   'http://localhost',
   '127.0.0.1'
 ]
 
 const corsOptions = NODE_ENV === 'production' ? {
   origin: function (origin, callback) {
+    console.log('cors origin=', origin);
+
     if (whitelist.indexOf(origin) !== -1) {
       callback(null, true)
     } else {
