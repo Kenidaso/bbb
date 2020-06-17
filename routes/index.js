@@ -111,7 +111,10 @@ const whitelist = [
   'https://www.feed24h.net',
 
   'http://feed24h.net',
-  'http://www.feed24h.net'
+  'http://www.feed24h.net',
+
+  'http://localhost',
+  '127.0.0.1'
 ]
 
 const corsOptions = NODE_ENV === 'production' ? {
