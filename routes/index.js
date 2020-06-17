@@ -41,6 +41,8 @@ const upload = multer({ dest: 'uploads/' });
 // const Response = require('./services/Response');
 const JwtService = require('./services/JwtService');
 
+const NODE_ENV = process.env.NODE_ENV || 'development';
+
 // Common Middleware
 keystone.pre('routes', middleware.initLocals);
 keystone.pre('render', middleware.flashMessages);
@@ -104,10 +106,24 @@ const limiter = rateLimit({
 
 const csrfProtection = csrf(/*{ cookie: true }*/);
 
-const corsOptions = {
-  origin: 'https://feed24h.net',
+const whitelist = [
+  'https://feed24h.net',
+  'https://www.feed24h.net',
+
+  'http://feed24h.net',
+  'http://www.feed24h.net'
+]
+
+const corsOptions = NODE_ENV === 'production' ? {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}
+} : {}
 
 // Setup Route Bindings
 exports = module.exports = function (app) {
