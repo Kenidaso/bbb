@@ -127,7 +127,7 @@ const whitelist = [
   '127.0.0.1'
 ]
 
-const corsOptions = NODE_ENV !== 'production' ? {
+const corsOptions = NODE_ENV === 'production' ? {
   origin: function (origin, callback) {
     console.log('cors origin=', origin);
 
