@@ -153,7 +153,7 @@ exports.verifyToken = jwt({ secret: JwtService.JWT_SECRET })
 
 exports.handleError = function (err, req, res, next) {
   if (err) {
-  	Sentry.captureException(err);
+  	// Sentry.captureException(err);
 
   	console.log(`handleError err= ${JSON.stringify(err)}`);
 
