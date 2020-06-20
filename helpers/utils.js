@@ -23,6 +23,10 @@ module.exports = {
 		return { errorCode, message, data, statusCode, codeDebug };
 	},
 
+	randomStr: (length) => {
+		return shortID.generate(length);
+	},
+
 	safeParse: (input) => {
 		try {
 			if (typeof input === 'object') return input;
@@ -458,5 +462,13 @@ module.exports = {
 	    '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
 	    '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
 	  return !!pattern.test(str);
-	}
+	},
+
+	objectIdFromDate: function (date) {
+		return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
+	},
+
+	dateFromObjectId: function (objectId) {
+		return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
+	},
 };

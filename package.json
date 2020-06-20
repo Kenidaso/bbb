@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@risingstack/protect": "^1.2.0",
     "@sentry/node": "^5.15.5",
     "@web-clipper/area-selector": "^0.1.1",
     "@web-clipper/readability": "^0.2.0",
@@ -33,6 +32,7 @@
     "googleapis": "^51.0.0",
     "helmet": "^3.22.0",
     "heroku-client": "^3.1.0",
+    "hpp": "^0.2.3",
     "html-entities": "^1.2.1",
     "html-minifier": "^4.0.0",
     "i18n": "^0.8.3",

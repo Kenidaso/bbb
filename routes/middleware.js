@@ -19,6 +19,7 @@ const JwtService = require('./services/JwtService');
 const UserSearch = keystone.list('UserSearch');
 
 const i18n = keystone.get('i18n');
+const Sentry = keystone.get('Sentry');
 const t = i18n.__;
 
 const { Statics } = keystone;
@@ -26,6 +27,7 @@ const { Statics } = keystone;
 const ERROR_CODE = Statics.errorCode;
 
 const utils = require('../helpers/utils');
+const feed24hHeader = require('../helpers/feed24h-headers');
 
 const noop = () => {}
 
@@ -151,11 +153,19 @@ exports.verifyToken = jwt({ secret: JwtService.JWT_SECRET })
 
 exports.handleError = function (err, req, res, next) {
   if (err) {
+  	Sentry.captureException(err);
+
+  	console.log(`handleError err= ${JSON.stringify(err)}`);
+
     if (err.name === 'UnauthorizedError') {
-    	return Response.error(req, res, ERROR_CODE.EINVALIDTOKEN, err);
+    	return res.error(req, res, ERROR_CODE.EINVALIDTOKEN, err);
     }
 
-  	return Response.error(req, res, err, err);
+    if (err.code === 'EBADCSRFTOKEN') {
+    	return res.error(req, res, ERROR_CODE.EBADCSRFTOKEN, err);
+    }
+
+  	return res.error(req, res, err, err);
   }
 
   return next(err);
@@ -177,6 +187,46 @@ exports.printDetailRequest = (req, res, next) => {
 	}
 
 	console.log(`\n${_prefix} DETAIL_REQUEST ${JSON.stringify(detail).italic}`);
+
+	return next();
+}
+
+exports.validateDynamicFeed24hToken = (req, res, next) => {
+	const headers = req.headers;
+	const appXToken = headers['app-x-token'];
+	const origin = headers['origin'];
+
+	// ignore SSR for speed
+	const appFingerprint = headers['app-fingerprint'];
+
+	if (appFingerprint === 'fingerprint_ssr') return next();
+	// if (origin === 'chickyky-by-pass') return next();
+
+	let checkMissing = feed24hHeader.checkMissingHeaders(headers);
+
+	if (checkMissing.isMissing) {
+		return res.error(req, res, ERROR_CODE.EHEADERSMISSING, { headers: checkMissing.headersMiss });
+	}
+
+	if (appFingerprint.length != 32) {
+		return res.error(req, res, ERROR_CODE.EHEADERSFINGERPRINT);
+	}
+
+	let checkVersion = feed24hHeader.validateBuildKeyAndVersion(headers);
+
+	if (!checkVersion) {
+		return res.error(req, res, ERROR_CODE.EHEADERSVERSION);
+	}
+
+	const hash = feed24hHeader.getHash(headers);
+
+	if (hash !== appXToken) {
+		const _prefix = `[${req.id.red.bgYellow.bold}]`;
+
+		console.log(`${_prefix} Invalid x-token`);
+
+		return res.error(req, res, ERROR_CODE.EXTOKEN);
+	}
 
 	return next();
 }

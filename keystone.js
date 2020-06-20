@@ -16,6 +16,8 @@ const acrud = require('./helpers/acrud');
 
 const utils = require('./helpers/utils');
 
+// console.log('--->', utils.randomStr(32))
+
 acrud.init({
   keystone
 });
@@ -208,7 +210,7 @@ async.parallel({
 
 	let queueService = require('./routes/services/QueueService');
 
-	console.log('keystone start done.');
+	console.log('keystone start done. PORT:', process.env.PORT);
 	keystone.emit('ready');
 })
 

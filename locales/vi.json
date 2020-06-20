@@ -1,4 +1,5 @@
 {
+	"1015": "1015",
 	"ok": "ok",
 	"Unknown error": "Lỗi chưa xác định",
 	"success": "Thành công",
@@ -45,5 +46,15 @@
 	"Assignment to constant variable.": "Assignment to constant variable.",
 	"patern is not defined": "patern is not defined",
 	"Test Sentry ...": "Test Sentry ...",
-	"invalid csrf token": "invalid csrf token"
+	"invalid csrf token": "invalid csrf token",
+	"text is not defined": "text is not defined",
+	"Invalid x-token": "Invalid x-token",
+	"Cannot read property 'split' of undefined": "Cannot read property 'split' of undefined",
+	"app-build-key, app-refesh-token, app-request-timestamp, app-timezone-offset, app-fingerprint": "app-build-key, app-refesh-token, app-request-timestamp, app-timezone-offset, app-fingerprint",
+	"Missing headers": "Missing headers",
+	"Invalid headers version": "Invalid headers version",
+	"Invalid headers fingerprint": "Invalid headers fingerprint",
+	"Not allowed by CORS": "Not allowed by CORS",
+	"ECORSNOTALLOWED": "ECORSNOTALLOWED",
+	"req.csrfToken is not a function": "req.csrfToken is not a function"
 }

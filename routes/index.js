@@ -23,12 +23,13 @@ const jwt = require('express-jwt');
 const addRequestId = require('express-request-id')();
 const morgan = require('morgan');
 const helmet = require('helmet');
+const crypto = require('crypto');
 const compression = require('compression');
 const debug = require('debug');
 const rateLimit = require("express-rate-limit");
 const csrf = require('csurf');
 const cookieParser = require('cookie-parser');
-const protect = require('@risingstack/protect');
+const hpp = require('hpp');
 
 const middleware = require('./middleware');
 const importRoutes = keystone.importer(__dirname);
@@ -41,7 +42,10 @@ const upload = multer({ dest: 'uploads/' });
 // const Response = require('./services/Response');
 const JwtService = require('./services/JwtService');
 
+const { Statics } = keystone;
 const NODE_ENV = process.env.NODE_ENV || 'development';
+
+const ERROR_CODE = Statics.errorCode;
 
 // Common Middleware
 keystone.pre('routes', middleware.initLocals);
@@ -104,7 +108,7 @@ const limiter = rateLimit({
   max: 5 // limit each IP to 100 requests per windowMs
 });
 
-const csrfProtection = csrf(/*{ cookie: true }*/);
+const csrfProtection = csrf({ cookie: true });
 
 const whitelist = [
   'https://feed24h.net',
@@ -116,20 +120,22 @@ const whitelist = [
   'herokuapp.com',
 
   'chickyky-by-pass',
+  'Chickyky-by-pass',
 
   'localhost',
   'http://localhost',
   '127.0.0.1'
 ]
 
-const corsOptions = NODE_ENV === 'production' ? {
+const corsOptions = NODE_ENV !== 'production' ? {
   origin: function (origin, callback) {
     console.log('cors origin=', origin);
 
     if (whitelist.indexOf(origin) !== -1) {
       callback(null, true)
     } else {
-      callback(new Error('Not allowed by CORS'))
+      // callback(ERROR_CODE.ECORSNOTALLOWED)
+      callback('ECORSNOTALLOWED')
     }
   },
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
@@ -216,30 +222,74 @@ exports = module.exports = function (app) {
     return `[${id.red.bgYellow.bold}] ${remoteAddr} - ${remoteUser} [${isoDate.blue.bgWhite}] "${method.red.bgGreen} ${url.bgGreen}" ${status} "${referrer}" "${userAgent}" - ${responseTime} ms`;
   }))
 
-  app.use(cors(corsOptions));
-  app.use(helmet());
+  // X-Frame-Options: https://github.com/helmetjs/frameguard
+  app.use(helmet.frameguard({ action: 'deny' }));
+  // X-XSS-Protection: https://github.com/helmetjs/x-xss-protection
+  app.use(helmet.xssFilter());
+  // Strict-Transport-Security: https://github.com/helmetjs/hsts
+  app.use(helmet.hsts({
+    maxAge: 1296000, // 15 days in seconds
+    includeSubDomains: true,
+    preload: true
+  }));
+  // X-Powered-By: http://expressjs.com/en/4x/api.html#app.settings.table
+  app.disable('x-powered-by');
+  // X-Download-Options: https://github.com/helmetjs/ienoopen
+  app.use(helmet.ieNoOpen());
+  // X-Content-Type-Options: https://github.com/helmetjs/dont-sniff-mimetype
+  app.use(helmet.noSniff());
+  // Content-Security-Policy: https://github.com/helmetjs/csp
+  app.use(function nonceGenerator(req, res, next) {
+    res.locals.nonce = crypto.randomBytes(16).toString('hex');
+    next();
+  });
+  /* eslint-disable quotes */
+  app.use(helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [ "'self'", (req, res) => `'nonce-${res.locals.nonce}'` ],
+      styleSrc: [ "'self'", (req, res) => `'nonce-${res.locals.nonce}'` ],
+      baseUri: ["'self'"],
+      connectSrc: [ "'self'", 'wss:' ],
+      frameAncestors: ["'none'"],
+      reportUri: 'https://feed24h.net'
+    },
+    setAllHeaders: false,
+    reportOnly: false,
+    browserSniff: false
+  })); /* eslint-enable */
 
-  /*app.use(protect.express.sqlInjection({
-    body: true,
-    loggerFunction: console.error
-  }))*/
-
-  app.use(protect.express.xss({
-    body: true,
-    loggerFunction: console.error
-  }))
+  // X-DNS-Prefetch-Control: https://github.com/helmetjs/dns-prefetch-control
+  app.use(helmet.dnsPrefetchControl({ allow: false }));
+  // https://github.com/helmetjs/referrer-policy
+  app.use(helmet.referrerPolicy({ policy: 'same-origin' }));
+  // https://helmetjs.github.io/docs/expect-ct/
+  app.use(helmet.expectCt({
+    enforce: true,
+    maxAge: 1296000,
+    // reportUri: config.expectCT.reportUri
+  }));
 
   // parse cookies
   // we need this because "cookie" is true in csrfProtection
   app.use(cookieParser());
   // app.use(csrfProtection);
 
+  // app.all('*', function (req, res, next) {
+  //   res.cookie('XSRF-TOKEN', req.csrfToken())
+  //   return next();
+  // })
+
   app.use(i18n.init);
 
   // compress responses
   app.use(compression({ filter: shouldCompress }));
 
-  app.get('/ping', (req, res) => {
+  app.use(cors(corsOptions));
+
+  app.use(hpp());
+
+  app.use('/ping', middleware.validateDynamicFeed24hToken, (req, res) => {
     return res.success(req, res, {
       id: req.id,
       message: 'pong',
@@ -281,12 +331,13 @@ exports = module.exports = function (app) {
   app.post('/feed/upsert', routes.controllers.feed.upsertFeed);
 
   app.post('/autocomplete', routes.controllers.gg.autocompleteMerge); // autocomplete by google search
-  app.post('/gg/autocomplete', routes.controllers.gg.autocomplete); // autocomplete by google search
+
   app.post('/ggt/yis', routes.controllers.trends.yearInSearch); // Year in Search, top search in year
   app.post('/ggt/autocomplete', routes.controllers.trends.autocomplete); // autocomplete with region
   app.post('/ggt/daily', routes.controllers.trends.dailytrends);
   app.post('/ggt/realtime', routes.controllers.trends.realtimetrends);
 
+  app.post('/gg/autocomplete', routes.controllers.gg.autocomplete); // autocomplete by google search
   app.post('/gg/standing-of-league', routes.controllers.gg.standingOfLeague);
   app.post('/gg/stat-of-league', routes.controllers.gg.statOfLeague);
   app.post('/gg/news-of-league', routes.controllers.gg.newsOfLeague);

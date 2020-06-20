@@ -1,6 +1,7 @@
 module.exports = {
   0: 'Success',
   '-1': 'Not define error message',
+  9999: 'Invalid x-token',
 
   1002: 'Invalid token',
   1003: 'Something went wrong when create guest profile',
@@ -11,5 +12,10 @@ module.exports = {
   1008: 'Refresh access token fail',
   1009: 'No response body from service',
   1010: 'Generate access token fail',
-  1011: 'Devide not registered'
+  1011: 'Devide not registered',
+
+  1012: 'Missing headers',
+  1013: 'Invalid headers version',
+  1014: 'Invalid headers fingerprint',
+  1015: 'Not allowed by CORS'
 };

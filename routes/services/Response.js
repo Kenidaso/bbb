@@ -38,7 +38,7 @@ let handleError_string = (req, res, error, result) => {
     data = result.data || result;
   }
 
-  return Error(req, res, errorCode, codeDebug, data, message, statusCode);
+  return _Error(req, res, errorCode, codeDebug, data, message, statusCode);
 }
 
 let handleError_object = (req, res, error, result) => {
@@ -62,7 +62,7 @@ let handleError_object = (req, res, error, result) => {
     message = error.toString();
   }
 
-  return Error(req, res, errorCode, codeDebug, data, message, statusCode);
+  return _Error(req, res, errorCode, codeDebug, data, message, statusCode);
 }
 
 let handleError_number = (req, res, error, result) => {
@@ -84,7 +84,7 @@ let handleError_number = (req, res, error, result) => {
     }
   }
 
-  return Error(req, res, errorCode, codeDebug, data, message, statusCode);
+  return _Error(req, res, errorCode, codeDebug, data, message, statusCode);
 }
 
 module.exports = {
@@ -104,17 +104,17 @@ module.exports = {
       return handleError_number(req, res, error, result);
     }
 
-    return Error(req, res, undefined, undefined, { error, result });
+    return _Error(req, res, undefined, undefined, { error, result });
   },
 
-  success: Success,
+  success: _Success,
 
   _objError: (codeDebug, message, statusCode, data) => {
     return { codeDebug, message, statusCode, data };
   }
 }
 
-function Success (req, res, data = {}, message = 'success', statusCode = HTTP_STATUS_CODE.SUCCESS) {
+function _Success (req, res, data = {}, message = 'success', statusCode = HTTP_STATUS_CODE.SUCCESS) {
   const response = {
     error   : 0,
     data    : data,
@@ -124,7 +124,7 @@ function Success (req, res, data = {}, message = 'success', statusCode = HTTP_ST
   return res.status(statusCode).json(response);
 }
 
-function Error (req, res, errorCode = -1, errorCodeDebug = 'EDEFAULT', data = {}, message = '', statusCode = HTTP_STATUS_CODE.BAD_REQUEST) {
+function _Error (req, res, errorCode = -1, errorCodeDebug = 'EDEFAULT', data = {}, message = '', statusCode = HTTP_STATUS_CODE.BAD_REQUEST) {
   if (message === '') message = messageCode[errorCode] || messageCode[-1];
 
   const response = {
