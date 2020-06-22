@@ -3,7 +3,14 @@ const _ = require('lodash');
 const async = require('async');
 const fs = require('fs');
 const path = require('path');
-const request = require('request');
+const request = require('request').defaults({
+	headers: {
+		'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36'
+	},
+	gzip: true,
+	rejectUnauthorized: false,
+	timeout: 30e3
+});
 
 const fetchHtml = require('./fetchHtml');
 const Utils = require('../helpers/utils');
@@ -257,12 +264,14 @@ const getOriginLink = (link, callback) => {
 
 	request({
 		url: link,
-		method: 'GET',
-		gzip: true,
-		rejectUnauthorized: false,
-		timeout: 30e3
+		method: 'GET'
 	}, (err, response, body) => {
-		if (err) return callback(null, null);
+		if (err) {
+			debug('getOriginLink err= %o', err);
+			return callback(null, null);
+		}
+
+		// debug('body= %s', body);
 
 		let $ = cheerio.load(body);
 		let scripts = $('script');
@@ -322,6 +331,8 @@ const getFeedFromCategoryUrl = (categoryUrl, callback) => {
 		let $ = cheerio.load(html);
 		let feeds = _parseFeed($);
 
+		// debug('feeds= %o', feeds);
+
 		/*
 		{
 		  "linkBaoMoi": "https://m.baomoi.com/fox-sports-noi-gi-truoc-luot-binh-chon-khung-cho-sieu-pham-cau-vong-trong-tuyet-cua-quang-hai/c/33344199.epi",
@@ -342,7 +353,7 @@ const getFeedFromCategoryUrl = (categoryUrl, callback) => {
 
 					let parseResult = parseRawHtml(body, feed.linkBaoMoi);
 
-					if (!parseResult) return cbMap(null);
+					if (!parseResult) return cbMap(null, feed);
 
 					feed.rawHtml = parseResult.rawHtml;
 
