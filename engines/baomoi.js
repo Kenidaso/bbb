@@ -28,6 +28,8 @@ const HOST_NAME = 'baomoi';
 const customClass = [];
 const optSanitizeHtml = {};
 
+const debug = require('debug')('BaoMoiEngine');
+
 
 const _parseContent = ($, objHtml) => {
 	let description = $('.article .article__sapo').text();
@@ -131,16 +133,16 @@ const getLinkReal = (linkRealRedirect) => {
 			const linkReal = $('script')[2].children[0].data.replace(/\s/g, '').replace(regex, `$1`);
 			return resolve(linkReal);
 		} catch (error) {
-			console.log('TCL: getLinkReal -> error', error);
+			debug('TCL: getLinkReal -> error', error);
 			return reject(error);
 		}
 	});
 };
 
 const getNewsFromHtml = (htmlUrl, mainSelector) => {
-	console.log('TCL: getNewsFromHtml -> htmlUrl', htmlUrl);
+	debug('TCL: getNewsFromHtml -> htmlUrl', htmlUrl);
 	return new Promise(async (resolve, reject) => {
-		console.log('fetching html ...');
+		debug('fetching html ...');
 		const feeds = [];
 		let [err, $] = await Utils.to(fetchHtml({ link: htmlUrl }));
 		if (err) {
@@ -284,22 +286,27 @@ const parseRawHtml = (html, link) => {
 
   let contentStr = $(content).html();
 
-  contentStr = clipper.removeAttributes(contentStr);
-  contentStr = clipper.removeSocialElements(contentStr);
-  contentStr = clipper.removeNavigationalElements(contentStr, link);
-  contentStr = clipper.removeEmptyElements(contentStr);
-  contentStr = clipper.removeNewline(contentStr);
-  contentStr = clipper.sanitizeHtml(contentStr, optSanitizeHtml || {});
+	try {
+	  contentStr = clipper.removeAttributes(contentStr);
+	  contentStr = clipper.removeSocialElements(contentStr);
+	  contentStr = clipper.removeNavigationalElements(contentStr, link);
+	  contentStr = clipper.removeEmptyElements(contentStr);
+	  contentStr = clipper.removeNewline(contentStr);
+	  contentStr = clipper.sanitizeHtml(contentStr, optSanitizeHtml || {});
 
-  contentStr = clipper.getBody(contentStr);
-  contentStr = clipper.minifyHtml(contentStr);
-  contentStr = clipper.decodeEntities(contentStr);
+	  contentStr = clipper.getBody(contentStr);
+	  contentStr = clipper.minifyHtml(contentStr);
+	  contentStr = clipper.decodeEntities(contentStr);
 
-  let classStr = [];
-  classStr.push(`host-${HOST_NAME}`);
-  classStr = [...classStr, ...customClass];
+	  let classStr = [];
+	  classStr.push(`host-${HOST_NAME}`);
+	  classStr = [...classStr, ...customClass];
 
-  contentStr = clipper.wrapWithSpecialClasses(contentStr, classStr);
+	  contentStr = clipper.wrapWithSpecialClasses(contentStr, classStr);
+	} catch (ex) {
+		debug(`parseRawHtml ex= ${ex} :: link= ${link}`);
+		return {};
+	}
 
   let result = {
     rawHtml: contentStr,
@@ -334,6 +341,9 @@ const getFeedFromCategoryUrl = (categoryUrl, callback) => {
 					if (originLink) feed.link = originLink;
 
 					let parseResult = parseRawHtml(body, feed.linkBaoMoi);
+
+					if (!parseResult) return cbMap(null);
+
 					feed.rawHtml = parseResult.rawHtml;
 
 					return cbMap(null, feed);
