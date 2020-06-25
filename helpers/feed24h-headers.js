@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const moment = require('moment');
 
 const FEED24H_APIKEY = process.env.FEED24H_APIKEY;
+const LIMIT_DIF_TIMESTAMP = 1000 * 3; // 3s
 
 const utils = require('./utils');
 
@@ -93,9 +94,15 @@ const validateBuildKeyAndVersion = (headers) => {
   return true;
 }
 
+const validateReqTimestamp = (headers) => {
+  let timestamp = Number(headers['app-request-timestamp']);
+  return new Date().getTime() - timestamp <= LIMIT_DIF_TIMESTAMP;
+}
+
 module.exports = {
   getHash,
   checkMissingHeaders,
   checkFormatHeaders,
   validateBuildKeyAndVersion,
+  validateReqTimestamp
 }

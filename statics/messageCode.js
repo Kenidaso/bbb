@@ -17,5 +17,6 @@ module.exports = {
   1012: 'Missing headers',
   1013: 'Invalid headers version',
   1014: 'Invalid headers fingerprint',
-  1015: 'Not allowed by CORS'
+  1015: 'Not allowed by CORS',
+  1017: 'Invalid request timestamp'
 };

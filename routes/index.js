@@ -289,7 +289,7 @@ exports = module.exports = function (app) {
 
   app.use(hpp());
 
-  app.use('/ping', middleware.validateDynamicFeed24hToken, (req, res) => {
+  app.use('/ping', /*middleware.validateDynamicFeed24hToken,*/ (req, res) => {
     return res.success(req, res, {
       id: req.id,
       message: 'pong',
@@ -318,25 +318,32 @@ exports = module.exports = function (app) {
     throw new Error('Test Sentry ...');
   })
 
-  app.get('/categories', routes.controllers.feed.getCategories);
-  app.get('/content/:slug', routes.controllers.feed.getContent);
-  app.get('/view/:slug', routes.controllers.feed.incView);
+  app.get('/categories', middleware.validateDynamicFeed24hToken, routes.controllers.feed.getCategories);
+  app.get('/content/:slug', middleware.validateDynamicFeed24hToken, routes.controllers.feed.getContent);
+  app.get('/view/:slug', middleware.validateDynamicFeed24hToken, routes.controllers.feed.incView);
+
+  // app.use('/feed', middleware.validateDynamicFeed24hToken);
   app.post('/feed/raw', routes.controllers.feed.getRawContent);
-  app.get('/feed/hotnews', routes.controllers.feed.getHotNews);
-  app.get('/feed/:category/:page?', routes.controllers.feed.getFeeds);
+  app.get('/feed/hotnews', middleware.validateDynamicFeed24hToken, routes.controllers.feed.getHotNews);
+  app.get('/feed/:category/:page?', middleware.validateDynamicFeed24hToken, routes.controllers.feed.getFeeds);
+
+  app.use('/ggn', middleware.validateDynamicFeed24hToken);
   app.post('/ggn/search', middleware.trackSearch, routes.controllers.search.ggnSearch);
   app.post('/ggn/search-ggs', middleware.trackSearch, routes.controllers.search.searchFromGgSearch);
-  app.post('/device/register', limiter, routes.controllers.device.register);
+
+  app.post('/device/register', limiter, middleware.validateDynamicFeed24hToken, routes.controllers.device.register);
 
   app.post('/feed/upsert', routes.controllers.feed.upsertFeed);
 
   app.post('/autocomplete', routes.controllers.gg.autocompleteMerge); // autocomplete by google search
 
+  app.use('/ggt', middleware.validateDynamicFeed24hToken);
   app.post('/ggt/yis', routes.controllers.trends.yearInSearch); // Year in Search, top search in year
   app.post('/ggt/autocomplete', routes.controllers.trends.autocomplete); // autocomplete with region
   app.post('/ggt/daily', routes.controllers.trends.dailytrends);
   app.post('/ggt/realtime', routes.controllers.trends.realtimetrends);
 
+  app.use('/gg', middleware.validateDynamicFeed24hToken);
   app.post('/gg/autocomplete', routes.controllers.gg.autocomplete); // autocomplete by google search
   app.post('/gg/standing-of-league', routes.controllers.gg.standingOfLeague);
   app.post('/gg/stat-of-league', routes.controllers.gg.statOfLeague);
@@ -350,6 +357,7 @@ exports = module.exports = function (app) {
   app.post('/gg/news-of-match', routes.controllers.gg.newsOfMatch);
   app.post('/gg/layout-header-of-match', routes.controllers.gg.layoutHeaderOfMatch);
 
+  app.use('/q', middleware.validateDynamicFeed24hToken);
   app.post('/q/search', middleware.trackSearch, routes.controllers.search.queueSearch); // push search into queue
   app.post('/q/push-task', limiter, middleware.trackSearchInPushTask, routes.controllers.queue.pushTask); // push task
   app.get('/task/status/:taskId', routes.controllers.task.status);
@@ -361,6 +369,7 @@ exports = module.exports = function (app) {
   });
 
   // firebase
+  app.use('/firebase', middleware.validateDynamicFeed24hToken);
   app.post('/firebase/verify-access-token', routes.controllers.firebase.verifyAccessToken);
   app.get('/firebase/generate-access-token', routes.controllers.firebase.generateAccessToken);
   app.post('/firebase/refresh-access-token', routes.controllers.firebase.refreshAccessToken);

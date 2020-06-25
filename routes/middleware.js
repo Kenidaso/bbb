@@ -205,7 +205,13 @@ exports.validateDynamicFeed24hToken = (req, res, next) => {
 	let checkMissing = feed24hHeader.checkMissingHeaders(headers);
 
 	if (checkMissing.isMissing) {
-		return res.error(req, res, ERROR_CODE.EHEADERSMISSING, { headers: checkMissing.headersMiss });
+		return res.error(req, res, ERROR_CODE.EHEADERSMISSING/*, { headers: checkMissing.headersMiss }*/);
+	}
+
+	let checkTimestamp = feed24hHeader.validateReqTimestamp(headers);
+
+	if (!checkTimestamp) {
+		return res.error(req, res, ERROR_CODE.EREQTIMESTAMP);
 	}
 
 	if (appFingerprint.length != 32) {
