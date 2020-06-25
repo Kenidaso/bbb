@@ -220,7 +220,8 @@ const procOneCategory = (category, callback) => {
 	  console.log('linkPage', linkPage);
 
 	  engine.getFeedFromCategoryUrl(linkPage, (err, feeds) => {
-	  	// console.log('done err=', err);
+	  	// console.log(`\n\n\n procOneCategory getFeedFromCategoryUrl feeds= ${JSON.stringify(feeds)} \n\n\n`);
+
 	  	if (err || !feeds || feeds.length == 0) return next(null, null);
 
 	  	feeds = feeds.map((f) => {
