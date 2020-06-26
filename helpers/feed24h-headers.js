@@ -95,8 +95,12 @@ const validateBuildKeyAndVersion = (headers) => {
 }
 
 const validateReqTimestamp = (headers) => {
-  let timestamp = Number(headers['app-request-timestamp']);
-  return new Date().getTime() - timestamp <= LIMIT_DIF_TIMESTAMP;
+  const timestamp = Number(headers['app-request-timestamp']);
+  const dif = new Date().getTime() - timestamp
+  const isValid = dif <= LIMIT_DIF_TIMESTAMP;
+
+  if (!isValid) console.log(`timestamp dif= ${dif}`);
+  return isValid;
 }
 
 module.exports = {
