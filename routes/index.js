@@ -289,6 +289,20 @@ exports = module.exports = function (app) {
 
   app.use(hpp());
 
+  app.use((res, req, next) => {
+    const headers = req.headers;
+
+    if (headers.referer && headers.referer.indexOf('sahamportal') > -1) {
+      return next('ECORSNOTALLOWED');
+    }
+
+    if (headers.via && headers.via.indexOf('proxy-fix-squid-pwd-float') > -1) {
+      return next('ECORSNOTALLOWED');
+    }
+
+    return next();
+  })
+
   app.use('/ping', /*middleware.validateDynamicFeed24hToken,*/ (req, res) => {
     return res.success(req, res, {
       id: req.id,
