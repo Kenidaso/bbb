@@ -96,10 +96,13 @@ const validateBuildKeyAndVersion = (headers) => {
 
 const validateReqTimestamp = (headers) => {
   const timestamp = Number(headers['app-request-timestamp']);
-  const dif = new Date().getTime() - timestamp
+  const now = new Date();
+  const dif = now.getTime() - timestamp
   const isValid = dif <= LIMIT_DIF_TIMESTAMP;
 
-  if (!isValid) console.log(`timestamp dif= ${dif}`);
+  // if (!isValid)
+  console.log(`timestamp dif= ${dif} : ${timestamp} : ${now.getTime()}`);
+
   return isValid;
 }
 

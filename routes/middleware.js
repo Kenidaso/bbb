@@ -210,9 +210,9 @@ exports.validateDynamicFeed24hToken = (req, res, next) => {
 
 	let checkTimestamp = feed24hHeader.validateReqTimestamp(headers);
 
-	if (!checkTimestamp) {
-		return res.error(req, res, ERROR_CODE.EREQTIMESTAMP);
-	}
+	// if (!checkTimestamp) {
+	// 	return res.error(req, res, ERROR_CODE.EREQTIMESTAMP);
+	// }
 
 	if (appFingerprint.length != 32) {
 		return res.error(req, res, ERROR_CODE.EHEADERSFINGERPRINT);
