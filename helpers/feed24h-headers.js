@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const moment = require('moment');
 
 const FEED24H_APIKEY = process.env.FEED24H_APIKEY;
-const LIMIT_DIF_TIMESTAMP = 1000 * 3; // 3s
+const LIMIT_DIF_TIMESTAMP = 1000 * 10; // 10s
 
 const utils = require('./utils');
 
@@ -89,7 +89,7 @@ const validateBuildKeyAndVersion = (headers) => {
 
   date = Number(moment(date).utcOffset(420).format('YYYYMMDD'));
 
-  if (dateVersion != date) {
+  if (Math.abs(dateVersion - date) > 1) {
     console.log(`check headers version: dateVersion= ${dateVersion} :: date= ${date}`);
     return false;
   }
@@ -103,8 +103,9 @@ const validateReqTimestamp = (headers) => {
   const dif = now.getTime() - timestamp
   const isValid = dif <= LIMIT_DIF_TIMESTAMP;
 
-  // if (!isValid)
-  console.log(`timestamp dif= ${dif} : ${timestamp} : ${now.getTime()}`);
+  if (!isValid) {
+    console.log(`timestamp dif= ${dif} : ${timestamp} : ${now.getTime()}`);
+  }
 
   return isValid;
 }

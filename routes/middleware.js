@@ -210,9 +210,9 @@ exports.validateDynamicFeed24hToken = (req, res, next) => {
 
 	let checkTimestamp = feed24hHeader.validateReqTimestamp(headers);
 
-	// if (!checkTimestamp) {
-	// 	return res.error(req, res, ERROR_CODE.EREQTIMESTAMP);
-	// }
+	if (!checkTimestamp) {
+		return res.error(req, res, ERROR_CODE.EREQTIMESTAMP);
+	}
 
 	if (appFingerprint.length != 32) {
 		return res.error(req, res, ERROR_CODE.EHEADERSFINGERPRINT);
@@ -220,9 +220,9 @@ exports.validateDynamicFeed24hToken = (req, res, next) => {
 
 	let checkVersion = feed24hHeader.validateBuildKeyAndVersion(headers);
 
-	// if (!checkVersion) {
-	// 	return res.error(req, res, ERROR_CODE.EHEADERSVERSION);
-	// }
+	if (!checkVersion) {
+		return res.error(req, res, ERROR_CODE.EHEADERSVERSION);
+	}
 
 	const hash = feed24hHeader.getHash(headers);
 
