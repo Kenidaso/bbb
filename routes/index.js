@@ -124,7 +124,9 @@ const whitelist = [
 
   'localhost',
   'http://localhost',
-  '127.0.0.1'
+  '127.0.0.1',
+
+  '157.230.253.180',
 ]
 
 const corsOptions = NODE_ENV === 'production' ? {
@@ -285,8 +287,6 @@ exports = module.exports = function (app) {
   // compress responses
   app.use(compression({ filter: shouldCompress }));
 
-  app.use(cors(corsOptions));
-
   app.use(hpp());
 
   app.use('/ping', /*middleware.validateDynamicFeed24hToken,*/ (req, res) => {
@@ -311,6 +311,8 @@ exports = module.exports = function (app) {
   app.get('/blog/:category?', routes.views.blog);
   app.get('/blog/post/:post', routes.views.post);
   app.get('/gallery', routes.views.gallery);
+
+  app.use(cors(corsOptions));
 
   app.get('/image-of-day', routes.controllers.image.imageOfDay);
 
