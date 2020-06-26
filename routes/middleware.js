@@ -199,8 +199,8 @@ exports.validateDynamicFeed24hToken = (req, res, next) => {
 	// ignore SSR for speed
 	const appFingerprint = headers['app-fingerprint'];
 
+	if (origin === 'chickyky-by-pass') return next();
 	if (appFingerprint === 'fingerprint_ssr') return next();
-	// if (origin === 'chickyky-by-pass') return next();
 
 	let checkMissing = feed24hHeader.checkMissingHeaders(headers);
 

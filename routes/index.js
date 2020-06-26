@@ -362,6 +362,7 @@ exports = module.exports = function (app) {
   app.post('/q/push-task', limiter, middleware.trackSearchInPushTask, routes.controllers.queue.pushTask); // push task
   app.get('/task/status/:taskId', routes.controllers.task.status);
 
+  app.use('/user', middleware.validateDynamicFeed24hToken);
   app.post('/user/register-guest', limiter, routes.controllers.user.registerGuest);
   // app.get('/user/verify-token', jwt({ secret: JwtService.JWT_SECRET }));
   app.get('/user/verify-token', middleware.verifyToken, (req, res, next) => {
