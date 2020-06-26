@@ -89,7 +89,10 @@ const validateBuildKeyAndVersion = (headers) => {
 
   date = Number(moment(date).utcOffset(420).format('YYYYMMDD'));
 
-  if (dateVersion != date) return false;
+  if (dateVersion != date) {
+    console.log(`check headers version: dateVersion= ${dateVersion} :: date= ${date}`);
+    return false;
+  }
 
   return true;
 }
