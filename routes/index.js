@@ -289,7 +289,7 @@ exports = module.exports = function (app) {
 
   app.use(hpp());
 
-  app.use((res, req, next) => {
+  app.use((req, res, next) => {
     const headers = req.headers;
 
     if (headers.referer && headers.referer.indexOf('sahamportal') > -1) {
