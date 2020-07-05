@@ -40,6 +40,11 @@ let engine = require(enginePath);
 // 	.then(result => console.log('result', result))
 // 	.catch(err => console.log('err', err));
 
-engine.getContent({ link })
-	.then(result => console.log('result=', JSON.stringify(result)))
-	.catch(err => console.log('err=', err));
+// engine.getContent({ link })
+// 	.then(result => console.log('result=', JSON.stringify(result)))
+// 	.catch(err => console.log('err=', err));
+
+engine.homepageByHtml((err, result) => {
+	console.log('err=', err);
+	console.log('result=', JSON.stringify(result));
+})

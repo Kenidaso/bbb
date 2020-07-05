@@ -9,6 +9,9 @@ const cheerio = require('cheerio');
 const _ = require('lodash');
 const moment = require('moment');
 
+const Entities = require('html-entities').AllHtmlEntities;
+const entities = new Entities();
+
 const base = require('./base');
 const utils = require('../helpers/utils');
 
@@ -85,10 +88,13 @@ let extractArticle = ($, article) => {
     title = $(a[0], article).text();
     title = utils.normalizeText(title);
   }
+
   if (!title || title.length == 0) {
     title = $(a[0], article).attr('title');
     title = utils.normalizeText(title);
   }
+
+  title = entities.decode(title);
 
   let link = $('a', article).attr('href');
 
