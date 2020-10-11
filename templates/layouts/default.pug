@@ -59,6 +59,8 @@ html
 							if user
 								if user.canAccessKeystone
 									li: a(href='/keystone') Open Keystone
+								li: a(href='/dashboard/agenda') Agenda
+								li: a(href='/dashboard/bull') Bull
 								li: a(href='/keystone/signout') Sign Out
 							else
 								li: a(href='/keystone/signin') Sign In

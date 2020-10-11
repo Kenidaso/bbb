@@ -16,6 +16,10 @@ const acrud = require('./helpers/acrud');
 
 const utils = require('./helpers/utils');
 
+// const agenda = require('./workers/agenda_worker');
+const agenda = require('./libs/agenda');
+const bullNotify = require('./libs/bull')('notify feed');;
+
 // console.log('--->', utils.randomStr(32))
 
 acrud.init({
@@ -79,7 +83,8 @@ keystone.set('i18n', i18n);
 keystone.set('acrud', acrud);
 keystone.set('Sentry', Sentry);
 keystone.set('debug', debug);
-
+keystone.set('agenda', agenda);
+keystone.set('bullNotify', bullNotify);
 keystone.set('useLogContext', function (reqContext, logVariable, namespace) {
 	if (reqContext && reqContext.logId) {
 		return reqContext.logId(namespace);
@@ -134,7 +139,6 @@ keystone.set('locals', {
 
 // Load your project's Routes
 keystone.set('routes', require('./routes'));
-
 
 // Configure the navigation bar in Keystone's Admin UI
 keystone.set('nav', {
@@ -212,6 +216,8 @@ async.parallel({
 
 	console.log('keystone start done. PORT:', process.env.PORT);
 	keystone.emit('ready');
+
+	// bullNotify.add({ video: 'http://example.com/video1.mov' });
 })
 
 // keystone.start(() => {

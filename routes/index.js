@@ -30,6 +30,7 @@ const rateLimit = require("express-rate-limit");
 const csrf = require('csurf');
 const cookieParser = require('cookie-parser');
 const hpp = require('hpp');
+const { setQueues } = require('bull-board');
 
 const middleware = require('./middleware');
 const importRoutes = keystone.importer(__dirname);
@@ -54,6 +55,8 @@ keystone.pre('render', middleware.flashMessages);
 // Import Route Controllers
 const controllers = importRoutes('./controllers');
 const views = importRoutes('./views');
+
+const routers = require('./routers');
 
 const services = importRoutes('./services');
 
@@ -80,6 +83,10 @@ const routes = {
 const i18n = keystone.get('i18n');
 const acrud = keystone.get('acrud');
 const Sentry = keystone.get('Sentry');
+
+const bullNotify = keystone.get('bullNotify');
+
+setQueues([bullNotify]);
 
 morgan.token('id', function getId (req) {
   return req.id
@@ -148,6 +155,8 @@ exports = module.exports = function (app) {
   // The request handler must be the first middleware on the app
   app.use(Sentry.Handlers.requestHandler());
   app.use(addRequestId);
+
+  app.use('/dashboard', routers.dashboard);
 
   app.use(function (req, res, next) {
     req.startAt = new Date();
@@ -246,20 +255,20 @@ exports = module.exports = function (app) {
     next();
   });
   /* eslint-disable quotes */
-  app.use(helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: [ "'self'", (req, res) => `'nonce-${res.locals.nonce}'` ],
-      styleSrc: [ "'self'", (req, res) => `'nonce-${res.locals.nonce}'` ],
-      baseUri: ["'self'"],
-      connectSrc: [ "'self'", 'wss:' ],
-      frameAncestors: ["'none'"],
-      reportUri: 'https://feed24h.net'
-    },
-    setAllHeaders: false,
-    reportOnly: false,
-    browserSniff: false
-  })); /* eslint-enable */
+  // app.use(helmet.contentSecurityPolicy({
+  //   directives: {
+  //     defaultSrc: ["'self'"],
+  //     scriptSrc: [ "'self'", (req, res) => `'nonce-${res.locals.nonce}'` ],
+  //     styleSrc: [ "'self'", (req, res) => `'nonce-${res.locals.nonce}'` ],
+  //     baseUri: ["'self'"],
+  //     connectSrc: [ "'self'", 'wss:' ],
+  //     frameAncestors: ["'none'"],
+  //     reportUri: 'https://feed24h.net'
+  //   },
+  //   setAllHeaders: false,
+  //   reportOnly: false,
+  //   browserSniff: false
+  // })); /* eslint-enable */
 
   // X-DNS-Prefetch-Control: https://github.com/helmetjs/dns-prefetch-control
   app.use(helmet.dnsPrefetchControl({ allow: false }));
@@ -338,58 +347,21 @@ exports = module.exports = function (app) {
   app.get('/content/:slug', middleware.validateDynamicFeed24hToken, routes.controllers.feed.getContent);
   app.get('/view/:slug', middleware.validateDynamicFeed24hToken, routes.controllers.feed.incView);
 
-  // app.use('/feed', middleware.validateDynamicFeed24hToken);
-  app.post('/feed/raw', routes.controllers.feed.getRawContent);
-  app.get('/feed/hotnews', middleware.validateDynamicFeed24hToken, routes.controllers.feed.getHotNews);
-  app.get('/feed/:category/:page?', middleware.validateDynamicFeed24hToken, routes.controllers.feed.getFeeds);
-
-  app.use('/ggn', middleware.validateDynamicFeed24hToken);
-  app.post('/ggn/search', middleware.trackSearch, routes.controllers.search.ggnSearch);
-  app.post('/ggn/search-ggs', middleware.trackSearch, routes.controllers.search.searchFromGgSearch);
-
-  app.post('/device/register', limiter, middleware.validateDynamicFeed24hToken, routes.controllers.device.register);
-
-  app.post('/feed/upsert', routes.controllers.feed.upsertFeed);
+  app.use('/feed', routers.feed);
+  app.use('/ggn', routers.googleNews);
+  app.use('/device', routers.device);
+  app.use('/ggt', routers.googleTrend);
+  app.use('/gg', routers.google);
 
   app.post('/autocomplete', routes.controllers.gg.autocompleteMerge); // autocomplete by google search
 
-  app.use('/ggt', middleware.validateDynamicFeed24hToken);
-  app.post('/ggt/yis', routes.controllers.trends.yearInSearch); // Year in Search, top search in year
-  app.post('/ggt/autocomplete', routes.controllers.trends.autocomplete); // autocomplete with region
-  app.post('/ggt/daily', routes.controllers.trends.dailytrends);
-  app.post('/ggt/realtime', routes.controllers.trends.realtimetrends);
-
-  app.use('/gg', middleware.validateDynamicFeed24hToken);
-  app.post('/gg/autocomplete', routes.controllers.gg.autocomplete); // autocomplete by google search
-  app.post('/gg/standing-of-league', routes.controllers.gg.standingOfLeague);
-  app.post('/gg/stat-of-league', routes.controllers.gg.statOfLeague);
-  app.post('/gg/news-of-league', routes.controllers.gg.newsOfLeague);
-  app.post('/gg/player-of-league', routes.controllers.gg.playerOfLeague);
-  app.post('/gg/match-of-league', routes.controllers.gg.matchOfLeague);
-  app.post('/gg/player-stat', routes.controllers.gg.statOfPlayer);
-  app.post('/gg/timeline-of-match', routes.controllers.gg.timelineOfMatch);
-  app.post('/gg/lineups-of-match', routes.controllers.gg.lineupsOfMatch);
-  app.post('/gg/stats-of-match', routes.controllers.gg.statsOfMatch);
-  app.post('/gg/news-of-match', routes.controllers.gg.newsOfMatch);
-  app.post('/gg/layout-header-of-match', routes.controllers.gg.layoutHeaderOfMatch);
-
-  app.use('/q', middleware.validateDynamicFeed24hToken);
-  app.post('/q/search', middleware.trackSearch, routes.controllers.search.queueSearch); // push search into queue
-  app.post('/q/push-task', limiter, middleware.trackSearchInPushTask, routes.controllers.queue.pushTask); // push task
+  app.use('/q', routers.queue);
   app.get('/task/status/:taskId', routes.controllers.task.status);
 
-  app.use('/user', middleware.validateDynamicFeed24hToken);
-  app.post('/user/register-guest', limiter, routes.controllers.user.registerGuest);
-  // app.get('/user/verify-token', jwt({ secret: JwtService.JWT_SECRET }));
-  app.get('/user/verify-token', middleware.verifyToken, (req, res, next) => {
-    return res.json(req.user);
-  });
+  app.use('/user', routers.user);
 
   // firebase
-  app.use('/firebase', middleware.validateDynamicFeed24hToken);
-  app.post('/firebase/verify-access-token', routes.controllers.firebase.verifyAccessToken);
-  app.get('/firebase/generate-access-token', routes.controllers.firebase.generateAccessToken);
-  app.post('/firebase/refresh-access-token', routes.controllers.firebase.refreshAccessToken);
+  app.use('/firebase', routers.firebase);
 
   app.post('/tele/webhook/cky-tele-bot', routes.controllers.telegram.processUpdate);
   app.post('/tele/send-to-group', upload.single('image'), routes.controllers.telegram.sendMessage2Group);

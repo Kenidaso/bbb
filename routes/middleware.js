@@ -178,6 +178,9 @@ exports.verifyAccessTokenProvider = (req, res, next) => {
 exports.printDetailRequest = (req, res, next) => {
 	const _prefix = `[${req.id.red.bgYellow.bold}] [${new Date().toISOString().blue.bgWhite.bold}]`;
 	const { originalUrl, method, headers, body, query } = req;
+
+	// if (/(?!\/dashboard\/agenda.*)/.test(originalUrl)) return next();
+
 	const  detail = {
 		originalUrl,
 		method,

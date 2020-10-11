@@ -12,12 +12,16 @@ const path = require('path');
 const myArgs = process.argv.slice(2);
 
 const engineName = myArgs[0].toLowerCase();
-const link = myArgs[1];
+const func = myArgs[1];
+const params = myArgs.slice(2);
+
+console.log(`${engineName} - ${func} - ${JSON.stringify(params)}`);
 
 const enginePath = `../engines/${engineName}.js`;
 
 if (!fs.existsSync(path.join(__dirname, enginePath))) {
-	console.log('Engine not exists');
+	console.error(`Engine ${engineName} not exists`);
+	return;
 };
 
 let engine = require(enginePath);
@@ -44,7 +48,18 @@ let engine = require(enginePath);
 // 	.then(result => console.log('result=', JSON.stringify(result)))
 // 	.catch(err => console.log('err=', err));
 
-engine.homepageByHtml((err, result) => {
+// engine.homepageByHtml((err, result) => {
+// 	console.log('err=', err);
+// 	console.log('result=', JSON.stringify(result));
+// })
+
+if (!engine[func]) return console.error(`----> No function ${func} in engine ${engineName}`);
+
+let _callback = (err, result) => {
 	console.log('err=', err);
-	console.log('result=', JSON.stringify(result));
-})
+	console.log('result=', typeof result === 'object' ? JSON.stringify(result) : result);
+}
+
+params.push(_callback);
+
+engine[func].apply(null, params);
