@@ -18,7 +18,7 @@ const utils = require('./helpers/utils');
 
 // const agenda = require('./workers/agenda_worker');
 const agenda = require('./libs/agenda');
-const bullNotify = require('./libs/bull')('notify feed');;
+// const bullNotify = require('./libs/bull')('notify feed');
 
 // console.log('--->', utils.randomStr(32))
 
@@ -84,7 +84,7 @@ keystone.set('acrud', acrud);
 keystone.set('Sentry', Sentry);
 keystone.set('debug', debug);
 keystone.set('agenda', agenda);
-keystone.set('bullNotify', bullNotify);
+// keystone.set('bullNotify', bullNotify);
 keystone.set('useLogContext', function (reqContext, logVariable, namespace) {
 	if (reqContext && reqContext.logId) {
 		return reqContext.logId(namespace);

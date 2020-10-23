@@ -12,7 +12,7 @@ router.use('/', function (req, res, next) {
   return res.send(401);
 });
 
-router.use('/agenda', Agendash(agenda));
-router.use('/bull', UI);
+// router.use('/agenda', Agendash(agenda));
+// router.use('/bull', UI);
 
 module.exports = router

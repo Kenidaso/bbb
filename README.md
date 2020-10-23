@@ -35,4 +35,6 @@ pm2 --name news-api start keystone.js
 pm2 --name baomoi start "npm run baomoi"
 pm2 --name rss start "npm run rss"
 pm2 --name task_queue start "npm run task_queue"
-pm2 --name news-web start "npm start"
+
+<!-- project web -->
+pm2 --name news-web start "nuxt start"

@@ -84,9 +84,9 @@ const i18n = keystone.get('i18n');
 const acrud = keystone.get('acrud');
 const Sentry = keystone.get('Sentry');
 
-const bullNotify = keystone.get('bullNotify');
+// const bullNotify = keystone.get('bullNotify');
 
-setQueues([bullNotify]);
+// setQueues([bullNotify]);
 
 morgan.token('id', function getId (req) {
   return req.id
