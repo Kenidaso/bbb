@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const moment = require('moment');
 
 const FEED24H_APIKEY = process.env.FEED24H_APIKEY;
-const LIMIT_DIFF_TIMESTAMP = 1000 * 10; // 10s
+const LIMIT_DIFF_TIMESTAMP = 1000 * 20; // 10s
 
 const utils = require('./utils');
 

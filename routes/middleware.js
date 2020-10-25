@@ -211,7 +211,7 @@ exports.validateDynamicFeed24hToken = (req, res, next) => {
 
 	let checkTimestamp = feed24hHeader.validateReqTimestamp(req, headers);
 
-	res.set('x-request-diff', req.timeDiff);
+	res.set('x-request-time-diff', req.timeDiff);
 
 	if (!checkTimestamp) {
 		return res.error(req, res, ERROR_CODE.EREQTIMESTAMP);

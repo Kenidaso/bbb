@@ -211,6 +211,7 @@ exports = module.exports = function (app) {
   app.use((req, res, next) => {
     res.set('app-request-timestamp', req.headers['app-request-timestamp']);
     res.set('x-start', req.startAt.getTime());
+    res.set('x-start-date', req.startAt.toGMTString());
 
     return next();
   })

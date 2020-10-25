@@ -38,6 +38,8 @@ router.get('/time-detail', (req, res) => {
 		timeDiffAsSeconds: moment.duration(timeDiffMs).asSeconds()
 	};
 
+	res.set('x-request-time-diff', timeDiffMs);
+
 	return res.success(req, res, result);
 });
 
