@@ -208,6 +208,13 @@ exports = module.exports = function (app) {
   app.use(middleware.addFnFormatResponse);
   app.use(middleware.printDetailRequest);
 
+  app.use((req, res, next) => {
+    res.set('app-request-timestamp', req.headers['app-request-timestamp']);
+    res.set('x-start', req.startAt.getTime());
+
+    return next();
+  })
+
   // limit request
   /*app.use((req, res, next) => {
     console.log(`--> ${req.url}`);
@@ -328,6 +335,8 @@ exports = module.exports = function (app) {
       },
     });
   });
+
+  app.use('/server', routers.server);
 
   // Views
   app.get('/', routes.views.index);

@@ -83,13 +83,15 @@ Feed.getFeeds = (params, callback) => {
 	});
 }
 
-Feed.getContent = (slugFeed, ignoreCache = false, callback) => {
+Feed.getContent = (slugFeed, opts, callback) => {
+	opts = opts || {};
+
 	// get link feed from slug-feed
 	let keyLinkFeed = `linkFeed:${slugFeed}`;
 	RedisService.get(keyLinkFeed, (err, link) => {
 		if (!err && link) {
 			debug('get link feed from cache key= %s', keyLinkFeed);
-			return RawFeedService.getHtmlContent(link, ignoreCache, callback);
+			return RawFeedService.getHtmlContent(link, opts, callback);
 		}
 
 		FeedModel.findOne({
@@ -102,7 +104,7 @@ Feed.getContent = (slugFeed, ignoreCache = false, callback) => {
 
 			// if (feed.rawHtml && feed.rawHtml.length > 0) return callback(null, feed.rawHtml);
 
-			return RawFeedService.getHtmlContent(feed.link, ignoreCache, callback);
+			return RawFeedService.getHtmlContent(feed.link, opts, callback);
 		})
 	});
 }

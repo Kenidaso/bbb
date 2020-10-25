@@ -44,7 +44,10 @@ let handleError_string = (req, res, error, result) => {
 let handleError_object = (req, res, error, result) => {
   let { errorCode, message, data, statusCode, codeDebug } = error;
 
+  console.log('handleError_object:', error.stack);
+
   data = result;
+
   if (result && typeof result === 'object') {
     if (result.message) message = result.message;
     if (result.statusCode) statusCode = result.statusCode;
@@ -58,8 +61,13 @@ let handleError_object = (req, res, error, result) => {
     }
   }
 
-  if (!message && error instanceof Error) {
-    message = error.toString();
+  if (error instanceof Error) {
+    if (!message) message = error.toString();
+  }
+
+  if (error.stack) {
+    data = data || {};
+    data.stack = error.stack;
   }
 
   return _Error(req, res, errorCode, codeDebug, data, message, statusCode);
@@ -133,6 +141,10 @@ function _Error (req, res, errorCode = -1, errorCodeDebug = 'EDEFAULT', data = {
     data    : data,
     message : message ? localizeResultMessage(req, res, message) : messageCode[errorCode]
   };
+
+  if (data instanceof Error) {
+    response.stack = data.stack
+  }
 
   return res.status(statusCode).json(response);
 }

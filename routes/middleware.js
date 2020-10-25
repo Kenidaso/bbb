@@ -153,9 +153,7 @@ exports.verifyToken = jwt({ secret: JwtService.JWT_SECRET })
 
 exports.handleError = function (err, req, res, next) {
   if (err) {
-  	// Sentry.captureException(err);
-
-  	console.log(`handleError err= ${JSON.stringify(err)}`);
+  	console.log(`handleError err=`, err);
 
     if (err.name === 'UnauthorizedError') {
     	return res.error(req, res, ERROR_CODE.EINVALIDTOKEN, err);
@@ -211,7 +209,9 @@ exports.validateDynamicFeed24hToken = (req, res, next) => {
 		return res.error(req, res, ERROR_CODE.EHEADERSMISSING/*, { headers: checkMissing.headersMiss }*/);
 	}
 
-	let checkTimestamp = feed24hHeader.validateReqTimestamp(headers);
+	let checkTimestamp = feed24hHeader.validateReqTimestamp(req, headers);
+
+	res.set('x-request-diff', req.timeDiff);
 
 	if (!checkTimestamp) {
 		return res.error(req, res, ERROR_CODE.EREQTIMESTAMP);
