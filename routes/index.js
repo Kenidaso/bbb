@@ -141,7 +141,7 @@ const corsOptions = NODE_ENV === 'production' ? {
     console.log('cors origin=', origin);
 
     let inWhiteList = whitelist.some((host) => {
-      return origin.includes(host);
+      return origin && origin.includes(host);
     })
 
     // if (whitelist.indexOf(origin) !== -1) {
