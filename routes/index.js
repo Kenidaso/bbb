@@ -140,13 +140,20 @@ const corsOptions = NODE_ENV === 'production' ? {
   origin: function (origin, callback) {
     console.log('cors origin=', origin);
 
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      // callback(ERROR_CODE.ECORSNOTALLOWED)
-      callback('ECORSNOTALLOWED')
-    }
+    let inWhiteList = whitelist.some((host) => {
+      return origin.includes(host);
+    })
+
+    // if (whitelist.indexOf(origin) !== -1) {
+    //   callback(null, true)
+    // } else {
+    //   // callback(ERROR_CODE.ECORSNOTALLOWED)
+    //   callback('ECORSNOTALLOWED')
+    // }
+
+    return callback(inWhiteList ? null: 'ECORSNOTALLOWED', inWhiteList)
   },
+
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 } : {}
 
