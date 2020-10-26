@@ -141,7 +141,7 @@ const corsOptions = NODE_ENV === 'production' ? {
     console.log('cors origin=', origin);
 
     let inWhiteList = whitelist.some((host) => {
-      return origin && origin.includes(host);
+      return !origin || origin.includes(host);
     })
 
     // if (whitelist.indexOf(origin) !== -1) {
@@ -247,6 +247,8 @@ exports = module.exports = function (app) {
 
     return `[${id.red.bgYellow.bold}] ${remoteAddr} - ${remoteUser} [${isoDate.blue.bgWhite}] "${method.red.bgGreen} ${url.bgGreen}" ${status} "${referrer}" "${userAgent}" - ${responseTime} ms`;
   }))
+
+  app.options('*', cors());
 
   // X-Frame-Options: https://github.com/helmetjs/frameguard
   app.use(helmet.frameguard({ action: 'deny' }));
