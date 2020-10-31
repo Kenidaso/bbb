@@ -213,9 +213,9 @@ exports.validateDynamicFeed24hToken = (req, res, next) => {
 
 	res.set('x-request-time-diff', req.timeDiff);
 
-	if (!checkTimestamp) {
+	/*if (!checkTimestamp) {
 		return res.error(req, res, ERROR_CODE.EREQTIMESTAMP);
-	}
+	}*/
 
 	if (appFingerprint.length != 32) {
 		return res.error(req, res, ERROR_CODE.EHEADERSFINGERPRINT);
