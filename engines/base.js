@@ -48,7 +48,9 @@ const UA_MOBILE = 'Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) Apple
 
 const minify = require('html-minifier').minify;
 
-const { JSDOM } = require('jsdom');
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
+const virtualConsole = new jsdom.VirtualConsole();
 const Readability = require('@web-clipper/readability');
 
 const clipper = require('./webClipper');
@@ -601,7 +603,8 @@ base.useReadability = (link, callback) => {
 
     try {
       const doc = new JSDOM(html, {
-        url: link
+        url: link,
+        virtualConsole
       });
 
       let reader = new MozillaReadability(doc.window.document);

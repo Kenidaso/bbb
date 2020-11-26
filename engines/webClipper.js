@@ -14,7 +14,9 @@ const striptags = require('striptags');
 const debug = require('debug')('WebClipper');
 const fatal = require('debug')('FATAL');
 
-const { JSDOM } = require('jsdom');
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
+const virtualConsole = new jsdom.VirtualConsole();
 const Readability = require('@web-clipper/readability');
 
 let clipper = {};
@@ -553,6 +555,7 @@ clipper.readability = (link, html) => {
   try {
   	let doc = new JSDOM(html, {
   	  url: link,
+      virtualConsole
   	});
   	let reader = new Readability(doc.window.document);
   	let article = reader.parse();
