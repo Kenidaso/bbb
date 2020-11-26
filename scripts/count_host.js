@@ -23,6 +23,9 @@ db.getCollection('feeds').aggregate([
         $sort: {
             count: -1
         }
+    },
+    {
+        $out: 'aggregate_results'
     }
 ]).forEach(function (doc) {
     print(doc._id, doc.count)

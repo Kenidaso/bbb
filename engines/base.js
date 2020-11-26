@@ -599,20 +599,26 @@ base.useReadability = (link, callback) => {
       return callback('EFETCHHTMLNOTFOUND');
     }
 
-    const doc = new JSDOM(html, {
-      url: link
-    });
+    try {
+      const doc = new JSDOM(html, {
+        url: link
+      });
 
-    let reader = new MozillaReadability(doc.window.document);
-    let article = reader.parse();
+      let reader = new MozillaReadability(doc.window.document);
+      let article = reader.parse();
 
-    doc.window.close();
+      doc.window.close();
+
+      return callback(null, article);
+    } catch (ex) {
+      console.log(`[base.useReadability] ex=`, ex);
+
+      return callback(null, {});
+    }
 
     // let doc = new JSDOMParser().parse(html);
     // let parser = new MozillaReadability(doc);
     // let article = parser.parse()
-
-    return callback(null, article);
   })
 }
 

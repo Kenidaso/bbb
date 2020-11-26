@@ -550,15 +550,20 @@ clipper.getArticleContent = (rawHtml, host) => {
 }
 
 clipper.readability = (link, html) => {
-	let doc = new JSDOM(html, {
-	  url: link,
-	});
-	let reader = new Readability(doc.window.document);
-	let article = reader.parse();
+  try {
+  	let doc = new JSDOM(html, {
+  	  url: link,
+  	});
+  	let reader = new Readability(doc.window.document);
+  	let article = reader.parse();
 
-  // doc.close(); // close jsdom
+    doc.close(); // close jsdom
 
-	return article;
+    return article;
+  } catch (ex) {
+    console.log('[clipper.readability] ex=', ex);
+    return {};
+  }
 }
 
 const walk = _ => {
