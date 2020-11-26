@@ -557,7 +557,7 @@ clipper.readability = (link, html) => {
   	let reader = new Readability(doc.window.document);
   	let article = reader.parse();
 
-    doc.close(); // close jsdom
+    doc.window.close(); // close jsdom
 
     return article;
   } catch (ex) {
