@@ -449,7 +449,7 @@ module.exports = {
 		if (!search) return search;
 
 		search = search.toLowerCase().trim();
-		search = unidecode(search);
+		// search = unidecode(search);
 
 		return search;
 	},

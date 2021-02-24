@@ -247,16 +247,20 @@ const _parse_gg_news = ($, isGetOriginLink = false, callback) => {
 
 const search = (searchString, callback) => {
 	// let query = encodeURIComponent(searchString);
-	request({
+	const opts = {
 		url: `${BASE_URL}`,
 		method: 'GET',
 		qs: {
 			q: searchString,
 			hl: 'vi',
 			gl: 'VN',
-			ceid: 'VN%3Avi'
+			ceid: 'VN:vi'
 		}
-	}, (err, response, body) => {
+	}
+
+	console.log(`googleNews search opts=`, opts);
+
+	request(opts, (err, response, body) => {
 		if (err) return callback(err);
 		if (!body) return callback('ERESPONSENOBODY');
 

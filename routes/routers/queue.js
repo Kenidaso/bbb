@@ -8,7 +8,6 @@ const controllers = importRoutes('../controllers');
 const middleware = require('../middleware');
 
 router.use('/', middleware.validateDynamicFeed24hToken);
-router.post('/search', middleware.trackSearch, controllers.search.ggnSearch);
-router.post('/search-ggs', middleware.trackSearch, controllers.search.searchFromGgSearch);
+router.post('/search', middleware.trackSearch, controllers.queue.pushTaskSearch);
 
 module.exports = router;
