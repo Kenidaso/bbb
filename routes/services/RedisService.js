@@ -22,7 +22,7 @@ let TASK_STATUS = {
 }
 
 // let TASK_KEY_TTL = 1000 * 60 * 60 * 24 * 2; // TTL of key is 2 days
-let TASK_KEY_TTL = 60 * 10; // TTL of key is 10 minutes
+let TASK_KEY_TTL = 60 * 3; // TTL of key is 3 minutes
 
 let _changeStatusKey = (key, result = {}, status, callback = noop) => {
 	_client.get(key, (err, value) => {

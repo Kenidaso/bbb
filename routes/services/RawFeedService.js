@@ -21,7 +21,7 @@ const debug = require('debug')('RawFeedService');
 
 const utils = require('../../helpers/utils');
 
-const TTL_RAW_HTML = 60 * 60 * 24 * 7; // cache 1 week
+const TTL_RAW_HTML = 60 * 60 * 24 * 1; // cache 1 day
 
 const noop = () => {};
 
@@ -145,7 +145,7 @@ RawFeed.getHtmlContent = (link, options = {}, callback) => {
 				}
 
 				if (doc && doc.rawHtml && doc.rawHtml.length > 0) {
-					RedisService.set(keyContent, doc.rawHtml);
+					RedisService.set(keyContent, doc.rawHtml, TTL_RAW_HTML);
 					rawHtml = doc.rawHtml;
 					debug('get content from db key= %s', keyContent);
 					return next('GET_FROM_DB', doc.rawHtml);
