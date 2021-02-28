@@ -84,7 +84,7 @@ const validateBuildKeyAndVersion = (headers) => {
 
   if (date > now) return false;
 
-  let dateVersion = moment(version, 'vYYYYMMDD.HH.mm').utcOffset(420).format('YYYYMMDD');
+  let dateVersion = moment(`${version}+07:00`, 'vYYYYMMDD.HH.mmZ').utcOffset(420).format('YYYYMMDD');
   dateVersion = Number(dateVersion);
 
   date = Number(moment(date).utcOffset(420).format('YYYYMMDD'));
