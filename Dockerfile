@@ -1,4 +1,4 @@
-FROM node:18.6.0-slim
+FROM node:18.6.0
 
 ARG NODE_ENV
 
@@ -15,7 +15,6 @@ COPY package*.json /app/
 
 COPY . /app/
 
-RUN npm install bcrypt node-gyp
 RUN npm install
 
 EXPOSE $PORT
