@@ -84,7 +84,7 @@
     "task_queue": "node workers/task_queue",
     "rss": "node workers/from_rss",
     "baomoi": "node workers/crawl_baomoi -p 1",
-    "start": "nodemon keystone.js",
+    "start": "node keystone.js",
     "docs": "apidoc -i routes/controllers -o public/docs",
     "test-clipper": "DEBUG=*WebClipper* mocha test-web-clipper.mocha.js",
     "postinstall": "npm install apidoc -g && cp cheats/FileChangeMessage.js node_modules/keystone/fields/components &&  cp cheats/cloudinaryResize.js node_modules/keystone/admin/client/utils && cp cheats/CloudinaryImagesField.js node_modules/keystone/fields/types/cloudinaryimages && cp cheats/CloudinaryImageField.js node_modules/keystone/fields/types/cloudinaryimage && cp -f ./public/images/newspaper.png ./node_modules/keystone/admin/public/images/logo.png && cp -f cheats/Brand.js node_modules/keystone/admin/client/Signin/components/Brand.js"
