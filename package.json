@@ -90,7 +90,7 @@
     "postinstall": "npm install apidoc -g && cp cheats/FileChangeMessage.js node_modules/keystone/fields/components &&  cp cheats/cloudinaryResize.js node_modules/keystone/admin/client/utils && cp cheats/CloudinaryImagesField.js node_modules/keystone/fields/types/cloudinaryimages && cp cheats/CloudinaryImageField.js node_modules/keystone/fields/types/cloudinaryimage && cp -f ./public/images/newspaper.png ./node_modules/keystone/admin/public/images/logo.png && cp -f cheats/Brand.js node_modules/keystone/admin/client/Signin/components/Brand.js"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=14.0.0"
   },
   "_moduleAliases": {
     "@root": ".",

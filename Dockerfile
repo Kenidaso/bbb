@@ -1,4 +1,4 @@
-FROM node:18.0.0
+FROM node:16.16-slim
 
 ARG NODE_ENV
 
@@ -8,7 +8,6 @@ RUN apt-get update -y
 RUN apt-get install -y python python3 make g++ gcc build-essential
 
 RUN npm install pm2 -g
-RUN npm install bcrypt@5.0.0
 
 WORKDIR /app
 RUN chmod +x /app
