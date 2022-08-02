@@ -15,6 +15,7 @@ COPY package*.json /app/
 
 COPY . /app/
 
+RUN npm install bcrypt node-gyp
 RUN npm install
 
 EXPOSE $PORT
