@@ -8,6 +8,8 @@ const queue = require('./queue');
 const user = require('./user');
 const firebase = require('./firebase');
 const server = require('./server');
+const post = require('./post');
+const comment = require('./comment');
 
 module.exports = {
 	dashboard,
@@ -19,5 +21,7 @@ module.exports = {
 	google,
 	user,
 	firebase,
-	server
+	server,
+	post,
+	comment
 }

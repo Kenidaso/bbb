@@ -1,3 +1,5 @@
+require('module-alias/register');
+
 // Simulate config options from your production environment by
 // customising the .env file in your project's root folder.
 require('dotenv').config();
@@ -142,7 +144,12 @@ keystone.set('routes', require('./routes'));
 
 // Configure the navigation bar in Keystone's Admin UI
 keystone.set('nav', {
-	'posts': ['posts', 'post-categories'],
+	'posts': [
+		'posts',
+		'post-categories',
+		'comments',
+		'comment-buckets'
+	],
 	'galleries': 'galleries',
 	'ks-users': 'ks-users',
 

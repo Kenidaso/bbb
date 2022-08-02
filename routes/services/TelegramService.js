@@ -25,7 +25,7 @@ let urlWebhook = process.env.URL_TELEGRAM_WEBHOOK;
 if (NODE_ENV === 'production') {
 	// nothing
 } else {
-  urlWebhook = `${NGROK_TUNNEL}/tele/webhook/cky-tele-bot`; // setting here
+  // urlWebhook = `${NGROK_TUNNEL}/tele/webhook/cky-tele-bot`; // setting here
 }
 
 bot.setWebHook(urlWebhook);

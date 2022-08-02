@@ -26,11 +26,9 @@ const helmet = require('helmet');
 const crypto = require('crypto');
 const compression = require('compression');
 const debug = require('debug');
-const rateLimit = require("express-rate-limit");
 const csrf = require('csurf');
 const cookieParser = require('cookie-parser');
 const hpp = require('hpp');
-const { setQueues } = require('bull-board');
 
 const middleware = require('./middleware');
 const importRoutes = keystone.importer(__dirname);
@@ -84,10 +82,6 @@ const i18n = keystone.get('i18n');
 const acrud = keystone.get('acrud');
 const Sentry = keystone.get('Sentry');
 
-// const bullNotify = keystone.get('bullNotify');
-
-// setQueues([bullNotify]);
-
 morgan.token('id', function getId (req) {
   return req.id
 })
@@ -109,11 +103,6 @@ function shouldCompress (req, res) {
 // Enable if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
 // see https://expressjs.com/en/guide/behind-proxies.html
 // app.set('trust proxy', 1);
-
-const limiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 5 // limit each IP to 100 requests per windowMs
-});
 
 const csrfProtection = csrf({ cookie: true });
 
@@ -223,16 +212,6 @@ exports = module.exports = function (app) {
     return next();
   })
 
-  // limit request
-  /*app.use((req, res, next) => {
-    console.log(`--> ${req.url}`);
-
-    return limiter(req, res, next);
-  });*/
-
-  // app.use(morgan('combined'));
-  // app.use(morgan('[:id] :remote-addr - :remote-user [:date[iso]] ":method :url" :status ":referrer" ":user-agent" - :response-time ms'));
-
   app.use(morgan(function (tokens, req, res) {
     let id = tokens.id(req, res);
     let remoteAddr = tokens['remote-addr'](req, res);
@@ -271,21 +250,6 @@ exports = module.exports = function (app) {
     res.locals.nonce = crypto.randomBytes(16).toString('hex');
     next();
   });
-  /* eslint-disable quotes */
-  // app.use(helmet.contentSecurityPolicy({
-  //   directives: {
-  //     defaultSrc: ["'self'"],
-  //     scriptSrc: [ "'self'", (req, res) => `'nonce-${res.locals.nonce}'` ],
-  //     styleSrc: [ "'self'", (req, res) => `'nonce-${res.locals.nonce}'` ],
-  //     baseUri: ["'self'"],
-  //     connectSrc: [ "'self'", 'wss:' ],
-  //     frameAncestors: ["'none'"],
-  //     reportUri: 'https://feed24h.net'
-  //   },
-  //   setAllHeaders: false,
-  //   reportOnly: false,
-  //   browserSniff: false
-  // })); /* eslint-enable */
 
   // X-DNS-Prefetch-Control: https://github.com/helmetjs/dns-prefetch-control
   app.use(helmet.dnsPrefetchControl({ allow: false }));
@@ -377,7 +341,7 @@ exports = module.exports = function (app) {
   app.use('/q', routers.queue);
   app.get('/task/status/:taskId', routes.controllers.task.status);
 
-  app.use('/user', routers.user);
+  app.use('/users', routers.user);
 
   // firebase
   app.use('/firebase', routers.firebase);
@@ -389,12 +353,13 @@ exports = module.exports = function (app) {
 
   app.post('/fb/sharing-debugger', routes.controllers.fb.scrapedSharingDebugger);
 
+  app.use('/posts', routers.post);
+  app.use('/comments', routers.comment);
+
   app.post(acrud.ROUTE, acrud.controller);
 
   // The error handler must be before any other error middleware
   app.use(Sentry.Handlers.errorHandler());
 
   app.use(middleware.handleError);
-  // NOTE: To protect a route so that only admins can see it, use the requireUser middleware:
-  // app.get('/protected', middleware.requireUser, routes.views.protected);
 };

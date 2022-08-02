@@ -61,5 +61,7 @@
 	"Cannot read property 'accept-language' of undefined": "Cannot read property 'accept-language' of undefined",
 	"Cannot read property 'app-request-timestamp' of undefined": "Cannot read property 'app-request-timestamp' of undefined",
 	"req.set is not a function": "req.set is not a function",
-	"timestamp is not defined": "timestamp is not defined"
+	"timestamp is not defined": "timestamp is not defined",
+	"Feed validation failed: publishDate: Cast to Date failed for value \"Invalid date\" at path \"publishDate\", title: Path `title` is required.": "Feed validation failed: publishDate: Cast to Date failed for value \"Invalid date\" at path \"publishDate\", title: Path `title` is required.",
+	"PostService is not a function": "PostService is not a function"
 }
