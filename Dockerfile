@@ -20,4 +20,4 @@ RUN npm install
 EXPOSE $PORT
 
 CMD ["echo", "Start service..."]
-CMD ["pm2-runtime", "ecosystem.config.js"]
+CMD ["npm", "start"]
