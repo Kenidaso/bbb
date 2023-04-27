@@ -63,5 +63,17 @@
 	"req.set is not a function": "req.set is not a function",
 	"timestamp is not defined": "timestamp is not defined",
 	"Feed validation failed: publishDate: Cast to Date failed for value \"Invalid date\" at path \"publishDate\", title: Path `title` is required.": "Feed validation failed: publishDate: Cast to Date failed for value \"Invalid date\" at path \"publishDate\", title: Path `title` is required.",
-	"PostService is not a function": "PostService is not a function"
+	"PostService is not a function": "PostService is not a function",
+	"callback is not a function": "callback is not a function",
+	"path.join is not a function": "path.join is not a function",
+	"$(...)[0].text is not a function": "$(...)[0].text is not a function",
+	"Unexpected type of selector": "Unexpected type of selector",
+	"Converting circular structure to JSON\n    --> starting at object with constructor 'Document'\n    |     property 'children' -> object with constructor 'Array'\n    |     index 0 -> object with constructor 'ProcessingInstruction'\n    --- property 'parent' closes the circle": "Converting circular structure to JSON\n    --> starting at object with constructor 'Document'\n    |     property 'children' -> object with constructor 'Array'\n    |     index 0 -> object with constructor 'ProcessingInstruction'\n    --- property 'parent' closes the circle",
+	"count is not defined": "count is not defined",
+	"f is not defined": "f is not defined",
+	"blockOuterMainTop is not defined": "blockOuterMainTop is not defined",
+	"The \"data\" argument must be of type string or an instance of Buffer, TypedArray, or DataView. Received undefined": "The \"data\" argument must be of type string or an instance of Buffer, TypedArray, or DataView. Received undefined",
+	"The \"data\" argument must be of type string or an instance of Buffer, TypedArray, or DataView. Received an instance of Object": "The \"data\" argument must be of type string or an instance of Buffer, TypedArray, or DataView. Received an instance of Object",
+	"that is not a function": "that is not a function",
+	"html is not defined": "html is not defined"
 }

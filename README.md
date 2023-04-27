@@ -38,3 +38,7 @@ pm2 --name task_queue start "npm run task_queue"
 
 <!-- project web -->
 pm2 --name news-web start "nuxt start"
+
+<!-- staas -->
+nodejs-newsbackend.staas--110703536814197843684.svc.cluster.local
+<service-name>.<namespace>.svc.cluster.loca

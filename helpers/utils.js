@@ -37,8 +37,10 @@ module.exports = {
 	},
 
 	normalizeText: (text = '') => {
-		let result = text.replace(/\s\s/g, ' ').trim();
-		result = result.replace(/\n/g, ' ');
+		let result = text
+			.replace(/\n/g, ' ')
+			.replace(/\s\s/g, ' ')
+			.trim();
 
 		while (result.indexOf('  ') > -1) {
 			result = result.replace(/\s\s/g, ' ');

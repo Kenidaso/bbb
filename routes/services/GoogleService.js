@@ -96,8 +96,8 @@ const standingOfLeague = (options, callback) => {
 		football.standingOfLeague(options, (err, result) => {
 			if (err) return callback(err);
 
-			if (NODE_ENV !== 'production') {
-				fs.writeFileSync('football_standing.html', result);
+			if (result && result.rawHtml && NODE_ENV !== 'production') {
+				fs.writeFileSync('football_standing.html', result.rawHtml);
 			}
 
 			RedisService.set(key, result, TTL_STANDING);
@@ -119,11 +119,14 @@ const statOfLeague = (options, callback) => {
 		football.statOfLeague(options, (err, result) => {
 			if (err) return callback(err);
 
-			if (NODE_ENV !== 'production') {
-				fs.writeFileSync('football_stat.html', result);
+			if (result && result.rawHtml && NODE_ENV !== 'production') {
+				console.log(`result=`, result);
+				fs.writeFileSync('football_stat.html', result.rawHtml);
 			}
 
-			RedisService.set(key, result, TTL_STAT);
+			if (result) {
+				RedisService.set(key, result, TTL_STAT);
+			}
 
 			return callback(null, result);
 		});
@@ -144,11 +147,13 @@ const newsOfLeague = (options, callback) => {
 		football.newsOfLeague(options, (err, result) => {
 			if (err) return callback(err);
 
-			if (NODE_ENV !== 'production') {
-				fs.writeFileSync('football_news.html', result);
+			if (result && result.rawHtml && NODE_ENV !== 'production') {
+				fs.writeFileSync('football_news.html', result.rawHtml);
 			}
 
-			RedisService.set(key, result, TTL_NEWS);
+			if (result) {
+				RedisService.set(key, result, TTL_NEWS);
+			}
 
 			return callback(null, result);
 		});
@@ -167,11 +172,13 @@ const playerOfLeague = (options, callback) => {
 		football.playerOfLeague(options, (err, result) => {
 			if (err) return callback(err);
 
-			if (NODE_ENV !== 'production') {
-				fs.writeFileSync('football_player.html', result);
+			if (result && result.rawHtml && NODE_ENV !== 'production') {
+				fs.writeFileSync('football_player.html', result.rawHtml);
 			}
 
-			RedisService.set(key, result, TTL_PLAYER);
+			if (result) {
+				RedisService.set(key, result, TTL_PLAYER);
+			}
 
 			return callback(null, result);
 		});

@@ -69,6 +69,8 @@ const request = require('request').defaults({
 const fs = require('fs');
 const _ = require('lodash');
 
+const clipper = require('./webClipper');
+
 let cookie = request.jar();
 
 const FOOTBALL_LEAGUE = require('./footballLeague');
@@ -320,6 +322,30 @@ const matchOfLeague = (opt, callback) => {
 	})
 }
 
+const tryParseBodyFromGGFootball = (body) => {
+	if (!body || body.length === 0) return null;
+
+	const start = body.indexOf('<style>');
+	const end = body.lastIndexOf('</div>') + '</div>'.length;
+
+	const html = body.substr(start, end - start);
+	const $ = cheerio.load(html);
+
+	// fix link image
+	$('img').each(function () {
+		const dataSrc = $(this).attr('data-src');
+
+		if (dataSrc) {
+	  	$(this).attr('src', dataSrc);
+		}
+	});
+
+	const _style = `<style>${$('style').contents()}</style>`;
+	const _body = $('body').contents();
+
+	return `${_style}${_body}`;
+}
+
 const standingOfLeague = (opt, callback) => {
 	opt = Object.assign({}, default_Option, opt);
 
@@ -343,19 +369,10 @@ const standingOfLeague = (opt, callback) => {
 		method: 'GET'
 	}, (err, response, body) => {
 		if (err) return callback(err);
-
 		if (!body || body.length == 0) return callback();
 
-		let split = body.split('\n');
-
-		if (!split || split.length < 4) return callback();
-
-		let iSlice = split[3].indexOf('<style');
-		let html = split[3].slice(iSlice);
-		html = html.substr(0, html.length - 5);
-
 		let result = {
-			rawHtml: html
+			rawHtml: tryParseBodyFromGGFootball(body)
 		}
 
 		return callback(err, result);
@@ -386,20 +403,10 @@ const newsOfLeague = (opt, callback) => {
 		jar: cookie
 	}, (err, response, body) => {
 		if (err) return callback(err);
-
 		if (!body || body.length == 0) return callback();
-		// return callback(err, body);
-		let split = body.split('\n');
-
-		if (!split || split.length < 5) return callback();
-
-		let html = split[3].slice(5);
-		html = html + split[4];
-
-		html = html.substr(0, html.length - 5);
 
 		let result = {
-			rawHtml: html
+			rawHtml: tryParseBodyFromGGFootball(body)
 		}
 
 		return callback(err, result);
@@ -431,18 +438,10 @@ const statOfLeague = (opt, callback) => {
 		method: 'GET'
 	}, (err, response, body) => {
 		if (err) return callback(err);
-
 		if (!body || body.length == 0) return callback();
 
-		let split = body.split('\n');
-
-		if (!split || split.length < 4) return callback();
-
-		let html = split[3].slice(5);
-		html = html.substr(0, html.length - 5);
-
 		let result = {
-			rawHtml: html
+			rawHtml: tryParseBodyFromGGFootball(body)
 		}
 
 		return callback(err, result);
@@ -473,69 +472,51 @@ const playerOfLeague = (opt, callback) => {
 		if (err) return callback(err);
 		if (!body || body.length == 0) return callback();
 
-		let split = body.split('\n');
+		const start = body.indexOf('<style>');
+		const end = body.lastIndexOf('</div>') + '</div>'.length;
+		const html = body.substr(start, end - start);
+		const $ = cheerio.load(html);
 
-		if (!split || split.length < 4) return callback();
+		const imgIds = $('wp-grid-tile > div > img')
+			.map((i, ele) => {
+				return $(ele).attr('id');
+			})
+			.toArray();
 
-		let html = split[3].slice(5);
-		html = html.substr(0, html.length - 5);
+		const _closeDiv = '</div>';
+		const indexCloseDiv = body.lastIndexOf(_closeDiv);
+		const _tmp = body.substr(indexCloseDiv);
+		const preImgBase64 = 'data:image/jpeg;base64,';
 
-		let $ = cheerio.load(html);
-		let lastId = null;
-		let count = 0;
+		for (let i = 0; i < imgIds.length; i++) {
+			const id = imgIds[i];
+			const _id = `[3,"${id}"]`;
+			const substr = _tmp.substr(_tmp.indexOf(_id) + _id.length);
+			const split = substr.split(preImgBase64);
 
-		for (let i = 11; i < split.length; i++) {
-			count++;
-			let text = split[i];
-			let dataBase64 = null;
+			if (split && split[1]) {
+				const _indexTail = split[1].lastIndexOf(';[3,');
+				let data = _indexTail > 0
+					? split[1].substr(0, split[1].lastIndexOf(';[3,'))
+					: split[1];
+				const lastEqual = data.lastIndexOf('=');
 
-			let start = text.indexOf(';') + 1;
-			let end = text.lastIndexOf(';') + 1;
+				data = lastEqual > 0
+					? data.substr(0, lastEqual + 1)
+					: data;
 
-			dataBase64 = text.substr(start, end - start);
-			if (dataBase64 && dataBase64.length < 20) {
-				end = text.lastIndexOf('[');
+				const dataImg = `${preImgBase64}${data}`;
 
-				if (end > -1) {
-					dataBase64 = text.substr(start, end - start);
-				} else {
-					dataBase64 = text.substr(start);
-				}
-			}
-
-			let lastEqual = dataBase64.lastIndexOf('=');
-			let lastSlash = dataBase64.lastIndexOf('/');
-
-			if (lastEqual > -1) {
-				dataBase64 = dataBase64.substr(0, lastEqual + 1);
-			} else {
-				if (lastSlash > 15) {
-					dataBase64 = dataBase64.substr(0, lastSlash + 1);
-				}
-			}
-
-			if (dataBase64 && dataBase64.length > 0) {
-				$(`#${lastId}`).attr('src', dataBase64);
-				// console.log(`i= ${i} :: count= ${count} :: #${lastId} - ${dataBase64} \n`);
-			}
-
-			let array = text.substr(text.lastIndexOf(';') + 1);
-			array = safeParse(array);
-			if (array && array.length > 1) {
-				lastId = array[1];
+				$(`#${id}`).attr('src', dataImg);
 			}
 		}
 
-		let $style = cheerio.html($('style'));
-		let $body = $('body').html();
+		const _style = `<style>${$('style').contents()}</style>`;
+		const _body = $('body').contents();
 
-		let final = `${$style}${$body}`;
+		const rawHtml = `${_style}${_body}`;
 
-		let result = {
-			rawHtml: final
-		}
-
-		return callback(err, result);
+		return callback(null, { rawHtml });
 	})
 }
 

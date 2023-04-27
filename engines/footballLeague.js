@@ -28,10 +28,23 @@ const config = {
 	},
 
 	'premier-league': {
-		emid: '/g/11fj6snmjm',
-		lmid: '/m/02_tc',
+		emid: '/g/11pz7zbpnb', // data-season
+		lmid: '/m/02_tc', // data-league
 		title: 'Premier League',
 		title_vn: 'Ngoại hạng Anh'
+
+		/*
+		[season, data-season, data-league]
+		2022–23, /g/11pz7zbpnb, /m/02_tc
+		2021–22, /g/11p44qhs93, /m/02_tc
+		2020–21, /g/11j4y8fvpd, /m/02_tc
+		2019–20, /g/11fj6snmjm, /m/02_tc
+		2018–19, /g/11f60x_ln9, /m/02_tc
+		2017–18, /g/11c74zg7g7, /m/02_tc
+		2016–17, /g/11c3yptrz5, /m/02_tc
+		2015–16, /m/012vp1qy, /m/02_tc
+		2014–15, /m/0_v76q8, /m/02_tc
+		*/
 	},
 
 	'efl-championship': {

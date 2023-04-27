@@ -10,6 +10,7 @@ const firebase = require('./firebase');
 const server = require('./server');
 const post = require('./post');
 const comment = require('./comment');
+const voz = require('./voz');
 
 module.exports = {
 	dashboard,
@@ -23,5 +24,6 @@ module.exports = {
 	firebase,
 	server,
 	post,
-	comment
+	comment,
+	voz
 }
