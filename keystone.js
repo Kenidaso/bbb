@@ -13,6 +13,7 @@ const Sentry = require('@sentry/node');
 const debug = require('debug');
 const path = require('path');
 const colors = require('colors');
+const mongoose = require('mongoose');
 
 const acrud = require('./helpers/acrud');
 
@@ -79,6 +80,8 @@ keystone.init({
 	'auth': true,
 	'user model': 'KsUser',
 	'logger': false,
+
+	mongoose: mongoose
 });
 
 keystone.set('i18n', i18n);
