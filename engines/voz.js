@@ -66,10 +66,14 @@ const parseListThreadsInForum = ($, slug) => {
       const latestAuthorName = $('.structItem-cell--latest .structItem-minor a', ele).text();
       const lastestAuthoImg = $('.structItem-cell--iconEnd img', ele).attr('src');
 
+      const link = revertLinkGgTrans(threadLink);
+      const slug = url.parse(link).path.split('/')[2];
+
       const threadDetail = {
         thread: {
           title: normalizeText(threadTitle),
-          link: revertLinkGgTrans(threadLink),
+          link,
+          slug,
           author: {
             name: authorName,
             img: iconImgSrc,
