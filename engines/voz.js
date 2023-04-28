@@ -1,6 +1,7 @@
 const NAME = 'voz';
 const sanitizeHtml = require('sanitize-html');
 const debug = require('debug')(`Engine:${NAME}`);
+const numeral = require('numeral');
 
 const fs = require('fs');
 const path = require('path');
@@ -81,8 +82,8 @@ const parseListThreadsInForum = ($, slug) => {
           },
           time,
           meta: {
-            answer: answer,
-            view: view
+            answer: Number(answer),
+            view: numeral(view.toLowerCase()).value()
           },
         },
         lastest: {
