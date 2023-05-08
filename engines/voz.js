@@ -69,12 +69,13 @@ const parseListThreadsInForum = ($, slug) => {
 
       const link = revertLinkGgTrans(threadLink);
       const slug = url.parse(link).path.split('/')[2];
+      const [seo, threadId] = slug.split('.');
 
       const threadDetail = {
         thread: {
           title: normalizeText(threadTitle),
           link,
-          slug,
+          slug: threadId,
           author: {
             name: authorName,
             img: iconImgSrc,
@@ -86,7 +87,7 @@ const parseListThreadsInForum = ($, slug) => {
             view: numeral(view.toLowerCase()).value()
           },
         },
-        lastest: {
+        latest: {
           time: latestTime,
           author: {
             link: revertLinkGgTrans(latestAuthorLink),
@@ -103,12 +104,12 @@ const parseListThreadsInForum = ($, slug) => {
 
   const result = {
     forum: {
-      slug: slug,
+      slug,
       title,
       page: Number(page),
       totalPage: Number(totalPage),
     },
-    threads: threads
+    threads
   }
 
   return result;
