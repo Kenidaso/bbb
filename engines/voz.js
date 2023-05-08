@@ -2,6 +2,7 @@ const NAME = 'voz';
 const sanitizeHtml = require('sanitize-html');
 const debug = require('debug')(`Engine:${NAME}`);
 const numeral = require('numeral');
+const async = require('async');
 
 const fs = require('fs');
 const path = require('path');
@@ -14,6 +15,8 @@ const clipper = require('./webClipper');
 const { normalizeText } = require('../helpers/utils');
 
 const BASE_URL = `https://voz.vn`;
+
+const mapPreviews = new Map();
 
 let engine = {};
 module.exports = engine;
@@ -35,6 +38,53 @@ function revertLinkGgTrans(link) {
   const parser = url.parse(link);
 
   return `${BASE_URL}${parser.pathname}`;
+}
+
+const storeCache = (key, value) => {
+  if (mapPreviews.size >= 100) {
+    mapPreviews.clear();
+  }
+
+  mapPreviews.set(key, value);
+}
+
+const getPreview = (t, callback) => {
+  const { link } = t.thread;
+  const linkPreview = `${link}preview`;
+
+  if (mapPreviews.has(linkPreview)) {
+    const preview = mapPreviews.get(linkPreview);
+
+    t.thread = {
+      ...t.thread,
+      ...preview
+    }
+
+    return callback(null, t);
+  }
+
+  ggTrans.fetch(linkPreview, (err, body) => {
+    if (err) return callback(null, {});
+
+    const $ = cheerio.load(body);
+    const preview = $('.bbWrapper').text();
+    const previewRawHtml = clean($, $('.bbWrapper'));
+
+    const trimPreview = normalizeText(preview).substr(0, 150) + ' ...';
+
+    t.thread = {
+      ...t.thread,
+      preview: trimPreview,
+      previewRawHtml
+    }
+
+    storeCache(linkPreview, {
+      preview: trimPreview,
+      previewRawHtml
+    });
+
+    return callback(null, t);
+  })
 }
 
 const parseListThreadsInForum = ($, slug) => {
@@ -132,7 +182,11 @@ engine.getThreadsOfForum = (params, callback) => {
 
     const result = parseListThreadsInForum($, f);
 
-    return callback(err, result);
+    if (!result || !result.threads || !result.threads.length) {
+      return result;
+    }
+
+    async.mapLimit(result.threads, 5, getPreview, callback);
   });
 }
 
