@@ -186,7 +186,15 @@ engine.getThreadsOfForum = (params, callback) => {
       return result;
     }
 
-    async.mapLimit(result.threads, 5, getPreview, callback);
+    async.mapLimit(result.threads, 5, getPreview, (err, threads) => {
+      if (err) {
+        return callback(err, threads);
+      }
+
+      result.threads = threads;
+
+      return callback(err, threads);
+    });
   });
 }
 
