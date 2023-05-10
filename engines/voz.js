@@ -193,7 +193,7 @@ engine.getThreadsOfForum = (params, callback) => {
 
       result.threads = threads;
 
-      return callback(err, threads);
+      return callback(err, result);
     });
   });
 }
