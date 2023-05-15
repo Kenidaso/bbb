@@ -70,7 +70,6 @@ const getPreview = (t, callback) => {
     const preview = $('.bbWrapper').text();
     const previewRawHtml = clean($, $('.bbWrapper'));
 
-    // const trimPreview = normalizeText(preview).substr(0, 150) + ' ...';
     const trimPreview = normalizeText(preview);
 
     t.thread = {
