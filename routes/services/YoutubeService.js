@@ -7,6 +7,6 @@ ytbService.news = (callback) => {
   engine.news(callback);
 }
 
-ytbService.getFeeds = (category, callback) => {
-  engine.getFeeds(category, callback);
+ytbService.getFeeds = (category, opts, callback) => {
+  engine.getFeeds(category, opts, callback);
 }

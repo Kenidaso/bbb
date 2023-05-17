@@ -121,17 +121,22 @@ engine.news = (callback) => {
   });
 }
 
-engine.getFeeds = (category, callback) => {
+engine.getFeeds = (category, opts, callback) => {
   const pathFeed = YT_FEED_PATH[category];
+  opts = opts || {};
 
-  console.log('category=', category, pathFeed);
+  let qs = '?hl=vi&gl=VN&ceid=VN:vi' ;
+
+  if (opts.country !== 'VN') {
+    qs = '?hl=en-US&gl=US&ceid=US:en';
+  }
 
   if (!pathFeed) {
     return callback('EINVALIDCATEGORY', `category "${category}" not support`);
   }
 
   request({
-    url: `${BASE_URL}${pathFeed}`,
+    url: `${BASE_URL}${pathFeed}${qs}`,
     method: 'GET'
   }, (err, response, body) => {
     if (err) return callback('EYOUTUBE', err);
