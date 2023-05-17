@@ -124,10 +124,11 @@ engine.news = (callback) => {
 engine.getFeeds = (category, opts, callback) => {
   const pathFeed = YT_FEED_PATH[category];
   opts = opts || {};
+  const { country } = opts;
 
   let qs = '?hl=vi&gl=VN&ceid=VN:vi' ;
 
-  if (opts.country !== 'VN') {
+  if (country && country !== 'VN') {
     qs = '?hl=en-US&gl=US&ceid=US:en';
   }
 
