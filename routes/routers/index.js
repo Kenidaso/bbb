@@ -11,6 +11,7 @@ const server = require('./server');
 const post = require('./post');
 const comment = require('./comment');
 const voz = require('./voz');
+const youtube = require('./youtube');
 
 module.exports = {
 	dashboard,
@@ -25,5 +26,6 @@ module.exports = {
 	server,
 	post,
 	comment,
-	voz
+	voz,
+	youtube
 }

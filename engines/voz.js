@@ -3,7 +3,6 @@ const sanitizeHtml = require('sanitize-html');
 const debug = require('debug')(`Engine:${NAME}`);
 const numeral = require('numeral');
 const async = require('async');
-
 const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');

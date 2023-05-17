@@ -75,5 +75,8 @@
 	"The \"data\" argument must be of type string or an instance of Buffer, TypedArray, or DataView. Received undefined": "The \"data\" argument must be of type string or an instance of Buffer, TypedArray, or DataView. Received undefined",
 	"The \"data\" argument must be of type string or an instance of Buffer, TypedArray, or DataView. Received an instance of Object": "The \"data\" argument must be of type string or an instance of Buffer, TypedArray, or DataView. Received an instance of Object",
 	"that is not a function": "that is not a function",
-	"html is not defined": "html is not defined"
+	"html is not defined": "html is not defined",
+	"ytInitialData.indexOf is not a function": "ytInitialData.indexOf is not a function",
+	"youtubeService.getFeeds is not a function": "youtubeService.getFeeds is not a function",
+	"Invalid category": "Invalid category"
 }

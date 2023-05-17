@@ -336,6 +336,7 @@ exports = module.exports = function (app) {
   app.use('/ggt', routers.googleTrend);
   app.use('/gg', routers.google);
   app.use('/voz', routers.voz);
+  app.use('/youtube', routers.youtube);
 
   app.post('/autocomplete', routes.controllers.gg.autocompleteMerge); // autocomplete by google search
 

@@ -18,5 +18,7 @@ module.exports = {
   1013: 'Invalid headers version',
   1014: 'Invalid headers fingerprint',
   1015: 'Not allowed by CORS',
-  1017: 'Invalid request timestamp'
+  1017: 'Invalid request timestamp',
+
+  2000: 'Invalid category'
 };
