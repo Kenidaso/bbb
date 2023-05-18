@@ -8,5 +8,6 @@ const controllers = importRoutes('../controllers');
 
 router.get('/news', controllers.youtube.news);
 router.get('/feeds/:category', controllers.youtube.getFeeds);
+router.get('/explore/:explore', controllers.youtube.getExplore);
 
 module.exports = router;

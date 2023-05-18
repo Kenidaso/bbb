@@ -20,5 +20,6 @@ module.exports = {
   1015: 'Not allowed by CORS',
   1017: 'Invalid request timestamp',
 
-  2000: 'Invalid category'
+  2000: 'Invalid category',
+  2001: 'Invalid param explore'
 };
