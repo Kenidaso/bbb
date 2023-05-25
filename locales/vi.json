@@ -12,5 +12,16 @@
 	"Invalid headers fingerprint": "Invalid headers fingerprint",
 	"Not allowed by CORS": "Not allowed by CORS",
 	"ECORSNOTALLOWED": "ECORSNOTALLOWED",
-	"Invalid category": "Invalid category"
+	"Invalid category": "Invalid category",
+	"explore is not defined": "explore is not defined",
+	"Assignment to constant variable.": "Assignment to constant variable.",
+	"Cannot read properties of undefined (reading 'join')": "Cannot read properties of undefined (reading 'join')",
+	"Cannot read properties of undefined (reading 'map')": "Cannot read properties of undefined (reading 'map')",
+	"sections is not defined": "sections is not defined",
+	"_.get(...).map is not a function": "_.get(...).map is not a function",
+	"description.map is not a function": "description.map is not a function",
+	"item.hasProperty is not a function": "item.hasProperty is not a function",
+	"cb is not defined": "cb is not defined",
+	"Cannot read properties of undefined (reading 'log')": "Cannot read properties of undefined (reading 'log')",
+	"Unquoted attribute value\nLine: 1\nColumn: 12\nChar: e": "Unquoted attribute value\nLine: 1\nColumn: 12\nChar: e"
 }

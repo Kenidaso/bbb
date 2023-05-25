@@ -40,3 +40,33 @@ YoutubeCtrl.getExplore = (req, res) => {
     return res.success(req, res, result);
   });
 }
+
+YoutubeCtrl.getChannel = (req, res) => {
+  const { params: { channelId }} = req;
+  const opts = req.query;
+
+  youtubeService.getChannel(channelId, opts, (err, result) => {
+    if (err) return res.error(req, res, err, result);
+    return res.success(req, res, result);
+  });
+}
+
+YoutubeCtrl.getChannelCommunity = (req, res) => {
+  const { params: { channelId }} = req;
+  const opts = req.query;
+
+  youtubeService.getChannelCommunity(channelId, opts, (err, result) => {
+    if (err) return res.error(req, res, err, result);
+    return res.success(req, res, result);
+  });
+}
+
+YoutubeCtrl.getFeedsChannelByRss = (req, res) => {
+  const { params: { channelId }} = req;
+  const opts = req.query;
+
+  youtubeService.getFeedsChannelByRss(channelId, opts, (err, result) => {
+    if (err) return res.error(req, res, err, result);
+    return res.success(req, res, result);
+  });
+}

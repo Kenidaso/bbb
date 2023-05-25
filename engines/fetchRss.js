@@ -36,7 +36,7 @@ const fetch = (opts = {}, callback = noop) => {
 		if (err) return callback(err);
 		if (!body) return callback(null, null);
 
-		let wrapped = async.timeout(parseXml, 10e3);
+		const wrapped = async.timeout(parseXml, 10e3);
 
 		wrapped(body, callback);
 
