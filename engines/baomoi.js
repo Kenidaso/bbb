@@ -230,7 +230,8 @@ const cleanSpecial = ($, content) => {
 }
 
 const _parseFeed = ($) => {
-	let stories = $('.story');
+	// let stories = $('.story');
+	let stories = $('.list-topic-special');
 	let result = [];
 
 	_.forEach(stories, (story) => {

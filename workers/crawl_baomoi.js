@@ -3,6 +3,7 @@
 // NODE_ENV=production node workers/from_topic_gg_news_v2
 
 const path = require('path');
+const mongoose = require('mongoose');
 
 require('dotenv').config({
 	path: path.join(__dirname, '../.env')
@@ -21,7 +22,7 @@ const async = require('async');
 const fs = require('fs');
 const moment = require('moment');
 const _ = require('lodash');
-const DecayMongo = require('cky-mongo-decay');
+// const DecayMongo = require('cky-mongo-decay');
 
 const program = require('commander');
 program.version('1.0.0');
@@ -36,7 +37,9 @@ keystone.init({
 	headless: true,
 	'user model': 'KsUser',
 	'auto update': false,
-	'cookie secret': shortId.generate(16)
+	'cookie secret': shortId.generate(16),
+
+	mongoose
 });
 
 keystone.import('../models');
@@ -51,44 +54,44 @@ const Baomoi = keystone.list('Baomoi');
 
 const Statics = requireDir('../statics');
 
-const decayMongo = new DecayMongo({
-	fnDecay: (obj) => {
-		return moment(obj.publishDate).utcOffset(420).format('YYYYMM');
-	},
+// const decayMongo = new DecayMongo({
+// 	fnDecay: (obj) => {
+// 		return moment(obj.publishDate).utcOffset(420).format('YYYYMM');
+// 	},
 
-	schema: require('../schemas/FeedSchema'),
-	modelName: 'Feed',
-	limitDecay: 10,
-	stopDecayWhenError: false,
+// 	schema: require('../schemas/FeedSchema'),
+// 	modelName: 'Feed',
+// 	limitDecay: 10,
+// 	stopDecayWhenError: false,
 
-	piecesOfDecay: {
-		'201901': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201901?ssl=true&authSource=admin',
-		'201902': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201902?ssl=true&authSource=admin',
-		'201903': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201903?ssl=true&authSource=admin',
-		'201904': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201904?ssl=true&authSource=admin',
-		'201905': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201905?ssl=true&authSource=admin',
-		'201906': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201906?ssl=true&authSource=admin',
-		'201907': 'mongodb://u03tbcz3m0lixhxufgp2:0DfdHu9nvj6EQbNrXjsX@bpbbnmdkbfh4jac-mongodb.services.clever-cloud.com:27017/bpbbnmdkbfh4jac',
-		'201908': 'mongodb://ugpuny720zuiehj4bh3i:tGkqJXRndBlLLWvDFWTJ@b5ews7eoyuic9x5-mongodb.services.clever-cloud.com:27017/b5ews7eoyuic9x5',
-		'201909': 'mongodb://uaq5ryxwxoaarzrf45sa:PnKs2RfQs0wpZvAuGGwo@bhx6aaykn40e6ac-mongodb.services.clever-cloud.com:27017/bhx6aaykn40e6ac',
-		'201910': 'mongodb://umt3aqgjlfkrwjxqkp1z:33RrY4RuHYY7AJ8K9kyX@bm6eejqcbacvjfv-mongodb.services.clever-cloud.com:27017/bm6eejqcbacvjfv',
-		'201911': 'mongodb://uwgtfa3n2inucui3u5cq:Eb29Kj49pdwmEy9QrhVM@bmfjjhav1hbruyp-mongodb.services.clever-cloud.com:27017/bmfjjhav1hbruyp',
-		'201912': 'mongodb://ugrbizkityk1t32neglg:L7ikCYcz9bV6wvsWSzAe@b3haqbviztkcjnm-mongodb.services.clever-cloud.com:27017/b3haqbviztkcjnm',
+// 	piecesOfDecay: {
+// 		'201901': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201901?ssl=true&authSource=admin',
+// 		'201902': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201902?ssl=true&authSource=admin',
+// 		'201903': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201903?ssl=true&authSource=admin',
+// 		'201904': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201904?ssl=true&authSource=admin',
+// 		'201905': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201905?ssl=true&authSource=admin',
+// 		'201906': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201906?ssl=true&authSource=admin',
+// 		'201907': 'mongodb://u03tbcz3m0lixhxufgp2:0DfdHu9nvj6EQbNrXjsX@bpbbnmdkbfh4jac-mongodb.services.clever-cloud.com:27017/bpbbnmdkbfh4jac',
+// 		'201908': 'mongodb://ugpuny720zuiehj4bh3i:tGkqJXRndBlLLWvDFWTJ@b5ews7eoyuic9x5-mongodb.services.clever-cloud.com:27017/b5ews7eoyuic9x5',
+// 		'201909': 'mongodb://uaq5ryxwxoaarzrf45sa:PnKs2RfQs0wpZvAuGGwo@bhx6aaykn40e6ac-mongodb.services.clever-cloud.com:27017/bhx6aaykn40e6ac',
+// 		'201910': 'mongodb://umt3aqgjlfkrwjxqkp1z:33RrY4RuHYY7AJ8K9kyX@bm6eejqcbacvjfv-mongodb.services.clever-cloud.com:27017/bm6eejqcbacvjfv',
+// 		'201911': 'mongodb://uwgtfa3n2inucui3u5cq:Eb29Kj49pdwmEy9QrhVM@bmfjjhav1hbruyp-mongodb.services.clever-cloud.com:27017/bmfjjhav1hbruyp',
+// 		'201912': 'mongodb://ugrbizkityk1t32neglg:L7ikCYcz9bV6wvsWSzAe@b3haqbviztkcjnm-mongodb.services.clever-cloud.com:27017/b3haqbviztkcjnm',
 
-		'202001': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201901?ssl=true&authSource=admin',
-		'202002': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201902?ssl=true&authSource=admin',
-		'202003': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201903?ssl=true&authSource=admin',
-		'202004': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201904?ssl=true&authSource=admin',
-		'202005': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201905?ssl=true&authSource=admin',
-		'202006': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201906?ssl=true&authSource=admin',
-		'202007': 'mongodb://u03tbcz3m0lixhxufgp2:0DfdHu9nvj6EQbNrXjsX@bpbbnmdkbfh4jac-mongodb.services.clever-cloud.com:27017/bpbbnmdkbfh4jac',
-		'202008': 'mongodb://ugpuny720zuiehj4bh3i:tGkqJXRndBlLLWvDFWTJ@b5ews7eoyuic9x5-mongodb.services.clever-cloud.com:27017/b5ews7eoyuic9x5',
-		'202009': 'mongodb://uaq5ryxwxoaarzrf45sa:PnKs2RfQs0wpZvAuGGwo@bhx6aaykn40e6ac-mongodb.services.clever-cloud.com:27017/bhx6aaykn40e6ac',
-		'202010': 'mongodb://umt3aqgjlfkrwjxqkp1z:33RrY4RuHYY7AJ8K9kyX@bm6eejqcbacvjfv-mongodb.services.clever-cloud.com:27017/bm6eejqcbacvjfv',
-		'202011': 'mongodb://uwgtfa3n2inucui3u5cq:Eb29Kj49pdwmEy9QrhVM@bmfjjhav1hbruyp-mongodb.services.clever-cloud.com:27017/bmfjjhav1hbruyp',
-		'202012': 'mongodb://ugrbizkityk1t32neglg:L7ikCYcz9bV6wvsWSzAe@b3haqbviztkcjnm-mongodb.services.clever-cloud.com:27017/b3haqbviztkcjnm',
-	}
-});
+// 		'202001': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201901?ssl=true&authSource=admin',
+// 		'202002': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201902?ssl=true&authSource=admin',
+// 		'202003': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201903?ssl=true&authSource=admin',
+// 		'202004': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201904?ssl=true&authSource=admin',
+// 		'202005': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201905?ssl=true&authSource=admin',
+// 		'202006': 'mongodb://admin:123456qwerty@news-201901-shard-00-00-mb6gu.mongodb.net:27017,news-201901-shard-00-01-mb6gu.mongodb.net:27017,news-201901-shard-00-02-mb6gu.mongodb.net:27017/news-201906?ssl=true&authSource=admin',
+// 		'202007': 'mongodb://u03tbcz3m0lixhxufgp2:0DfdHu9nvj6EQbNrXjsX@bpbbnmdkbfh4jac-mongodb.services.clever-cloud.com:27017/bpbbnmdkbfh4jac',
+// 		'202008': 'mongodb://ugpuny720zuiehj4bh3i:tGkqJXRndBlLLWvDFWTJ@b5ews7eoyuic9x5-mongodb.services.clever-cloud.com:27017/b5ews7eoyuic9x5',
+// 		'202009': 'mongodb://uaq5ryxwxoaarzrf45sa:PnKs2RfQs0wpZvAuGGwo@bhx6aaykn40e6ac-mongodb.services.clever-cloud.com:27017/bhx6aaykn40e6ac',
+// 		'202010': 'mongodb://umt3aqgjlfkrwjxqkp1z:33RrY4RuHYY7AJ8K9kyX@bm6eejqcbacvjfv-mongodb.services.clever-cloud.com:27017/bm6eejqcbacvjfv',
+// 		'202011': 'mongodb://uwgtfa3n2inucui3u5cq:Eb29Kj49pdwmEy9QrhVM@bmfjjhav1hbruyp-mongodb.services.clever-cloud.com:27017/bmfjjhav1hbruyp',
+// 		'202012': 'mongodb://ugrbizkityk1t32neglg:L7ikCYcz9bV6wvsWSzAe@b3haqbviztkcjnm-mongodb.services.clever-cloud.com:27017/b3haqbviztkcjnm',
+// 	}
+// });
 
 const noop = () => {};
 
@@ -201,9 +204,9 @@ const save_1_article = (article, callback) => {
 		if (result.category) objDecay.category = result.category;
 		if (result.linkBaoMoi) objDecay.linkBaoMoi = result.linkBaoMoi;
 
-		decayMongo.decay({ link: 1 }, objDecay, (err, resultDecay) => {
-			console.log('resultDecay err=', err, JSON.stringify(resultDecay));
-		});
+		// decayMongo.decay({ link: 1 }, objDecay, (err, resultDecay) => {
+		// 	console.log('resultDecay err=', err, JSON.stringify(resultDecay));
+		// });
 
 		return callback(null, result);
 	})
@@ -261,9 +264,9 @@ const startWorker = () => {
 	console.time('run-worker');
 
 	async.parallel({
-		init_decay: (next) => {
-			decayMongo.init(next);
-		},
+		// init_decay: (next) => {
+		// 	decayMongo.init(next);
+		// },
 		start_keystone: (next) => {
 			keystone.start(next)
 		},
@@ -292,10 +295,10 @@ const stopWorker = () => {
 			});
 		},
 
-		close_decay: (next) => {
-			setTimeout(decayMongo.close, 1e3, next);
-			// decayMongo.close(next);
-		}
+		// close_decay: (next) => {
+		// 	setTimeout(decayMongo.close, 1e3, next);
+		// 	// decayMongo.close(next);
+		// }
 	}, (err, result) => {
 		console.log('stop worker done');
 		console.timeEnd('run-worker');

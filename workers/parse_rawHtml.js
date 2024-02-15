@@ -1,4 +1,5 @@
 require('dotenv').config();
+const mongoose = require('mongoose');
 
 const utils = require('../helpers/utils');
 
@@ -27,7 +28,8 @@ keystone.init({
 	headless: true,
 	'user model': 'KsUser',
 	'auto update': false,
-	'cookie secret': shortId.generate(16)
+	'cookie secret': shortId.generate(16),
+	mongoose
 });
 
 keystone.import('../models');
@@ -106,15 +108,15 @@ const procOneFeed = (feed, callback) => {
 }
 
 const procOneCategory = (category, callback) => {
-	console.log('procOneCategory: ', category.slug);
+	console.log('procOneCategory: ', category.slug, category);
 
 	Feed.model
 		.find({
-			category: category._id,
+			// category: category._id,
 			// link: new RegExp(regexHost),
-			publishDate: {
-				$gte: moment().add(-1, 'M').toDate()
-			},
+			// publishDate: {
+			// 	$gte: moment().add(-1, 'M').toDate()
+			// },
 			rawHtml: {
 				$exists: false
 			}

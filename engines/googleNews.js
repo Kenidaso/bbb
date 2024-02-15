@@ -566,6 +566,8 @@ const _parse_gg_news_topic = ($, isGetOriginLink = false, callback) => {
 
 	// if (process.env.NODE_ENV != 'production') cards = [ cards[0], cards[1], cards[2] ]
 
+	console.log('--> cards=', cards)
+
 	let result = [];
 
 	_.forEach(cards, (card) => {
@@ -616,6 +618,8 @@ const _parse_gg_news_topic = ($, isGetOriginLink = false, callback) => {
 
 		result.push(objCard);
 	})
+
+	console.log('--> result=', result)
 
 	if (!isGetOriginLink) return callback(null, result);
 
